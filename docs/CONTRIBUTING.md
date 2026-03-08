@@ -1,68 +1,35 @@
-# Branch Strategy
+# Contribution Guidelines
 
-## Branches
+We welcome contributions to ByReiXwift—ensuring our Shariah-compliant payment system remains robust and high-quality. All contributors must follow these standards.
+
+## Branch Strategy
+
+We use a structured branching model to maintain project stability.
 
 | Branch | Purpose |
 |--------|---------|
 | `main` | Production-ready code. Always stable. |
-| `dev` | Development branch. All features merge here first. |
-| `feature/*` | New features (e.g., `feature/login-page`) |
-| `fix/*` | Bug fixes (e.g., `fix/navbar-bug`) |
-| `hotfix/*` | Urgent fixes for production |
-
----
+| `dev` | Integration branch for all features. |
+| `feature/*` | Development of new features. |
+| `fix/*` | Maintenance and bug fixes. |
+| `hotfix/*` | Critical production resolutions. |
 
 ## Workflow
 
-### 1. Start a new feature
-
-```bash
-git checkout dev
-git pull origin dev
-git checkout -b feature/your-feature-name
-```
-
-### 2. Work on your feature
-
-Make changes, commit often:
-
-```bash
-git add .
-git commit -m "feat: add login form"
-```
-
-### 3. Push and create Pull Request
-
-```bash
-git push origin feature/your-feature-name
-```
-
-Then create a PR to merge into `dev` (not `main`).
-
-### 4. After review, merge to dev
-
-Once approved, merge to `dev`. Delete the feature branch.
-
-### 5. Release to main
-
-When `dev` is stable and tested, create a PR from `dev` → `main`.
-
----
+1. **Initialization**: Create a feature branch from latest `dev`.
+2. **Implementation**: Commit changes with clear, descriptive messages.
+3. **Verification**: Submit a Pull Request to `dev`.
+4. **Integration**: Merge only after peer review and manual validation.
 
 ## Naming Conventions
 
-| Type | Format | Example |
-|------|--------|---------|
-| Feature | `feature/short-description` | `feature/wallet-connect` |
-| Bug fix | `fix/short-description` | `fix/header-alignment` |
-| Hotfix | `hotfix/short-description` | `hotfix/login-crash` |
-| Docs | `docs/short-description` | `docs/update-readme` |
+- Features: `feature/short-description`
+- Bug fixes: `fix/short-description`
+- Documentation: `docs/short-description`
 
----
+## Quality Standards
 
-## Rules
-
-- Never push directly to `main` (production)
-- Always create PR (pull request) for code review
-- Keep commits simple and descriptive
-- Delete branches after merging
+- **Stability**: Never push directly to `main`.
+- **Review**: Every commit must undergo a Pull Request review.
+- **Cleanliness**: Delete local and remote branches immediately after successful merging.
+- **Definition of Done**: Adhere to all criteria in the project's [Definition of Done](./DOD.md).
