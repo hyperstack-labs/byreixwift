@@ -22,10 +22,10 @@ export function SwapPage() {
 
     const handleSwap = () => {
         if (!fromAmount || parseFloat(fromAmount) <= 0) {
-            toast.error("Please enter an amount to swap");
+            toast.error("Please enter a valid amount to swap.");
             return;
         }
-        toast.success("Swap initiated! Transaction pending...");
+        toast.success("Swap has been successfully initiated. Transaction is pending confirmation.");
     };
 
     return (
@@ -68,7 +68,7 @@ export function SwapPage() {
                             </Button>
                         </div>
                         <button className="text-sm text-[#26D578] mt-2 hover:underline">
-                            Max
+                            Use Maximum Balance
                         </button>
                     </div>
 
@@ -134,7 +134,7 @@ export function SwapPage() {
                     <div className="flex items-start gap-2 p-3 rounded-lg bg-[#26D578]/10 border border-[#26D578]/20">
                         <Info className="w-4 h-4 text-[#26D578] mt-0.5 flex-shrink-0" />
                         <p className="text-sm text-[#A0A0A0]">
-                            Swaps are executed through multiple DEXs to ensure you get the best rate available.
+                              Swaps are executed through multiple DEXs to ensure the optimal exchange rate.
                         </p>
                     </div>
 
@@ -143,7 +143,7 @@ export function SwapPage() {
                         onClick={handleSwap}
                         className="w-full bg-[#26D578] hover:bg-[#26D578]/90 text-black py-6 text-lg"
                     >
-                        {fromAmount ? "Swap Tokens" : "Enter Amount"}
+                        {fromAmount ? "Swap Tokens" : "Please specify an amount"}
                     </Button>
                 </div>
             </Card>

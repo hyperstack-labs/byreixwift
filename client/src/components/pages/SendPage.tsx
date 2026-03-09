@@ -130,7 +130,7 @@ export function SendPage() {
                                 onClick={() => setAmount(selectedToken.balance.replace(/,/g, ""))}
                                 className="text-sm text-[#26D578] mt-2 hover:underline"
                             >
-                                Max
+                                Use Max Balance
                             </button>
                         </div>
                     </div>
@@ -142,7 +142,7 @@ export function SendPage() {
                         </Label>
                         <Input
                             id="memo"
-                            placeholder="Add a note..."
+                            placeholder="Transaction note (optional)"
                             value={memo}
                             onChange={(e) => setMemo(e.target.value)}
                             className="bg-[#0A0A0A] border-[#1E1E1E]"

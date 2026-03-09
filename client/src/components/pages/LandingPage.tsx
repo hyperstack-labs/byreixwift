@@ -16,13 +16,13 @@ export function LandingPage({ onNavigate, onConnect }: LandingPageProps) {
         {
             icon: Repeat,
             title: "Swap",
-            description: "Best rates across DEXs. Zero hidden fees.",
+            description: "Competitive rates across decentralized exchanges. Transparent fee structure.",
             gradient: "from-[#26D578]/20 to-transparent",
         },
         {
             icon: Send,
             title: "Send",
-            description: "Instant transfers to any wallet.",
+            description: "Near-real-time transfers to compatible wallets.",
             gradient: "from-[#D4AF37]/20 to-transparent",
         },
         {
@@ -34,7 +34,7 @@ export function LandingPage({ onNavigate, onConnect }: LandingPageProps) {
         {
             icon: ShieldCheck,
             title: "Smart Escrow",
-            description: "Trustless P2P transactions.",
+            description: "Secure peer-to-peer transactions using smart escrow.",
             gradient: "from-[#D4AF37]/20 to-transparent",
         },
     ];
@@ -43,12 +43,12 @@ export function LandingPage({ onNavigate, onConnect }: LandingPageProps) {
         {
             icon: Zap,
             title: "Sub-Second Finality",
-            description: "Transactions confirm before you blink.",
+            description: "Transactions finalize within seconds.",
         },
         {
             icon: Lock,
             title: "Self-Custody",
-            description: "Your keys. Your coins. No middlemen.",
+            description: "Full control of private keys with no intermediary custody.",
         },
         {
             icon: Wallet,
@@ -242,7 +242,7 @@ export function LandingPage({ onNavigate, onConnect }: LandingPageProps) {
                                 Why Byreixwift?
                             </h2>
                             <p className="text-lg text-[#A0A0A0] mb-8">
-                                We built what we wanted to use ourselves.
+                                Designed to provide a secure and efficient experience for digital asset management.
                             </p>
 
                             <div className="space-y-6">
@@ -303,10 +303,10 @@ export function LandingPage({ onNavigate, onConnect }: LandingPageProps) {
                     <div className="absolute inset-0 bg-gradient-to-r from-[#26D578]/10 via-[#D4AF37]/10 to-[#26D578]/10 rounded-3xl blur-3xl -z-10" />
                     <div className="bg-[#121212] border border-[#1E1E1E] rounded-3xl p-12 hover:border-[#26D578]/30 transition-colors">
                         <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-                            Start in 30 seconds
+                            Get Started
                         </h2>
                         <p className="text-lg text-[#A0A0A0] mb-8">
-                            No email. No KYC. Just connect and go.
+                            No email registration or identity verification required. Connect your wallet to begin.
                         </p>
                         <Button
                             onClick={onConnect}

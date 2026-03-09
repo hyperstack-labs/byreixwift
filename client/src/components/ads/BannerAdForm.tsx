@@ -179,7 +179,7 @@ export const BannerAdForm: React.FC<BannerAdFormProps> = ({
                             <div className="w-12 h-12 rounded-full bg-(--byreix-surface) flex items-center justify-center text-(--byreix-text-secondary)">
                                 <Upload size={20} />
                             </div>
-                            <p className="text-sm text-(--byreix-text-secondary)">Click to upload or drag and drop</p>
+                            <p className="text-sm text-(--byreix-text-secondary)">Upload a file or drag and drop it here</p>
                             <p className="text-xs text-(--byreix-text-secondary)/60">
                                 {mediaType === 'video'
                                     ? 'MP4, WebM or OGG (max. 15s recommended)'
