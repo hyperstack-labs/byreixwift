@@ -4,13 +4,16 @@
   import { MousePointer2, BarChart3, Megaphone, Clock, ArrowUpRight,} from "lucide-react";
   import { Button, Card, CardHeader, CardTitle, CardContent } from "@/components/ui";
   import { useAnnouncementStore } from "@/store";
+  import { CMSOverviewSkeleton } from "./skeleton/CMSOverviewSkeleton";
   import { useRouter } from "next/navigation";
 
-  const CMSOverview = () => {
+  const CMSOverview = ({isLoading = false}) => {
     const { announcements } = useAnnouncementStore();
-
     const router = useRouter();
-
+    
+    // skeleton rendering
+    if (isLoading) return <CMSOverviewSkeleton />;
+    // data rendering
     const activeAnnouncements = announcements.filter((ann) => {
       const now = new Date();
       return now >= new Date(ann.startDate) && now <= new Date(ann.endDate);
@@ -79,7 +82,7 @@
         </div>
 
         {/* recent activity list container */}
-        <Card className="bg-white/2 border-white/5 flex flex-col max-h-90">
+        <Card className="bg-white/2 border-white/5 flex flex-col max-h-90 mb-4">
           {/* header */}
           <CardHeader className="border-b border-white/5 shrink-0">
             <div className="flex items-center gap-2">

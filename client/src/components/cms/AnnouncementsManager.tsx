@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Trash2, Edit3, Loader2, X, Megaphone, Calendar, Clock } from 'lucide-react';
 import { Button } from '@/components/ui';
 import { useAnnouncementStore, Announcement } from '@/store';
+import { AnnouncementSkeleton } from './skeleton/AnnouncementSkeleton';
 
 //AnnouncementsManager - Handles CRUD operations for site-wide banners.
 
@@ -129,9 +130,11 @@ export const AnnouncementsManager = () => {
       <div className="bg-(--byreix-surface) border border-(--byreix-border) rounded-2xl overflow-hidden">
         <div className="max-h-100 overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-700">
           {isLoading ? (
-            <div className="flex items-center justify-center h-100">
-              <Loader2 className="animate-spin text-(--byreix-green)" />
-            </div>
+            <div className="divide-y divide-(--byreix-border)">
+            {[...Array(4)].map((_, i) => (
+              <AnnouncementSkeleton key={i} />
+            ))}
+          </div>
           ) : (
             <div className="divide-y divide-(--byreix-border)">
               {announcements.length > 0 ? (

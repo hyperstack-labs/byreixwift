@@ -1,7 +1,21 @@
-import React from 'react';
+"use client";
+import React, { useEffect } from 'react';
 import CMSOverview from '@/components/cms/CMSOverview';
+import { useAnnouncementStore } from '@/store';
 
 export const CMSDashboard = () => {
+  const { isLoading, setLoading } = useAnnouncementStore();
+  
+  useEffect(() => {
+    // Simulate the "Data-Heavy" fetch mentioned in the task
+    setLoading(true);
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1500); // 1.5 seconds of pulsing skeleton
+
+    return () => clearTimeout(timer);
+  }, [setLoading]);
+
   return (
     <div className="space-y-6">  {/* overview component container */}
       <div>
@@ -12,7 +26,7 @@ export const CMSDashboard = () => {
       </div>
 
       {/* render overview component*/}
-      <CMSOverview />
+      <CMSOverview isLoading={isLoading}/>
     </div>
   );
 };

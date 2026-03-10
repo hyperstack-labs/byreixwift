@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, ExternalLink, Trash2, Edit3, Loader2 } from 'lucide-react';
+import { Plus, Search, ExternalLink, Trash2, Edit3 } from 'lucide-react';
 import { Button } from '../ui/button';
 import Image from 'next/image';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../ui/dialog';
 import { BannerAdForm, BannerAdFormData } from '../ads/BannerAdForm';
 import { BannerAdSize } from '../ads/BannerAd';
+import { BannerAdsTableSkeleton } from './skeleton/BannerAdsTableSkeleton';
 
 // interface def
 interface Ad {
@@ -138,8 +139,7 @@ export const BannerAdsManager = () => {
       <div className="bg-(--byreix-surface) border border-(--byreix-border) rounded-2xl overflow-hidden min-h-100 flex flex-col relative">
         {isLoading ? (
           <div className="flex-1 flex flex-col items-center justify-center gap-3 text-(--byreix-text-secondary)">
-            <Loader2 className="animate-spin text-(--byreix-green)" size={32} />
-            <p className="text-sm font-medium">Fetching advertisements...</p>
+            <BannerAdsTableSkeleton />        
           </div>
         ) : (
           <>
