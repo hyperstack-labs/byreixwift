@@ -9,11 +9,11 @@ export const BannerAdsTableSkeleton = () => {
           <div key={i} className="p-4 space-y-4">
             <div className="flex gap-4">
               {/* Thumbnail Box */}
-              <div className="w-12 h-12 rounded bg-white/10 shrink-0" />
+              <div className="w-12 h-12 rounded skeleton-fill shrink-0" />
               {/* Name and URL Box */}
               <div className="flex-1 space-y-2 min-w-0">
-                <div className="h-4 w-3/4 bg-white/10 rounded" />
-                <div className="h-3 w-1/2 bg-white/5 rounded" />
+                <div className="h-4 w-3/4 skeleton-fill rounded" />
+                <div className="h-3 w-1/2 skeleton-fill rounded" />
               </div>
               {/* Actions Box */}
               <div className="flex gap-2">

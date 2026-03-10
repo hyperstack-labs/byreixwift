@@ -15,11 +15,11 @@ export const CMSOverviewSkeleton = () => {
         {[...Array(4)].map((_, i) => (
           <Card key={i} className="bg-(--byreix-surface) border-(--byreix-border) min-w-0">
             <CardHeader className="flex flex-row items-center justify-between pb-2 space-x-2">
-              <div className="h-3 w-20 bg-white/10 rounded" />
-              <div className="h-5 w-5 bg-white/10 rounded-full shrink-0" />
+              <div className="h-3 w-20 skeleton-fill rounded" />
+              <div className="h-5 w-5 skeleton-fill rounded-full shrink-0" />
             </CardHeader>
             <CardContent>
-              <div className="h-8 w-14 bg-white/10 rounded mt-1" />
+              <div className="h-8 w-14 skeleton-fill rounded mt-1" />
             </CardContent>
           </Card>
         ))}
