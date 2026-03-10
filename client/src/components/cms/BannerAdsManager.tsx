@@ -9,7 +9,7 @@ import { BannerAdForm, BannerAdFormData } from '../ads/BannerAdForm';
 import { BannerAdSize } from '../ads/BannerAd';
 import { BannerAdsTableSkeleton } from './skeleton/BannerAdsTableSkeleton';
 
-// interface def
+// Interface def
 interface Ad {
   id: number;
   name: string;
@@ -26,14 +26,14 @@ interface Ad {
   mediaType?: 'image' | 'video';
 }
 
-// mock data for ads
+// Mock data for ads
 const initialAds: Ad[] = [
   { id: 1, name: 'Sidra Chain', url: 'https://Sidra.com/news', status: 'active', impressions: 1240, clicks: 88, thumbnail: '/mockThumbnail.png', size: BannerAdSize.LEADERBOARD, placements: ['homepage_top'], startDate: '2024-01-01', endDate: '2024-12-31', mediaType: 'image' },
   { id: 2, name: 'O Block Street', url: 'https://Kingvon.com/ArmAndDangerous', status: 'active', impressions: 420, clicks: 69, thumbnail: '/ads.mp4', size: BannerAdSize.MEDIUM_RECTANGLE, placements: ['sidebar_right'], startDate: '2024-02-01', endDate: '2024-03-01', mediaType: 'video' },
 ];
 
 export const BannerAdsManager = () => {
-  // states
+  // States
   const [ads, setAds] = useState<Ad[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -48,7 +48,7 @@ export const BannerAdsManager = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // toggle status logic
+  // Toggle status logic
   const handleToggleStatus = (id: number): void => {
     setAds((prevAds) =>
       prevAds.map((ad) =>
@@ -59,7 +59,7 @@ export const BannerAdsManager = () => {
     );
   };
 
-  // delete actions logic preparation
+  // Delete actions logic preparation
   const handleDelete = (id: number): void => {
     if (typeof window !== "undefined" && window.confirm("Are you sure you want to delete this ad?")) {
       setAds((prevAds) => prevAds.filter((ad) => ad.id !== id));
@@ -96,7 +96,7 @@ export const BannerAdsManager = () => {
     setEditingAd(null);
   };
 
-  // search filter logic
+  // Search filter logic
   const filteredAds = ads.filter((ad) =>
     ad.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     ad.url.toLowerCase().includes(searchQuery.toLowerCase())

@@ -11,14 +11,14 @@
     const { announcements } = useAnnouncementStore();
     const router = useRouter();
     
-    // skeleton rendering
+    // Skeleton rendering
     if (isLoading) return <CMSOverviewSkeleton />;
-    // data rendering
+    // Data rendering
     const activeAnnouncements = announcements.filter((ann) => {
       const now = new Date();
       return now >= new Date(ann.startDate) && now <= new Date(ann.endDate);
     }).length;
-    //mock stats
+    // Mock stats
     const activeAdsCount = "67";
 
     const stats = [
@@ -46,7 +46,7 @@
 
     return (
       <div className="space-y-6 md:space-y-8 animate-in fade-in duration-500">
-        {/* quick action buttons */}
+        {/* Quick action buttons */}
         <div className="flex flex-wrap items-center gap-3">
           <Button
             onClick={() => router.push("/cms/bannerAdsManagement")}
@@ -62,7 +62,7 @@
           </Button>
         </div>
 
-        {/* grid container */}
+        {/* Grid container */}
         <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((stat, i) => (
             <Card key={i} className="bg-white/2 border-white/5 min-w-0">
@@ -81,9 +81,9 @@
           ))}
         </div>
 
-        {/* recent activity list container */}
+        {/* Recent activity list container */}
         <Card className="bg-white/2 border-white/5 flex flex-col max-h-90 mb-4">
-          {/* header */}
+          {/* Header */}
           <CardHeader className="border-b border-white/5 shrink-0">
             <div className="flex items-center gap-2">
               <CardTitle className="text-sm font-bold text-white">
@@ -91,7 +91,7 @@
               </CardTitle>
             </div>
           </CardHeader>
-          {/* body */}
+          {/* Body */}
           <CardContent className="pt-6 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
             <div className="space-y-4 pb-4">
               {[...Array(15)].map((_, i) => (

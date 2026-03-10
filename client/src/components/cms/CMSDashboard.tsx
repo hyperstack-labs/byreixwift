@@ -17,7 +17,7 @@ export const CMSDashboard = () => {
   }, [setLoading]);
 
   return (
-    <div className="space-y-6">  {/* overview component container */}
+    <div className="space-y-6">  {/* Overview component container */}
       <div>
         <h1 className="text-2xl font-bold flex items-center gap-3 text-white">
           System Overview
@@ -25,7 +25,7 @@ export const CMSDashboard = () => {
         <p className="text-white/40 text-sm mt-1">Content and Advertisement Management.</p>
       </div>
 
-      {/* render overview component*/}
+      {/* Render overview component*/}
       <CMSOverview isLoading={isLoading}/>
     </div>
   );

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui';
 import { useAnnouncementStore, Announcement } from '@/store';
 import { AnnouncementSkeleton } from './skeleton/AnnouncementSkeleton';
 
-//AnnouncementsManager - Handles CRUD operations for site-wide banners.
+// AnnouncementsManager - Handles CRUD operations for site-wide banners.
 
 export const AnnouncementsManager = () => {
   const { announcements, setAnnouncements } = useAnnouncementStore();
@@ -15,7 +15,7 @@ export const AnnouncementsManager = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [currentEdit, setCurrentEdit] = useState<Announcement | null>(null);
 
-  // refs used to bypass controlled component overhead for quick date presets
+  // Refs used to bypass controlled component overhead for quick date presets
   const startRef = useRef<HTMLInputElement>(null);
   const endRef = useRef<HTMLInputElement>(null);
 
@@ -23,7 +23,7 @@ export const AnnouncementsManager = () => {
     const fetchAnnouncements = async () => {
       try {
         setIsLoading(true);
-        // simulate network latency for smooth UX transition
+        // Simulate network latency for smooth UX transition
         await new Promise(resolve => setTimeout(resolve, 500));
 
         // API Integration ready
@@ -38,7 +38,7 @@ export const AnnouncementsManager = () => {
   }, [setAnnouncements]);
 
   /**
-   * logic - compares current date against announcement window to determine visibility status
+   * Logic - compares current date against announcement window to determine visibility status
    */
   const getAnnouncementStatus = (start: string, end: string) => {
     const now = new Date();
@@ -57,7 +57,7 @@ export const AnnouncementsManager = () => {
     }
   };
 
-  // directly updates input values for specific timeframes (7 or 30 days from today)
+  // Directly updates input values for specific timeframes (7 or 30 days from today)
   const setQuickDate = (days: number) => {
     const today = new Date().toISOString().split('T')[0];
     const futureDate = new Date();
@@ -76,7 +76,7 @@ export const AnnouncementsManager = () => {
     const start = formData.get('startDate') as string;
     const end = formData.get('endDate') as string;
 
-    // validation - prevent invalid date ranges
+    // Validation - prevent invalid date ranges
     if (new Date(end) < new Date(start)) {
       alert("End date cannot be earlier than start date!");
       return;
@@ -113,7 +113,7 @@ export const AnnouncementsManager = () => {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
-      {/* header */}
+      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-white">Announcements</h1>
@@ -126,7 +126,7 @@ export const AnnouncementsManager = () => {
           New Announcement
         </Button>
       </div>
-      {/* announcement list ui container */}
+      {/* Announcement list ui container */}
       <div className="bg-(--byreix-surface) border border-(--byreix-border) rounded-2xl overflow-hidden">
         <div className="max-h-100 overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-700">
           {isLoading ? (
@@ -168,7 +168,7 @@ export const AnnouncementsManager = () => {
                   );
                 })
               ) : (
-                /* empty state fallback */
+                /* Empty state fallback */
                 <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
                   <div className="w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center mb-4 border border-dashed border-zinc-700">
                     <Megaphone size={24} className="text-zinc-600" />
@@ -189,7 +189,7 @@ export const AnnouncementsManager = () => {
           )}
         </div>
       </div>
-      {/* announcement creation/edit modal */}
+      {/* Announcement creation/edit modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/70 backdrop-blur-md p-4 animate-in fade-in zoom-in-95 duration-200">
           <div className="bg-(--byreix-surface) border border-(--byreix-border) w-full max-w-lg rounded-2xl p-6 shadow-2xl space-y-6 text-left">
