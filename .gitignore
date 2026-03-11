@@ -29,3 +29,15 @@ yarn-error.log*
 next-env.d.ts
 
 *_PLAN.md
+
+.vscode/
+
+.vs/
+
+obj
+
+bin
+
+
+
+*_PLAN.md

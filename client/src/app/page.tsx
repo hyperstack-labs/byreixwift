@@ -6,6 +6,8 @@ import { LandingPage, LoginPage, WalletDashboard, EscrowPage } from "@/component
 import { Toaster } from "@/components/ui/sonner"; // Keep specific if sonner has default/named mix not in ui/index? ui/index exports sonner. sonner usually exports Toaster named.
 import { toast } from "sonner";
 import { useAuthStore } from "@/store";
+
+// import { TokenPriceBoard } from "@/components/TokenPriceBoard.example";
 export default function Home() {
   // Page navigation
   const [currentPage, setCurrentPage] = useState("home");
@@ -85,6 +87,9 @@ export default function Home() {
         <div className="py-4">
           <AdContainer simulateError={true} />
         </div>
+
+        
+        {/* <TokenPriceBoard /> */}
 
         {/* Page Rendering */}
         {currentPage === "home" && (
