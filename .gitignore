@@ -33,4 +33,6 @@ next-env.d.ts
 
 .vs/
 
-obj/
+obj
+
+bin
