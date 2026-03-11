@@ -1,5 +1,5 @@
 {
   "dependencies": {
-    "zustand": "^5.0.10"
+    "zustand": "^5.0.11"
   }
 }
