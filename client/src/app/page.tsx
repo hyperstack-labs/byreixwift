@@ -7,7 +7,7 @@ import { Toaster } from "@/components/ui/sonner"; // Keep specific if sonner has
 import { toast } from "sonner";
 import { useAuthStore } from "@/store";
 
-import { TokenPriceBoard } from "@/components/TokenPriceBoard.example";
+// import { TokenPriceBoard } from "@/components/TokenPriceBoard.example";
 export default function Home() {
   // Page navigation
   const [currentPage, setCurrentPage] = useState("home");
