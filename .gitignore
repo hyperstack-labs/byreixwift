@@ -28,6 +28,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+*_PLAN.md
 
 .vscode/
 
@@ -36,6 +37,7 @@ next-env.d.ts
 obj
 
 bin
+
 
 
 *_PLAN.md
