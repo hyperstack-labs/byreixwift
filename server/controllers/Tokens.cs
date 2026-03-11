@@ -8,6 +8,10 @@ namespace server.Controllers
     {
         // Get: api/tokens/all
         [HttpGet("all")]
+        public async Task<IActionResult> GetAllTokens()
+        {
+            return Ok(new { message = "API Endpoint reached Successfully! ");
+        }
         
     }
 }
