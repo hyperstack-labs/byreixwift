@@ -36,3 +36,6 @@ next-env.d.ts
 obj
 
 bin
+
+
+*_PLAN.md

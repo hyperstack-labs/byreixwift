@@ -97,6 +97,14 @@
     --radius-lg: var(--radius);
     --radius-xl: calc(var(--radius) + 4px);
 }
+/*skeleton effect*/
+@layer utilities {
+    .skeleton-fill {
+      @apply bg-white/5;
+      position: relative;
+      overflow: hidden;
+    }
+}
 
 @layer base {
     * {

@@ -12,9 +12,8 @@ export const AdminHeader = ({
   user = { name: "JoeyCollado", role: "System Admin" } 
 }: AdminHeaderProps) => {
   return (
-    <header className="h-16 border-b border-white/5 bg-[#0A0A0A]/50 backdrop-blur-md flex items-center justify-between px-8 sticky top-0 z-30">
-      
-      <div className="text-white/60 text-[10px] uppercase tracking-[0.3em] font-medium hidden md:block">
+    <header className="h-16 border-b border-white/5 bg-[#0A0A0A]/50 backdrop-blur-md hidden lg:flex items-center justify-between px-8 sticky top-0 z-30">
+      <div className="text-white/60 text-[10px] uppercase tracking-[0.3em] font-medium">
         Management Portal
       </div>
       
