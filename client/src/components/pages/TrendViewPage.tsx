@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Card, Button } from "../ui";
+import { useSidraTokens } from "@/hooks/useSidraTokens";
 import { TrendingUp, TrendingDown, ChevronDown } from "lucide-react";
 import {
     AreaChart,
@@ -41,22 +42,27 @@ export function TrendViewPage() {
     const [selectedToken, setSelectedToken] = useState("SDA");
     const [timeRange, setTimeRange] = useState("7D");
 
-    const tokens = [
+    const { data: realTokens, isLoading } = useSidraTokens();
+    const tokens = realTokens ? realTokens.map(t => ({
+        symbol: t.symbol,
+        name: t.name,
+        price: `$${t.priceUsd.toFixed(4)}`,
+        change: `${t.change24h > 0 ? '+' : ''}${t.change24h}%`,
+        positive: t.change24h >= 0
+    })) : [
         { symbol: "SDA", name: "Sidra", price: "$2.00", change: "+12.5%", positive: true },
-        { symbol: "ETH", name: "Ethereum", price: "$2,500", change: "+5.2%", positive: true },
-        { symbol: "BTC", name: "Bitcoin", price: "$43,000", change: "-2.1%", positive: false },
-        { symbol: "USDT", name: "Tether", price: "$1.00", change: "+0.01%", positive: true },
+        { symbol: "BRXW", name: "ByReiXwift", price: "$0.15", change: "+5.2%", positive: true },
     ];
 
     const timeRanges = ["1H", "24H", "7D", "30D", "1Y"];
 
     const currentData = CHART_DATA[timeRange as keyof typeof CHART_DATA];
-    const selectedTokenData = tokens.find((t) => t.symbol === selectedToken)!;
+    const selectedTokenData = tokens.find((t) => t.symbol === selectedToken) || tokens[0];
 
     const stats = [
-        { label: "Market Cap", value: "$24.5B" },
-        { label: "24h Volume", value: "$1.2B" },
-        { label: "Circulating Supply", value: "12.3B SDA" },
+        { label: "Market Cap", value: realTokens ? `$${(realTokens.find(t => t.symbol === selectedToken)?.marketCap || 0).toLocaleString()}` : "$24.5B" },
+        { label: "24h Volume", value: realTokens ? `$${(realTokens.find(t => t.symbol === selectedToken)?.volume24h || 0).toLocaleString()}` : "$1.2B" },
+        { label: "Circulating Supply", value: "100 Billion SDA" },
         { label: "All Time High", value: "$3.45" },
     ];
 
