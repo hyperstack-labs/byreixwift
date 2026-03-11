@@ -14,6 +14,7 @@ namespace server.Controllers
             return Ok(new { message = "API Endpoint fetching all tokens reached Successfully! " });
         }
 
+        // Get: api/tokens/{id}
         [HttpGet("{id}")]
         public async Task<IActionResult> FetchTokenById(string id)
         {
@@ -21,14 +22,15 @@ namespace server.Controllers
             return Ok(new { message = "API Endpoint for fetching single token by id reached Successfully! " });
         }
 
+        // Get: api/tokens/prices
         [HttpGet("prices")]
         public async Task<IActionResult> FetchTokenPrices()
         {
             Console.WriteLine("Reach API Endpoint : GET /api/tokens/prices");
             return Ok(new { message = "API Endpoint for fetching token prices reached Successfully! " });
         }
-
-        [HttpGet("price/{id}")]
+        // Get: api/tokens/{id}/price
+        [HttpGet("{id}/price")]
         public async Task<IActionResult> FetchTokenPriceById(string id)
         {
             Console.WriteLine($"Reached API Endpoint: GET /api/tokens/");
