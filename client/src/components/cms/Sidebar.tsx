@@ -22,7 +22,7 @@ export const Sidebar = () => {
 
   return (
     <>
-      {/* MOBILE TOP BAR */}
+    {/* MOBILE TOP BAR */}
       <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-[#0A0A0A] border-b border-white/5 flex items-center justify-between px-6 z-60">
         <div className="flex items-center gap-4">
           <button
