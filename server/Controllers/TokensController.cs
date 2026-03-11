@@ -27,5 +27,12 @@ namespace server.Controllers
             Console.WriteLine("Reach API Endpoint : GET /api/tokens/prices");
             return Ok(new { message = "API Endpoint for fetching token prices reached Successfully! " });
         }
+
+        [HttpGet("price/{id}")]
+        public async Task<IActionResult> FetchTokenPriceById(string id)
+        {
+            Console.WriteLine($"Reached API Endpoint: GET /api/tokens/");
+            return Ok(new { message = $"API Endpoint for fetching single token price by {id} reached Successfully! " });
+        }
     }
 }
