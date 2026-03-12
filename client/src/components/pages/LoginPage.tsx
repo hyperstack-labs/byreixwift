@@ -28,17 +28,17 @@ export function LoginPage({
         {
             icon: Shield,
             title: "Bank-Grade Security",
-            description: "Multi-factor authentication and end-to-end encryption",
+            description: "Bank-grade security with multi-factor authentication and end-to-end encryption.",
         },
         {
             icon: Lock,
             title: "Self-Custody",
-            description: "You control your private keys. Always.",
+            description: "Full control of your private keys at all times.",
         },
         {
             icon: Wallet,
             title: "Multi-Chain Support",
-            description: "Access all your assets in one secure place",
+            description: "Securely manage assets across multiple chains.",
         },
     ];
 
@@ -186,7 +186,7 @@ export function LoginPage({
                                                         Secure & Private
                                                     </p>
                                                     <p className="text-sm text-[#707070] leading-relaxed">
-                                                        We never store your passwords. Your keys, your crypto.
+                                                        Passwords are never stored. You retain full control of your private keys and assets.
                                                     </p>
                                                 </div>
                                             </div>
@@ -199,7 +199,7 @@ export function LoginPage({
 
                     {/* Sign Up Link */}
                     <p className="mt-6 text-center text-sm text-[#A0A0A0]">
-                        Don&apos;t have an account?{" "}
+                       No account yet? Create one.{" "}
                         <button
                             onClick={() => onNavigate("signup")}
                             className="text-[#26D578] hover:text-[#26D578]/80 font-medium transition-colors"
@@ -245,7 +245,7 @@ export function LoginPage({
                             <span className="text-white">Your wallet.</span>
                             <br />
                             <span className="bg-gradient-to-r from-[#26D578] via-[#26D578] to-[#D4AF37] bg-clip-text text-transparent">
-                                Your Terms.
+                                Your Control.
                             </span>
                         </h2>
 
