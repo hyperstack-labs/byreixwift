@@ -73,6 +73,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
     }
   } catch (error) {
+    console.log('Error processing escrow transaction:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

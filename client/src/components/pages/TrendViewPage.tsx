@@ -42,7 +42,7 @@ export function TrendViewPage() {
     const [selectedToken, setSelectedToken] = useState("SDA");
     const [timeRange, setTimeRange] = useState("7D");
     const formatPrice = (value:number) => `$${value.toFixed(4)}`;
-    const { data: realTokens, isLoading } = useSidraTokens();
+    const { data: realTokens } = useSidraTokens();
     const tokens = realTokens ? realTokens.map(t => ({
         symbol: t.symbol,
         name: t.name,
