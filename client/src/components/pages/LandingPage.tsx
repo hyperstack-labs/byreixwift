@@ -43,7 +43,7 @@ export function LandingPage({ onNavigate, onConnect }: LandingPageProps) {
         {
             icon: Zap,
             title: "Sub-Second Finality",
-            description: "Transactions confirm before you blink.",
+            description: "Transactions confirm in under one second",
         },
         {
             icon: Lock,
@@ -53,7 +53,7 @@ export function LandingPage({ onNavigate, onConnect }: LandingPageProps) {
         {
             icon: Wallet,
             title: "Sidrachain Native",
-            description: "Built specifically for the Sidra ecosystem.",
+            description: "Built for performance and reliability",
         },
     ];
 
@@ -179,9 +179,11 @@ export function LandingPage({ onNavigate, onConnect }: LandingPageProps) {
             </section>
             <AdSlot adId="Hero-ads">
                 <BannerAd
-                    imageURL="/mockThumbnail.png"
-                    linkURL="https://example.com"
-                    size={BannerAdSize.LEADERBOARD} altText="Leaderboard Ad" />
+                     imageURL="/mockThumbnail.png"
+                     linkURL="https://example.com"
+                     size={BannerAdSize.LEADERBOARD}
+                     altText="Leaderboard advertisement"
+                    />
             </AdSlot>
 
             {/* Features Grid */}
@@ -242,7 +244,7 @@ export function LandingPage({ onNavigate, onConnect }: LandingPageProps) {
                                 Why Byreixwift?
                             </h2>
                             <p className="text-lg text-[#A0A0A0] mb-8">
-                                We built what we wanted to use ourselves.
+                                Designed to meet modern decentralized finance standards
                             </p>
 
                             <div className="space-y-6">
@@ -303,10 +305,10 @@ export function LandingPage({ onNavigate, onConnect }: LandingPageProps) {
                     <div className="absolute inset-0 bg-gradient-to-r from-[#26D578]/10 via-[#D4AF37]/10 to-[#26D578]/10 rounded-3xl blur-3xl -z-10" />
                     <div className="bg-[#121212] border border-[#1E1E1E] rounded-3xl p-12 hover:border-[#26D578]/30 transition-colors">
                         <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-                            Start in 30 seconds
+                            Get started quickly
                         </h2>
                         <p className="text-lg text-[#A0A0A0] mb-8">
-                            No email. No KYC. Just connect and go.
+                            No email — no KYC — just connect and go.
                         </p>
                         <Button
                             onClick={onConnect}

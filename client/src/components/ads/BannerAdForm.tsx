@@ -256,7 +256,7 @@ export const BannerAdForm: React.FC<BannerAdFormProps> = ({
                         <input
                             type="date"
                             {...register('endDate')}
-                            className={`w-full bg-(--byreix-bg) border ${errors.startDate ? 'border-red-500' : 'border-(--byreix-border)'} rounded-lg p-3 pl-10 text-sm text-white focus:ring-1 focus:ring-(--byreix-green) outline-none [&::-webkit-calendar-picker-indicator]:invert`}
+                            className={`w-full bg-(--byreix-bg) border ${errors.endDate ? 'border-red-500' : 'border-(--byreix-border)'} rounded-lg p-3 pl-10 text-sm text-white focus:ring-1 focus:ring-(--byreix-green) outline-none [&::-webkit-calendar-picker-indicator]:invert`}
                         />
                     </div>
                     {errors.endDate && <p className="text-xs text-red-500 mt-1">{errors.endDate.message}</p>}

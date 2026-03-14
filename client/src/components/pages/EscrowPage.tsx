@@ -72,7 +72,7 @@ export function EscrowPage() {
                     <div>
                         <h1 className="text-2xl font-semibold">Escrow</h1>
                         <p className="text-sm text-[#A0A0A0] mt-1">
-                            3 contracts · $17,250 secured
+                            3 contracts — $17,250 secured
                         </p>
                     </div>
                     <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
@@ -130,7 +130,7 @@ export function EscrowPage() {
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="description" className="text-sm">What&apos;s this for?</Label>
+                                    <Label htmlFor="description" className="text-sm">Transaction Description</Label>
                                     <Textarea
                                         id="description"
                                         placeholder="Brief description..."
@@ -226,8 +226,8 @@ export function EscrowPage() {
                 {/* Empty state hint - no more "How It Works" */}
                 {escrows.length === 0 && (
                     <div className="text-center py-12 text-[#A0A0A0]">
-                        <p>No escrows yet.</p>
-                        <p className="text-sm mt-1">Create one to get started.</p>
+                        <p>No escrow contracts available</p>
+                        <p className="text-sm mt-1">Create an escrow contract to get started.</p>
                     </div>
                 )}
             </div>

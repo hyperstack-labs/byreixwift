@@ -123,6 +123,7 @@ export function WalletDashboard() {
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <Button
+                                        aria-label="Copy wallet address"
                                         variant="ghost"
                                         size="sm"
                                         onClick={copyAddress}
@@ -153,6 +154,7 @@ export function WalletDashboard() {
                                         <button
                                             onClick={() => setBalanceVisible(!balanceVisible)}
                                             className="text-[#A0A0A0] hover:text-white transition-colors"
+                                            aria-label={balanceVisible ? "Hide balance" : "Show balance"} aria-pressed={balanceVisible}
                                         >
                                             {balanceVisible ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
                                         </button>

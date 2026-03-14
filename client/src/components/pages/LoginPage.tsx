@@ -15,6 +15,12 @@ interface LoginPageProps {
     isLoading?: boolean;
 }
 
+type Feature = {
+    icon: any;
+    title: string;
+    description: string;
+};
+
 export function LoginPage({
     onEmailLogin,
     onGoogleLogin,
@@ -24,7 +30,8 @@ export function LoginPage({
 }: LoginPageProps) {
     const [activeTab, setActiveTab] = useState<"email" | "social">("email");
 
-    const features = [
+
+    const features: Feature[] = [
         {
             icon: Shield,
             title: "Bank-Grade Security",
@@ -39,7 +46,7 @@ export function LoginPage({
             icon: Wallet,
             title: "Multi-Chain Support",
             description: "Access all your assets in one secure place",
-        },
+        }
     ];
 
     return (
@@ -68,7 +75,7 @@ export function LoginPage({
                         <CardHeader className="border-b border-[#1E1E1E] pb-8">
                             <CardTitle className="text-3xl">Sign In</CardTitle>
                             <CardDescription className="text-base">
-                                Choose your preferred sign-in method
+                               Select a preferred sign-in method
                             </CardDescription>
 
                             {/* Tab Switcher with Sliding Indicator */}
@@ -91,12 +98,13 @@ export function LoginPage({
                                 {/* Tab Buttons */}
                                 <button
                                     onClick={() => setActiveTab("email")}
+                                     aria-label="Sign in using email and password"
                                     className={`relative z-10 flex-1 py-2.5 rounded-md text-sm font-medium transition-colors ${activeTab === "email"
                                         ? "text-black"
                                         : "text-[#A0A0A0] hover:text-white"
                                         }`}
                                 >
-                                    Email / Password
+                                    Email and Password
                                 </button>
                                 <button
                                     onClick={() => setActiveTab("social")}
@@ -138,6 +146,8 @@ export function LoginPage({
                                     >
                                         {/* Google Sign In Button */}
                                         <Button
+                                            aria-label="Sign in with Google"
+                                            disabled={isLoading}
                                             onClick={onGoogleLogin}
                                             variant="outline"
                                             className="w-full border-[#1E1E1E] bg-[#121212] hover:bg-[#1E1E1E] hover:border-[#707070] text-white font-semibold py-7 text-base transition-all group"
@@ -183,10 +193,10 @@ export function LoginPage({
                                                 <Shield className="w-6 h-6 text-[#26D578] flex-shrink-0 mt-0.5" />
                                                 <div>
                                                     <p className="text-base text-[#E5E5E5] font-medium mb-1.5">
-                                                        Secure & Private
+                                                        Secure and Private
                                                     </p>
                                                     <p className="text-sm text-[#707070] leading-relaxed">
-                                                        We never store your passwords. Your keys, your crypto.
+                                                      We do not store passwords. Private keys remain under your control.
                                                     </p>
                                                 </div>
                                             </div>
@@ -245,13 +255,13 @@ export function LoginPage({
                             <span className="text-white">Your wallet.</span>
                             <br />
                             <span className="bg-gradient-to-r from-[#26D578] via-[#26D578] to-[#D4AF37] bg-clip-text text-transparent">
-                                Your Terms.
+                                Your terms.
                             </span>
                         </h2>
 
                         {/* Description */}
                         <p className="text-xl text-[#A0A0A0] mb-12 leading-relaxed">
-                            The wallet built for Sidrachain that puts you in complete control.
+                            A wallet designed for the Sidrachain ecosystem that provides full user control.
                         </p>
 
                         {/* Features List */}
