@@ -1,9 +1,9 @@
 {
-  "name": "byreixwift-frontend",
+  "name": "byreixwift",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --webpack",
+    "dev": "next dev --turbo",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
@@ -18,26 +18,26 @@
     "@tanstack/react-query-devtools": "^5.91.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "lucide-react": "^0.562.0",
-    "motion": "^12.25.0",
-    "next": "16.1.1",
-    "react": "19.2.3",
-    "react-dom": "19.2.3",
-    "react-hook-form": "^7.71.1",
-    "recharts": "^3.6.0",
+    "lucide-react": "^0.577.0",
+    "motion": "^12.36.0",
+    "next": "16.1.6",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "react-hook-form": "^7.71.2",
+    "recharts": "^3.8.0",
     "sonner": "^2.0.7",
-    "tailwind-merge": "^3.4.0",
+    "tailwind-merge": "^3.5.0",
     "zod": "^4.3.6",
-    "zustand": "^5.0.10"
+    "zustand": "^5.0.11"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.1.1",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "@tailwindcss/postcss": "^4.2.1",
+    "@types/node": "^25.5.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "eslint": "^10.0.3",
+    "eslint-config-next": "16.1.6",
+    "tailwindcss": "^4.2.1",
+    "typescript": "^5.9.3"
   }
 }
