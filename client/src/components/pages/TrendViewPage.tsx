@@ -41,12 +41,12 @@ const CHART_DATA = {
 export function TrendViewPage() {
     const [selectedToken, setSelectedToken] = useState("SDA");
     const [timeRange, setTimeRange] = useState("7D");
-
-    const { data: realTokens, isLoading } = useSidraTokens();
+    const formatPrice = (value:number) => `$${value.toFixed(4)}`;
+    const { data: realTokens } = useSidraTokens();
     const tokens = realTokens ? realTokens.map(t => ({
         symbol: t.symbol,
         name: t.name,
-        price: `$${t.priceUsd.toFixed(4)}`,
+        price: formatPrice(t.priceUsd),
         change: `${t.change24h > 0 ? '+' : ''}${t.change24h}%`,
         positive: t.change24h >= 0
     })) : [
@@ -55,13 +55,13 @@ export function TrendViewPage() {
     ];
 
     const timeRanges = ["1H", "24H", "7D", "30D", "1Y"];
-
+    const currentToken = realTokens?.find(t => t.symbol === selectedToken);
     const currentData = CHART_DATA[timeRange as keyof typeof CHART_DATA];
     const selectedTokenData = tokens.find((t) => t.symbol === selectedToken) || tokens[0];
 
     const stats = [
-        { label: "Market Cap", value: realTokens ? `$${(realTokens.find(t => t.symbol === selectedToken)?.marketCap || 0).toLocaleString()}` : "$24.5B" },
-        { label: "24h Volume", value: realTokens ? `$${(realTokens.find(t => t.symbol === selectedToken)?.volume24h || 0).toLocaleString()}` : "$1.2B" },
+        { label: "Market Cap", value: realTokens ? `$${(currentToken?.marketCap || 0).toLocaleString()}` : "$24.5B" },
+        { label: "24h Volume", value: realTokens ? `$${(currentToken?.volume24h || 0).toLocaleString()}` : "$1.2B" },
         { label: "Circulating Supply", value: "100 Billion SDA" },
         { label: "All Time High", value: "$3.45" },
     ];
@@ -125,7 +125,7 @@ export function TrendViewPage() {
                 </div>
 
                 {/* Chart */}
-                <div className="h-[400px]">
+                <div className="h-[400px] min-h-[300px]">
                     <ResponsiveContainer width="100%" height="100%">
                         <AreaChart data={currentData}>
                             <defs>
@@ -191,7 +191,7 @@ export function TrendViewPage() {
                         >
                             <div className="flex items-center gap-4">
                                 <div className="w-10 h-10 rounded-full bg-[#26D578]/10 flex items-center justify-center">
-                                    <span className="text-sm font-bold text-[#26D578]">{token.symbol[0]}</span>
+                                    <span className="text-sm font-bold text-[#26D578]">{token.symbol?.[0] ?? "?"}</span>
                                 </div>
                                 <div className="text-left">
                                     <p className="font-semibold">{token.symbol}</p>

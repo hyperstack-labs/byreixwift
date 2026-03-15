@@ -20,6 +20,8 @@ export function SwapPage() {
         setToAmount(fromAmount);
     };
 
+    const CONVERSION_RATE = 0.00042;
+
     const handleSwap = () => {
         if (!fromAmount || parseFloat(fromAmount) <= 0) {
             toast.error("Please enter an amount to swap");
@@ -33,8 +35,12 @@ export function SwapPage() {
             <Card className="p-6 bg-[#121212] border-[#1E1E1E]">
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-2xl font-semibold">Swap Tokens</h2>
-                    <Button variant="ghost" size="sm" className="text-[#A0A0A0]">
-                        <Settings className="w-5 h-5" />
+                    <Button
+                     variant="ghost"
+                     size="sm"
+                     aria-label="Swap settings"
+                    >
+                     <Settings className="w-5 h-5" />
                     </Button>
                 </div>
 
@@ -49,13 +55,15 @@ export function SwapPage() {
                         </div>
                         <div className="flex items-center gap-4">
                             <Input
-                                type="number"
+                                type="text"
                                 placeholder="0.00"
                                 value={fromAmount}
                                 onChange={(e) => {
                                     setFromAmount(e.target.value);
                                     // Mock conversion rate
-                                    setToAmount((parseFloat(e.target.value || "0") * 0.00042).toFixed(6));
+                                    const value = parseFloat(e.target.value || "0");
+                                    setFromAmount(e.target.value);
+                                    setToAmount((value * CONVERSION_RATE).toFixed(6));
                                 }}
                                 className="flex-1 bg-transparent border-none text-3xl p-0 h-auto focus-visible:ring-0"
                             />
@@ -67,14 +75,18 @@ export function SwapPage() {
                                 <ChevronDown className="w-4 h-4" />
                             </Button>
                         </div>
-                        <button className="text-sm text-[#26D578] mt-2 hover:underline">
-                            Max
+                        <button
+                         onClick={() => setFromAmount(fromToken.balance.replace(/,/g, ""))}
+                         className="text-sm text-[#26D578]"
+                        >
+                         Maximum
                         </button>
                     </div>
 
                     {/* Swap Button */}
                     <div className="flex justify-center -my-2 relative z-10">
                         <button
+                            aria-label="Reverse swap tokens"
                             onClick={handleSwapTokens}
                             className="w-10 h-10 rounded-full bg-[#121212] border border-[#1E1E1E] flex items-center justify-center hover:border-[#26D578] transition-colors"
                         >
@@ -92,7 +104,7 @@ export function SwapPage() {
                         </div>
                         <div className="flex items-center gap-4">
                             <Input
-                                type="number"
+                                type="text"
                                 placeholder="0.00"
                                 value={toAmount}
                                 readOnly
@@ -113,7 +125,7 @@ export function SwapPage() {
                         <div className="p-4 rounded-xl bg-[#0A0A0A] border border-[#1E1E1E] space-y-2">
                             <div className="flex items-center justify-between text-sm">
                                 <span className="text-[#A0A0A0]">Rate</span>
-                                <span className="text-white">1 {fromToken.symbol} = 0.00042 {toToken.symbol}</span>
+                                <span className="text-white">1 {fromToken.symbol} = {CONVERSION_RATE} {toToken.symbol}</span>
                             </div>
                             <div className="flex items-center justify-between text-sm">
                                 <span className="text-[#A0A0A0]">Slippage Tolerance</span>

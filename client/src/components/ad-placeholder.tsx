@@ -37,14 +37,14 @@ export const AdPlaceholder = ({
         
         <div className="flex flex-wrap justify-center gap-3">
           <button 
-            onClick={onRetry}
+            onClick={onRetry} aria-label="Retry loading ad"
             className="cursor-pointer flex items-center gap-2 px-5 py-2 text-[11px] font-semibold bg-white/5 hover:bg-white/10 text-white/80 rounded-full border border-white/10 transition-all active:scale-95"
           >
             <RefreshCw size={14} className="text-white/40" /> 
             RETRY
           </button>
 
-          <button className="cursor-pointer flex items-center gap-2 px-5 py-2 text-[11px] font-semibold bg-[#26D578]/10 hover:bg-[#26D578]/20 text-[#26D578] rounded-full border border-[#26D578]/30 transition-all active:scale-95">
+          <button aria-label="Advertise here" className="cursor-pointer flex items-center gap-2 px-5 py-2 text-[11px] font-semibold bg-[#26D578]/10 hover:bg-[#26D578]/20 text-[#26D578] rounded-full border border-[#26D578]/30 transition-all active:scale-95">
             <Megaphone size={14} /> 
             ADVERTISE HERE
           </button>

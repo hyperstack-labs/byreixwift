@@ -130,7 +130,7 @@ export function SendPage() {
                                 onClick={() => setAmount(selectedToken.balance.replace(/,/g, ""))}
                                 className="text-sm text-[#26D578] mt-2 hover:underline"
                             >
-                                Max
+                                Use Maximum Balance
                             </button>
                         </div>
                     </div>

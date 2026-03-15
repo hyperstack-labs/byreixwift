@@ -7,7 +7,7 @@ import { useState } from "react";
 
 export function TokenPriceBoard() {
   const { data: tokens, isLoading, error, refetch, isFetching } = useSidraTokens();
-  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [, setCopiedId] = useState<string | null>(null);
 
   const handleCopy = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
