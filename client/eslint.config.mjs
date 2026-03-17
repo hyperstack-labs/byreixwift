@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Do not lint flat config source
+    "eslint.config.mjs",
   ]),
 ]);
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 export const BannerAdsTableSkeleton = () => {
   return (
@@ -34,13 +34,23 @@ export const BannerAdsTableSkeleton = () => {
       <div className="hidden md:block">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse table-fixed">
-            <thead className="bg-[#1A1A1A] border-b border-(--byreix-border)">
+            <thead className="bg-card border-b border-(--byreix-border)">
               <tr>
-                <th className="w-[12%] px-6 py-5"><div className="h-3 w-12 bg-white/10 rounded" /></th>
-                <th className="w-[43%] px-6 py-5"><div className="h-3 w-24 bg-white/10 rounded" /></th>
-                <th className="w-[15%] px-6 py-5"><div className="h-3 w-16 bg-white/10 rounded" /></th>
-                <th className="w-[15%] px-6 py-5"><div className="h-3 w-16 bg-white/10 rounded mx-auto" /></th>
-                <th className="w-[15%] px-6 py-5 text-right"><div className="h-3 w-16 bg-white/10 rounded ml-auto" /></th>
+                <th className="w-[12%] px-6 py-5">
+                  <div className="h-3 w-12 bg-white/10 rounded" />
+                </th>
+                <th className="w-[43%] px-6 py-5">
+                  <div className="h-3 w-24 bg-white/10 rounded" />
+                </th>
+                <th className="w-[15%] px-6 py-5">
+                  <div className="h-3 w-16 bg-white/10 rounded" />
+                </th>
+                <th className="w-[15%] px-6 py-5">
+                  <div className="h-3 w-16 bg-white/10 rounded mx-auto" />
+                </th>
+                <th className="w-[15%] px-6 py-5 text-right">
+                  <div className="h-3 w-16 bg-white/10 rounded ml-auto" />
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-(--byreix-border)">

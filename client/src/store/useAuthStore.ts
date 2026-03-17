@@ -1,13 +1,13 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
 interface AuthState {
-    isAuthenticated: boolean;
-    login: (email: string) => void;
-    logout: () => void;
+  isAuthenticated: boolean;
+  login: (email: string) => void;
+  logout: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
-    isAuthenticated: false,
-    login: () => set({ isAuthenticated: true }),
-    logout: () => set({ isAuthenticated: false }),
+  isAuthenticated: false,
+  login: () => set({ isAuthenticated: true }),
+  logout: () => set({ isAuthenticated: false }),
 }));

@@ -1,9 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { Navbar, Footer, AnnouncementBanner, AdContainer } from "@/components";
-import { LandingPage, LoginPage, WalletDashboard, EscrowPage } from "@/components/pages";
-import { Toaster } from "@/components/ui/sonner"; // Keep specific if sonner has default/named mix not in ui/index? ui/index exports sonner. sonner usually exports Toaster named.
+import { Navbar, Footer, AnnouncementBanner } from "@/components";
+import {
+  LandingPage,
+  LoginPage,
+  WalletDashboard,
+  EscrowPage,
+  ProfilePage,
+  SwapPage,
+  SendPage,
+  TrendViewPage,
+} from "@/components/pages";
+import { CMSLayout, CMSDashboard } from "@/components/cms";
+import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { useAuthStore } from "@/store";
 
@@ -16,7 +26,6 @@ export default function Home() {
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   const { isAuthenticated, login } = useAuthStore();
 
-
   // Navigation handler
   const handleNavigate = (page: string) => {
     if ((page === "wallet" || page === "escrow") && !isAuthenticated) {
@@ -28,7 +37,6 @@ export default function Home() {
     // Scroll to top on navigation
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
 
   // Wallet connect handler with login check
   const handleConnect = () => {
@@ -48,7 +56,11 @@ export default function Home() {
   };
 
   // Email login handler
-  const handleEmailLogin = (credentials: { email: string; password: string; rememberMe: boolean }) => {
+  const handleEmailLogin = (credentials: {
+    email: string;
+    password: string;
+    rememberMe: boolean;
+  }) => {
     setTimeout(() => {
       // mark user as logged in
       login(credentials.email);
@@ -74,21 +86,18 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white font-['Inter']">
-      {/* Navbar */}
-      <Navbar
-        onConnect={handleConnect}
-        isConnected={isWalletConnected}
-        currentPage={currentPage}
-        onNavigate={handleNavigate}
-      />
+    <div className="min-h-screen bg-background text-foreground">
+      {/* Navbar - hidden in CMS */}
+      {currentPage !== "cms" && (
+        <Navbar
+          onConnect={handleConnect}
+          isConnected={isWalletConnected}
+          currentPage={currentPage}
+          onNavigate={handleNavigate}
+        />
+      )}
 
       <main className="relative">
-        <div className="py-4">
-          <AdContainer simulateError={true} />
-        </div>
-
-        
         {/* <TokenPriceBoard /> */}
 
         {/* Page Rendering */}
@@ -114,17 +123,30 @@ export default function Home() {
           />
         ) : null}
         {currentPage === "escrow" && <EscrowPage />}
+        {currentPage === "swap" && <SwapPage />}
+        {currentPage === "send" && <SendPage />}
+        {currentPage === "trend" && <TrendViewPage />}
+        {currentPage === "profile" && <ProfilePage />}
+        {currentPage === "cms" && (
+          <CMSLayout>
+            <CMSDashboard />
+          </CMSLayout>
+        )}
       </main>
 
-      <Footer />
-      <AnnouncementBanner />
+      {currentPage !== "cms" && (
+        <>
+          <Footer />
+          <AnnouncementBanner />
+        </>
+      )}
       <Toaster
         position="top-right"
         toastOptions={{
           style: {
-            background: "#121212",
-            border: "1px solid #1E1E1E",
-            color: "#FFFFFF",
+            background: "var(--card)",
+            border: "1px solid var(--border)",
+            color: "var(--foreground)",
           },
         }}
       />

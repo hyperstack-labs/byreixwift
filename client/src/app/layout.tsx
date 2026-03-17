@@ -1,23 +1,18 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Inter } from "next/font/google";
+import { Manrope } from "next/font/google";
 import "./globals.css";
 import QueryProvider from "@/providers/QueryProvider";
 
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
+const manrope = Manrope({
+  variable: "--font-manrope",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
-  title: "Byreixwift - Your Wallet, Your Terms",
-  description: "The non-custodial wallet for Sidrachain. Swap, send, and track with zero compromise.",
+  title: "ByReiXwift - Your Wallet, Your Terms",
+  description:
+    "The non-custodial wallet for Sidrachain. Swap, send, and track with zero compromise.",
 };
 
 export default function RootLayout({
@@ -27,12 +22,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body
-        className={`${spaceGrotesk.variable} ${inter.variable} antialiased`}
-      >
-        <QueryProvider>
-          {children}
-        </QueryProvider>
+      <body className={`${manrope.variable} antialiased`}>
+        <QueryProvider>{children}</QueryProvider>
       </body>
     </html>
   );
