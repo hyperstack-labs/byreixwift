@@ -10,12 +10,7 @@ interface AdSlotProps {
   className?: string;
 }
 
-export const AdSlot: React.FC<AdSlotProps> = ({
-  adId,
-  children,
-  isVisible = true,
-  className,
-}) => {
+export const AdSlot: React.FC<AdSlotProps> = ({ adId, children, isVisible = true, className }) => {
   const { elementRef, trackAdClick } = useAdTracking(adId);
 
   if (!isVisible) return null;

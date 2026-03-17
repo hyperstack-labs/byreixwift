@@ -3,20 +3,20 @@
 import { Toaster as Sonner, ToasterProps } from "sonner";
 
 const Toaster = ({ ...props }: ToasterProps) => {
-    return (
-        <Sonner
-            theme="dark"
-            className="toaster group"
-            style={
-                {
-                    "--normal-bg": "#121212",
-                    "--normal-text": "#FFFFFF",
-                    "--normal-border": "#1E1E1E",
-                } as React.CSSProperties
-            }
-            {...props}
-        />
-    );
+  return (
+    <Sonner
+      theme="dark"
+      className="toaster group"
+      style={
+        {
+          "--normal-bg": "var(--card)",
+          "--normal-text": "var(--foreground)",
+          "--normal-border": "var(--border)",
+        } as React.CSSProperties
+      }
+      {...props}
+    />
+  );
 };
 
 export { Toaster };

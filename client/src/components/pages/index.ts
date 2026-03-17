@@ -5,3 +5,4 @@ export * from "./SendPage";
 export * from "./SwapPage";
 export * from "./TrendViewPage";
 export * from "./WalletDashboard";
+export * from "./ProfilePage";

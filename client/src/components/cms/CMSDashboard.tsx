@@ -1,11 +1,11 @@
 "use client";
-import React, { useEffect } from 'react';
-import CMSOverview from '@/components/cms/CMSOverview';
-import { useAnnouncementStore } from '@/store';
+import React, { useEffect } from "react";
+import CMSOverview from "@/components/cms/CMSOverview";
+import { useAnnouncementStore } from "@/store";
 
 export const CMSDashboard = () => {
   const { isLoading, setLoading } = useAnnouncementStore();
-  
+
   useEffect(() => {
     // Simulate the "Data-Heavy" fetch mentioned in the task
     setLoading(true);
@@ -17,16 +17,15 @@ export const CMSDashboard = () => {
   }, [setLoading]);
 
   return (
-    <div className="space-y-6">  {/* Overview component container */}
+    <div className="space-y-6">
+      {" "}
+      {/* Overview component container */}
       <div>
-        <h1 className="text-2xl font-bold flex items-center gap-3 text-white">
-          System Overview
-        </h1>
+        <h1 className="text-2xl font-bold flex items-center gap-3 text-white">System Overview</h1>
         <p className="text-white/40 text-sm mt-1">Content and Advertisement Management.</p>
       </div>
-
       {/* Render overview component*/}
-      <CMSOverview isLoading={isLoading}/>
+      <CMSOverview isLoading={isLoading} />
     </div>
   );
 };

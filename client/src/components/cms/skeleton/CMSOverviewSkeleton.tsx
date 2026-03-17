@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui";
 
 export const CMSOverviewSkeleton = () => {
@@ -30,7 +30,7 @@ export const CMSOverviewSkeleton = () => {
         <CardHeader className="border-b border-(--byreix-border) shrink-0 p-6">
           <div className="h-5 w-40 bg-white/10 rounded" />
         </CardHeader>
-        
+
         <CardContent className="pt-6 space-y-5 overflow-y-auto">
           {[...Array(6)].map((_, i) => (
             <div key={i} className="flex items-start justify-between px-1">
