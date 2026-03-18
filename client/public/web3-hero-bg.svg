@@ -1,0 +1,305 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">
+  <defs>
+
+    <!-- HORIZON GLOW: Primary emerald core -->
+    <radialGradient id="glowCore" cx="50%" cy="100%" r="65%" fx="50%" fy="100%">
+      <stop offset="0%"  stop-color="#25c985" stop-opacity="0.92"/>
+      <stop offset="18%" stop-color="#1fa870" stop-opacity="0.68"/>
+      <stop offset="40%" stop-color="#0d6b46" stop-opacity="0.32"/>
+      <stop offset="65%" stop-color="#061f14" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- HORIZON GLOW: Champagne gold corona (slightly larger, thinner) -->
+    <radialGradient id="glowCorona" cx="50%" cy="100%" r="72%" fx="50%" fy="100%">
+      <stop offset="0%"  stop-color="#D6C485" stop-opacity="0"/>
+      <stop offset="28%" stop-color="#D6C485" stop-opacity="0"/>
+      <stop offset="42%" stop-color="#D6C485" stop-opacity="0.22"/>
+      <stop offset="54%" stop-color="#C8B56e" stop-opacity="0.38"/>
+      <stop offset="62%" stop-color="#D6C485" stop-opacity="0.18"/>
+      <stop offset="75%" stop-color="#D6C485" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#D6C485" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Volumetric mist layer -->
+    <radialGradient id="glowMist" cx="50%" cy="100%" r="80%" fx="50%" fy="98%">
+      <stop offset="0%"  stop-color="#25c985" stop-opacity="0.18"/>
+      <stop offset="30%" stop-color="#1a9060" stop-opacity="0.08"/>
+      <stop offset="60%" stop-color="#0a3d28" stop-opacity="0.03"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Subtle dark atmosphere overlay for depth -->
+    <linearGradient id="atmosphereGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#000000" stop-opacity="0.0"/>
+      <stop offset="55%"  stop-color="#000000" stop-opacity="0.0"/>
+      <stop offset="78%"  stop-color="#010a06" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.55"/>
+    </linearGradient>
+
+    <!-- Grid fade mask: visible only bottom 60% -->
+    <linearGradient id="gridFade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="white" stop-opacity="0"/>
+      <stop offset="35%" stop-color="white" stop-opacity="0"/>
+      <stop offset="55%" stop-color="white" stop-opacity="0.18"/>
+      <stop offset="72%" stop-color="white" stop-opacity="0.55"/>
+      <stop offset="88%" stop-color="white" stop-opacity="0.82"/>
+      <stop offset="100%" stop-color="white" stop-opacity="0.72"/>
+    </linearGradient>
+
+    <mask id="gridMask">
+      <rect width="1920" height="1080" fill="url(#gridFade)"/>
+    </mask>
+
+    <!-- Node glow filters -->
+    <filter id="nodeGlow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <filter id="nodeGlowGold" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <filter id="softBloom" x="-150%" y="-150%" width="400%" height="400%">
+      <feGaussianBlur stdDeviation="28" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <filter id="horizonBloom" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="60"/>
+    </filter>
+
+    <filter id="lineGlow" x="-10%" y="-200%" width="120%" height="500%">
+      <feGaussianBlur stdDeviation="1.5"/>
+    </filter>
+
+  </defs>
+
+  <!-- ═══════════════════════════════════════════════════════
+       LAYER 1: DEEP BLOOM — soft volumetric base wash
+  ═══════════════════════════════════════════════════════ -->
+  <ellipse cx="960" cy="1180" rx="1400" ry="520"
+    fill="#1ed87a" opacity="0.13" filter="url(#horizonBloom)"/>
+  <ellipse cx="960" cy="1120" rx="900" ry="300"
+    fill="#25c985" opacity="0.18" filter="url(#horizonBloom)"/>
+
+  <!-- ═══════════════════════════════════════════════════════
+       LAYER 2: HORIZON GLOW FIELDS
+  ═══════════════════════════════════════════════════════ -->
+  <rect width="1920" height="1080" fill="url(#glowCore)"/>
+  <rect width="1920" height="1080" fill="url(#glowMist)"/>
+  <rect width="1920" height="1080" fill="url(#glowCorona)"/>
+
+
+  <!-- ═══════════════════════════════════════════════════════
+       LAYER 4: NEURAL NETWORK CONNECTIONS
+       Thin, luminous connection lines between nodes
+  ═══════════════════════════════════════════════════════ -->
+
+  <!-- Primary neural threads — emerald -->
+  <g stroke="#25c985" stroke-width="0.6" opacity="0.28" fill="none">
+    <!-- Central neural web -->
+    <line x1="960" y1="740" x2="720" y2="860"/>
+    <line x1="960" y1="740" x2="1120" y2="820"/>
+    <line x1="960" y1="740" x2="840" y2="680"/>
+    <line x1="960" y1="740" x2="1080" y2="660"/>
+    <line x1="960" y1="740" x2="780" y2="940"/>
+    <line x1="960" y1="740" x2="1180" y2="940"/>
+    <line x1="960" y1="740" x2="560" y2="780"/>
+    <line x1="960" y1="740" x2="1380" y2="800"/>
+
+    <!-- Left cluster -->
+    <line x1="560" y1="780" x2="440" y2="700"/>
+    <line x1="560" y1="780" x2="320" y2="860"/>
+    <line x1="560" y1="780" x2="680" y2="900"/>
+    <line x1="440" y1="700" x2="280" y2="740"/>
+    <line x1="320" y1="860" x2="160" y2="900"/>
+    <line x1="280" y1="740" x2="140" y2="680"/>
+
+    <!-- Right cluster -->
+    <line x1="1380" y1="800" x2="1520" y2="720"/>
+    <line x1="1380" y1="800" x2="1600" y2="880"/>
+    <line x1="1380" y1="800" x2="1260" y2="900"/>
+    <line x1="1520" y1="720" x2="1700" y2="760"/>
+    <line x1="1600" y1="880" x2="1760" y2="920"/>
+    <line x1="1700" y1="760" x2="1840" y2="680"/>
+
+    <!-- Upper neural traces -->
+    <line x1="840" y1="680" x2="700" y2="580"/>
+    <line x1="1080" cy="660" x2="1200" y2="560"/>
+    <line x1="700"  y1="580" x2="580" y2="500"/>
+    <line x1="1200" y1="560" x2="1340" y2="480"/>
+    <line x1="580"  y1="500" x2="460" y2="420"/>
+    <line x1="1340" y1="480" x2="1460" y2="400"/>
+
+    <!-- Cross connections -->
+    <line x1="720" y1="860" x2="840" y2="680"/>
+    <line x1="1120" y1="820" x2="1080" y2="660"/>
+    <line x1="780" y1="940" x2="680" y2="900"/>
+    <line x1="1180" y1="940" x2="1260" y2="900"/>
+  </g>
+
+  <!-- Secondary neural threads — gold corona -->
+  <g stroke="#D6C485" stroke-width="0.4" opacity="0.16" fill="none">
+    <line x1="960" y1="740" x2="860" y2="580"/>
+    <line x1="960" y1="740" x2="1060" y2="570"/>
+    <line x1="720" y1="860" x2="600" y2="960"/>
+    <line x1="1120" y1="820" x2="1320" y2="960"/>
+    <line x1="440" y1="700" x2="360" y2="580"/>
+    <line x1="1520" y1="720" x2="1620" y2="600"/>
+    <line x1="580" y1="500" x2="500" y2="380"/>
+    <line x1="1340" y1="480" x2="1420" y2="340"/>
+    <line x1="320" y1="860" x2="200" y2="780"/>
+    <line x1="1600" y1="880" x2="1780" y2="820"/>
+  </g>
+
+  <!-- ═══════════════════════════════════════════════════════
+       LAYER 5: NEURAL NODES
+       Floating geometric nodes, emerald primary + gold accent
+  ═══════════════════════════════════════════════════════ -->
+
+  <!-- LARGE PRIMARY NODES — emerald, with soft bloom halos -->
+
+  <!-- Central nexus node -->
+  <circle cx="960" cy="740" r="22" fill="#25c985" opacity="0.06" filter="url(#softBloom)"/>
+  <circle cx="960" cy="740" r="5.5" fill="#25c985" opacity="0.9" filter="url(#nodeGlow)"/>
+  <circle cx="960" cy="740" r="3.2" fill="#7fffd4"/>
+  <circle cx="960" cy="740" r="9" fill="none" stroke="#25c985" stroke-width="0.6" opacity="0.45"/>
+  <circle cx="960" cy="740" r="14" fill="none" stroke="#25c985" stroke-width="0.3" opacity="0.22"/>
+
+  <!-- Left mid node -->
+  <circle cx="560" cy="780" r="14" fill="#25c985" opacity="0.05" filter="url(#softBloom)"/>
+  <circle cx="560" cy="780" r="4" fill="#25c985" opacity="0.85" filter="url(#nodeGlow)"/>
+  <circle cx="560" cy="780" r="2.4" fill="#a8ffd8"/>
+  <circle cx="560" cy="780" r="7" fill="none" stroke="#25c985" stroke-width="0.5" opacity="0.38"/>
+
+  <!-- Right mid node -->
+  <circle cx="1380" cy="800" r="14" fill="#25c985" opacity="0.05" filter="url(#softBloom)"/>
+  <circle cx="1380" cy="800" r="4" fill="#25c985" opacity="0.85" filter="url(#nodeGlow)"/>
+  <circle cx="1380" cy="800" r="2.4" fill="#a8ffd8"/>
+  <circle cx="1380" cy="800" r="7" fill="none" stroke="#25c985" stroke-width="0.5" opacity="0.38"/>
+
+  <!-- MEDIUM NODES -->
+  <!-- Left cluster -->
+  <circle cx="440"  cy="700" r="3.4" fill="#25c985" opacity="0.82" filter="url(#nodeGlow)"/>
+  <circle cx="440"  cy="700" r="2"   fill="#c8ffe8"/>
+  <circle cx="440"  cy="700" r="6"   fill="none" stroke="#25c985" stroke-width="0.45" opacity="0.32"/>
+
+  <circle cx="320"  cy="860" r="3"   fill="#25c985" opacity="0.78" filter="url(#nodeGlow)"/>
+  <circle cx="320"  cy="860" r="1.8" fill="#c8ffe8"/>
+
+  <circle cx="280"  cy="740" r="2.8" fill="#25c985" opacity="0.72"/>
+  <circle cx="280"  cy="740" r="1.6" fill="#a8ffd8"/>
+
+  <circle cx="160"  cy="900" r="2.5" fill="#25c985" opacity="0.65"/>
+  <circle cx="140"  cy="680" r="2.2" fill="#25c985" opacity="0.58"/>
+
+  <!-- Right cluster -->
+  <circle cx="1520" cy="720" r="3.4" fill="#25c985" opacity="0.82" filter="url(#nodeGlow)"/>
+  <circle cx="1520" cy="720" r="2"   fill="#c8ffe8"/>
+  <circle cx="1520" cy="720" r="6"   fill="none" stroke="#25c985" stroke-width="0.45" opacity="0.32"/>
+
+  <circle cx="1600" cy="880" r="3"   fill="#25c985" opacity="0.78" filter="url(#nodeGlow)"/>
+  <circle cx="1600" cy="880" r="1.8" fill="#c8ffe8"/>
+
+  <circle cx="1700" cy="760" r="2.8" fill="#25c985" opacity="0.72"/>
+  <circle cx="1700" cy="760" r="1.6" fill="#a8ffd8"/>
+
+  <circle cx="1760" cy="920" r="2.5" fill="#25c985" opacity="0.65"/>
+  <circle cx="1840" cy="680" r="2.2" fill="#25c985" opacity="0.58"/>
+
+  <!-- Top neural traces nodes -->
+  <circle cx="840"  cy="680" r="3"   fill="#25c985" opacity="0.78" filter="url(#nodeGlow)"/>
+  <circle cx="840"  cy="680" r="1.8" fill="#c8ffe8"/>
+
+  <circle cx="1080" cy="660" r="3"   fill="#25c985" opacity="0.78" filter="url(#nodeGlow)"/>
+  <circle cx="1080" cy="660" r="1.8" fill="#c8ffe8"/>
+
+  <circle cx="700"  cy="580" r="2.8" fill="#25c985" opacity="0.72"/>
+  <circle cx="700"  cy="580" r="1.6" fill="#a8ffd8"/>
+
+  <circle cx="1200" cy="560" r="2.8" fill="#25c985" opacity="0.72"/>
+  <circle cx="1200" cy="560" r="1.6" fill="#a8ffd8"/>
+
+  <circle cx="580"  cy="500" r="2.4" fill="#25c985" opacity="0.66"/>
+  <circle cx="580"  cy="500" r="1.4" fill="#a8ffd8"/>
+
+  <circle cx="1340" cy="480" r="2.4" fill="#25c985" opacity="0.66"/>
+  <circle cx="1340" cy="480" r="1.4" fill="#a8ffd8"/>
+
+  <circle cx="460"  cy="420" r="2"   fill="#25c985" opacity="0.55"/>
+  <circle cx="1460" cy="400" r="2"   fill="#25c985" opacity="0.55"/>
+
+  <!-- Fading upper nodes -->
+  <circle cx="860"  cy="580" r="1.8" fill="#25c985" opacity="0.48"/>
+  <circle cx="1060" cy="570" r="1.8" fill="#25c985" opacity="0.48"/>
+  <circle cx="500"  cy="380" r="1.6" fill="#25c985" opacity="0.38"/>
+  <circle cx="1420" cy="340" r="1.6" fill="#25c985" opacity="0.38"/>
+  <circle cx="360"  cy="580" r="1.5" fill="#25c985" opacity="0.32"/>
+  <circle cx="1620" cy="600" r="1.5" fill="#25c985" opacity="0.32"/>
+
+  <!-- Bottom bottom-heavy cluster for horizon density -->
+  <circle cx="720"  cy="860" r="3.2" fill="#25c985" opacity="0.80" filter="url(#nodeGlow)"/>
+  <circle cx="720"  cy="860" r="1.9" fill="#c8ffe8"/>
+  <circle cx="720"  cy="860" r="5.5" fill="none" stroke="#25c985" stroke-width="0.4" opacity="0.28"/>
+
+  <circle cx="1120" cy="820" r="3.2" fill="#25c985" opacity="0.80" filter="url(#nodeGlow)"/>
+  <circle cx="1120" cy="820" r="1.9" fill="#c8ffe8"/>
+  <circle cx="1120" cy="820" r="5.5" fill="none" stroke="#25c985" stroke-width="0.4" opacity="0.28"/>
+
+  <circle cx="780"  cy="940" r="2.8" fill="#25c985" opacity="0.72"/>
+  <circle cx="780"  cy="940" r="1.6" fill="#a8ffd8"/>
+
+  <circle cx="1180" cy="940" r="2.8" fill="#25c985" opacity="0.72"/>
+  <circle cx="1180" cy="940" r="1.6" fill="#a8ffd8"/>
+
+  <circle cx="680"  cy="900" r="2.4" fill="#25c985" opacity="0.66"/>
+  <circle cx="1260" cy="900" r="2.4" fill="#25c985" opacity="0.66"/>
+
+  <circle cx="600"  cy="960" r="2"   fill="#25c985" opacity="0.55"/>
+  <circle cx="1320" cy="960" r="2"   fill="#25c985" opacity="0.55"/>
+
+  <!-- GOLD ACCENT NODES — champagne accent at key intersections -->
+  <circle cx="960"  cy="740" r="18"  fill="none" stroke="#D6C485" stroke-width="0.5" opacity="0.28"/>
+  <circle cx="960"  cy="740" r="26"  fill="none" stroke="#D6C485" stroke-width="0.25" opacity="0.14"/>
+
+  <circle cx="440"  cy="700" r="5.5" fill="none" stroke="#D6C485" stroke-width="0.45" opacity="0.32"/>
+  <circle cx="1520" cy="720" r="5.5" fill="none" stroke="#D6C485" stroke-width="0.45" opacity="0.32"/>
+
+  <circle cx="700"  cy="580" r="1.8" fill="#D6C485" opacity="0.55"/>
+  <circle cx="1200" cy="560" r="1.8" fill="#D6C485" opacity="0.55"/>
+  <circle cx="560"  cy="780" r="1.6" fill="#D6C485" opacity="0.42"/>
+  <circle cx="1380" cy="800" r="1.6" fill="#D6C485" opacity="0.42"/>
+
+  <!-- Diamond accent markers at select nodes -->
+  <!-- Central node diamond -->
+  <polygon points="960,728 972,740 960,752 948,740"
+    fill="none" stroke="#D6C485" stroke-width="0.55" opacity="0.38"/>
+
+  <!-- Left mid diamond -->
+  <polygon points="560,772 568,780 560,788 552,780"
+    fill="none" stroke="#D6C485" stroke-width="0.45" opacity="0.28"/>
+
+  <!-- Right mid diamond -->
+  <polygon points="1380,792 1388,800 1380,808 1372,800"
+    fill="none" stroke="#D6C485" stroke-width="0.45" opacity="0.28"/>
+
+  <!-- ═══════════════════════════════════════════════════════
+       LAYER 6: DEPTH OF FIELD — subtle cinematic vignette
+       Darkens corners/top, preserving glow at bottom
+  ═══════════════════════════════════════════════════════ -->
+  <rect width="1920" height="1080" fill="url(#atmosphereGrad)"/>
+
+  <!-- Thin horizon line — the razor arc at 66% height -->
+  <line x1="0" y1="713" x2="1920" y2="713"
+    stroke="#25c985" stroke-width="0.5" opacity="0.22"/>
+  <line x1="0" y1="713" x2="1920" y2="713"
+    stroke="#25c985" stroke-width="1.5" opacity="0.08" filter="url(#lineGlow)"/>
+
+  <!-- Gold corona thin horizon line, just above -->
+  <line x1="0" y1="708" x2="1920" y2="708"
+    stroke="#D6C485" stroke-width="0.4" opacity="0.18"/>
+
+</svg>

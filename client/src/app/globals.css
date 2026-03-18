@@ -15,8 +15,8 @@
   --byreix-surface-soft: #143624;
   --byreix-green: #25c985;
   --byreix-green-deep: #11784d;
-  --byreix-gold: #d4af37;
-  --byreix-gold-soft: #e6c86b;
+  --byreix-gold: #c5a059;
+  --byreix-gold-soft: #dfc28d;
   --byreix-text-primary: #f5f8f6;
   --byreix-text-secondary: #afc1b7;
   --byreix-border: rgba(214, 196, 133, 0.16);
@@ -102,13 +102,79 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-/*skeleton effect*/
 @layer utilities {
   .skeleton-fill {
     @apply bg-white/5;
     position: relative;
     overflow: hidden;
   }
+
+  .noise-overlay {
+    position: relative;
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      opacity: 0.12;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3Y%3Cfilter id='noiseFilter'%3Y%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3Y%3C/filter%3Y%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3Y%3C/svg%3Y");
+    }
+  }
+
+  .glass-luxury,
+  .liquid-glass {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow:
+      0 4px 24px -1px rgba(0, 0, 0, 0.2),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  }
+
+  .liquid-glass {
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.05) 0%,
+      rgba(255, 255, 255, 0.01) 100%
+    );
+  }
+}
+
+@keyframes grid-scan {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes organic-float {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(2%, 4%) scale(1.05);
+  }
+  66% {
+    transform: translate(-1%, -3%) scale(0.95);
+  }
+}
+
+.animate-grid-scan {
+  animation: grid-scan 8s linear infinite;
+}
+
+.animate-organic-float {
+  animation: organic-float 20s ease-in-out infinite;
 }
 
 @layer base {
@@ -163,7 +229,7 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #071a11;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {

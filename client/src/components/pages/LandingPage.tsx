@@ -1,13 +1,24 @@
-"use client";
-
-import { Button } from "../ui";
-import { ArrowRight, Repeat, Zap } from "lucide-react";
+import { useState } from "react";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
 import { motion, useReducedMotion } from "motion/react";
+import { ArrowRight, Repeat, Zap } from "lucide-react";
 
 interface LandingPageProps {
   onNavigate: (page: string) => void;
   onConnect: () => void;
 }
+
+// Floating Node Component for the Neural Grid
+const NeuralNode = ({ delay = 0, x = 0, y = 0 }: { delay?: number; x?: number; y?: number }) => (
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: [0.2, 0.5, 0.2] }}
+    transition={{ duration: 4, repeat: Infinity, delay }}
+    className="absolute w-1.5 h-1.5 rounded-full bg-primary/30 blur-[1px]"
+    style={{ left: `${x}%`, top: `${y}%` }}
+  />
+);
 
 export function LandingPage({ onNavigate, onConnect }: LandingPageProps) {
   const easeOutQuint: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -20,58 +31,157 @@ export function LandingPage({ onNavigate, onConnect }: LandingPageProps) {
     transition: { duration: reducedMotion ? 0.18 : 0.38, delay, ease: easeOutQuint },
   });
 
-  return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
+  const [nodes] = useState(() =>
+    [...Array(15)].map((_, i) => ({
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      delay: i * 0.5,
+    }))
+  );
 
-      <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 overflow-hidden">
-        {/* Background - Earth-like glow */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+  return (
+    <div className="min-h-screen bg-background selection:bg-primary/30 selection:text-foreground">
+      {/* Hero Section */}
+      <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 overflow-hidden noise-overlay">
+        {/* Neural Grid Background */}
+        <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
+          {/* Organic Liquid Orbs */}
+          <div className="absolute top-[-10%] left-[-5%] w-[40%] h-[40%] bg-primary/10 blur-[120px] rounded-full animate-organic-float" />
           <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "radial-gradient(60% 50% at 50% 100%, rgba(42,212,138,0.14) 0%, rgba(19,138,88,0.06) 42%, transparent 78%), radial-gradient(38% 34% at 50% 0%, rgba(214,196,133,0.08) 0%, transparent 72%), radial-gradient(30% 40% at 100% 35%, rgba(42,212,138,0.06) 0%, transparent 74%)",
-            }}
+            className="absolute bottom-[10%] right-[-5%] w-[35%] h-[35%] bg-(--byreix-gold)/10 blur-[100px] rounded-full animate-organic-float"
+            style={{ animationDelay: "-5s" }}
           />
+
+          {/* Active Nodes */}
+          {nodes.map((node, i) => (
+            <NeuralNode key={i} x={node.x} y={node.y} delay={node.delay} />
+          ))}
+
+          {/* Connection Lines (Simulated SVG) */}
+          <svg className="absolute inset-0 w-full h-full opacity-20">
+            <defs>
+              <linearGradient id="line-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="transparent" />
+                <stop offset="50%" stopColor="var(--color-primary)" />
+                <stop offset="100%" stopColor="transparent" />
+              </linearGradient>
+            </defs>
+            <motion.path
+              d="M 10,20 Q 50,50 90,80"
+              stroke="url(#line-grad)"
+              strokeWidth="0.5"
+              fill="transparent"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+            />
+            <motion.path
+              d="M 80,10 Q 40,60 20,90"
+              stroke="url(#line-grad)"
+              strokeWidth="0.5"
+              fill="transparent"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: 12, repeat: Infinity, ease: "linear", delay: 2 }}
+            />
+          </svg>
         </div>
 
-        <div className="max-w-6xl mx-auto relative w-full">
-          <div className="max-w-3xl mx-auto text-center">
-            {/* Left: Text Content - Bolder Typography */}
+        {/* Adjusted Horizon Glow - Anchored to Headline/CTA for "Stage Light" effect */}
+        <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden">
+          {/* Top-down Vignette: Dims the top arc to prevent competition with Nav and Logo */}
+          <div className="absolute inset-x-0 top-0 h-1/2 bg-linear-to-b from-background via-background/50 to-transparent z-10" />
+
+          <motion.div
+            initial={{ opacity: 0, scale: 1.05, y: 160 }}
+            animate={{ opacity: 1, scale: 1, y: 130 }} // Moved further down to reveal less of the arc on load
+            transition={{ duration: 2.5, ease: easeOutQuint, delay: 0.1 }}
+            className="w-full h-full flex flex-col justify-end"
+          >
+            <div className="w-full aspect-21/9 opacity-95 relative">
+              <Image
+                src="/horizon_glow.png"
+                alt=""
+                fill
+                className="object-cover mix-blend-screen"
+                style={{
+                  maskImage: "linear-gradient(to bottom, transparent, black 15%)",
+                  WebkitMaskImage: "linear-gradient(to bottom, transparent, black 15%)",
+                }}
+              />
+            </div>
+          </motion.div>
+        </div>
+
+        <div className="max-w-6xl mx-auto relative z-20 w-full pt-12 sm:pt-16 lg:pt-20">
+          <div className="max-w-5xl mx-auto text-center px-4">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.72, ease: easeOutQuint }}
+              transition={{ duration: 0.85, ease: easeOutQuint }}
+              className="flex flex-col items-center"
             >
-              {/* Headline - Direct and minimal */}
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-[0.92] tracking-[-0.03em]">
-                <span className="text-foreground">Your Wallet,</span>
-                <br />
-                <span className="bg-linear-to-r from-(--byreix-gold-soft) to-(--byreix-gold) bg-clip-text text-transparent">
-                  Your Terms.
+              {/* Feature Highlight / Update Tag */}
+              <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/3 border border-white/10 mb-6 backdrop-blur-xl group cursor-pointer hover:bg-white/5 transition-colors">
+                <span className="text-[9px] font-black bg-primary text-primary-foreground px-1.5 py-0.5 rounded-sm mr-1">
+                  NEW
+                </span>
+                <span className="text-[11px] font-bold tracking-widest uppercase text-primary/90">
+                  Smart Escrow is now live
+                </span>
+              </div>
+
+              {/* Headline - Responsive Scaling */}
+              <h1 className="mb-4 sm:mb-6 flex flex-col items-center">
+                <span className="text-3xl sm:text-5xl lg:text-6xl font-medium tracking-tight text-foreground/90 mb-2 sm:mb-3">
+                  Secure transfers,
+                </span>
+                <span className="text-4xl sm:text-7xl lg:text-[8rem] xl:text-[9rem] font-black tracking-[-0.05em] leading-[0.8] bg-linear-to-b from-white via-white to-white/60 bg-clip-text text-transparent">
+                  ONE{" "}
+                  <span className="bg-linear-to-b from-(--byreix-gold) to-(--byreix-gold-soft) bg-clip-text text-transparent">
+                    TAP
+                  </span>{" "}
+                  AWAY
                 </span>
               </h1>
 
-              {/* Subheading */}
-              <p className="text-lg sm:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed font-light">
-                The non-custodial wallet for Sidrachain. Swap, send, and track with zero compromise.
+              {/* Subheading - Compact & Embedded Trust */}
+              <p className="text-base sm:text-xl text-foreground font-normal mb-6 max-w-md mx-auto leading-relaxed tracking-tight opacity-80 px-2 text-balance">
+                Swap instantly with <span className="text-primary font-medium">smart escrow</span>.
+                Send globally. Stay in full control of your assets on Sidrachain.
               </p>
 
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Button
-                  onClick={onConnect}
-                  size="lg"
-                  className="h-12 px-6 bg-primary hover:bg-primary/90 text-background font-semibold text-base rounded-lg transition-colors duration-200"
-                >
-                  Connect Wallet
-                </Button>
-                <button
-                  onClick={() => onNavigate("wallet")}
-                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Open app
-                </button>
+              {/* Buttons - Mobile Full Width Stack with sharper hierarchy */}
+              <div className="relative group/actions p-2">
+                {/* Darker anchor for maximum button crispness */}
+                <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-24 bg-background/40 blur-3xl rounded-full opacity-60 pointer-events-none" />
+
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 w-full max-w-[280px] sm:max-w-none mx-auto relative z-10">
+                  <Button
+                    onClick={onConnect}
+                    className="w-full sm:w-auto h-12 sm:h-13 px-8 bg-linear-to-b from-primary via-primary to-primary/95 text-primary-foreground font-bold text-base rounded-xl shadow-[0_8px_30px_rgb(37,201,133,0.3)] hover:shadow-[0_12px_45px_rgb(37,201,133,0.5)] hover:-translate-y-0.5 transition-all duration-300 active:scale-[0.98] border border-white/10"
+                  >
+                    Connect Wallet
+                  </Button>
+                  <Button
+                    onClick={() => onNavigate("wallet")}
+                    variant="outline"
+                    className="w-full sm:w-auto h-12 sm:h-13 px-8 bg-transparent hover:bg-white/5 text-foreground/80 hover:text-foreground font-semibold text-base rounded-xl border-white/10 hover:border-white/25 transition-all duration-300 active:scale-[0.98] backdrop-blur-none"
+                  >
+                    View Explorer
+                  </Button>
+                </div>
+              </div>
+
+              {/* Trust Hook - Compact Hierarchy */}
+              <div className="mt-4 flex items-center justify-center gap-4 sm:gap-6 opacity-40">
+                <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-foreground">
+                  Non-Custodial
+                </span>
+                <div className="w-1 h-1 rounded-full bg-border" />
+                <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-foreground">
+                  Sidrachain Native
+                </span>
               </div>
             </motion.div>
           </div>

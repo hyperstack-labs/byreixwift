@@ -200,11 +200,13 @@ export function Navbar({
             ) : (
               <Button
                 onClick={onConnect}
-                className="group relative overflow-hidden bg-linear-to-br from-(--byreix-gold) to-(--byreix-gold-soft) hover:from-(--byreix-gold-soft) hover:to-(--byreix-gold) text-black font-extrabold rounded-full px-8 py-3 cursor-pointer border-none shadow-[0_0_20px_rgba(212,175,55,0.32)] transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.48)] active:scale-95 outline-none"
+                className="group relative h-11 px-7 bg-[#0a120e] hover:bg-[#0c1a14] text-foreground font-bold rounded-full border border-white/15 hover:border-primary/40 transition-all duration-500 active:scale-95 shadow-[0_4px_12px_rgba(0,0,0,0.5)] hover:shadow-[0_8px_20px_rgba(37,201,133,0.12)] hover:-translate-y-0.5 overflow-hidden"
               >
-                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
-                <span className="relative flex items-center gap-2">
-                  <Wallet className="w-5 h-5" />
+                {/* Subtle Inner Highlight for Depth */}
+                <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/10 to-transparent" />
+
+                <span className="relative flex items-center gap-2.5">
+                  <Wallet className="w-4 h-4 text-primary group-hover:scale-110 transition-transform duration-500" />
                   Connect Wallet
                 </span>
               </Button>

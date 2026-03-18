@@ -10,9 +10,12 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "ByReiXwift - Your Wallet, Your Terms",
+  title: "ByReiXwift - You're a tap away",
   description:
     "The non-custodial wallet for Sidrachain. Swap, send, and track with zero compromise.",
+  icons: {
+    icon: "/logo_transparent.png",
+  },
 };
 
 export default function RootLayout({
