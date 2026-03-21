@@ -14,7 +14,7 @@ import {
   ShieldCheck,
   Wallet,
 } from "lucide-react";
-import { HOME_SECTION_IDS, HOME_SECTION_RAIL_LINKS } from "@/constants/homeSections";
+import { HOME_SECTION_IDS } from "@/constants/homeSections";
 
 interface LandingPageProps {
   onNavigate: (page: string) => void;
@@ -33,7 +33,20 @@ interface DetailRow {
   value: string;
 }
 
-const heroProofPoints = ["Fixed-fee review", "Escrow when needed", "Built for merchants and users"];
+const heroProofPoints = [
+  {
+    label: "Fee review",
+    value: "Visible before approval",
+  },
+  {
+    label: "Escrow",
+    value: "Used when trust needs structure",
+  },
+  {
+    label: "Audience",
+    value: "Users and merchants",
+  },
+] as const;
 
 const problemPoints = [
   "Many Muslims still navigate digital payments with unclear charges or structures that weaken trust.",
@@ -259,15 +272,15 @@ export function LandingPage({ onConnect }: LandingPageProps) {
         </div>
 
         <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden">
-          <div className="absolute inset-x-0 top-0 z-10 h-1/2 bg-linear-to-b from-background via-background/55 to-transparent" />
+          <div className="absolute inset-x-0 top-0 z-10 h-[58%] bg-linear-to-b from-background via-background/72 to-transparent" />
 
           <motion.div
-            initial={{ opacity: 0, scale: 1.05, y: 160 }}
-            animate={{ opacity: 1, scale: 1, y: 130 }}
+            initial={{ opacity: 0, scale: 1.05 }}
+            animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 2.5, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
-            className="flex h-full w-full flex-col justify-end"
+            className="flex h-full w-full flex-col items-center justify-center"
           >
-            <div className="relative w-full aspect-21/9 opacity-95">
+            <div className="relative aspect-21/9 w-[158%] max-w-none -translate-y-6.5 opacity-[0.78] sm:w-[132%] sm:translate-y-[3.2rem] sm:opacity-[0.84] lg:w-full lg:translate-y-19 lg:opacity-[0.9]">
               <Image
                 src="/horizon_glow.png"
                 alt=""
@@ -282,16 +295,16 @@ export function LandingPage({ onConnect }: LandingPageProps) {
           </motion.div>
         </div>
 
-        <div className="relative z-20 mx-auto w-full max-w-6xl pt-12 sm:pt-16 lg:pt-20">
+        <div className="relative z-20 mx-auto w-full max-w-6xl pt-24 sm:pt-28 lg:pt-32">
           <div className="mx-auto max-w-5xl px-4 text-center">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
-              className="flex flex-col items-center"
+              className="flex -translate-y-2 flex-col items-center sm:-translate-y-3 lg:-translate-y-4"
             >
-              <div className="mb-6 inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/3 px-4 py-1.5 backdrop-blur-xl">
-                <span className="rounded-sm bg-primary px-1.5 py-0.5 text-[9px] font-black text-primary-foreground">
+              <div className="mb-7 inline-flex items-center gap-2.5 rounded-full border border-white/8 bg-background/18 px-4 py-1.5 backdrop-blur-xl">
+                <span className="rounded-full border border-primary/24 bg-primary/12 px-2 py-0.5 text-[9px] font-black tracking-[0.08em] text-primary">
                   BYREIXWIFT
                 </span>
                 <span className="text-[11px] font-bold uppercase tracking-widest text-primary/90">
@@ -299,86 +312,75 @@ export function LandingPage({ onConnect }: LandingPageProps) {
                 </span>
               </div>
 
-              <h1 className="mb-5 flex max-w-5xl flex-col items-center">
-                <span className="mb-3 text-3xl font-medium tracking-tight text-foreground/92 sm:text-5xl lg:text-6xl">
+              <h1 className="mb-6 flex max-w-[64rem] flex-col items-center">
+                <span className="mb-5 text-[clamp(2.15rem,4.1vw,3.85rem)] font-medium leading-none tracking-[-0.045em] text-foreground/86">
                   Clearer payments
                 </span>
-                <span className="bg-linear-to-b from-white via-white to-white/60 bg-clip-text text-4xl font-black leading-[0.84] tracking-[-0.055em] text-transparent sm:text-7xl lg:text-[7.75rem] xl:text-[8.75rem]">
+                <span className="block bg-linear-to-b from-white via-white to-white/75 bg-clip-text text-[clamp(4.15rem,9.8vw,6.25rem)] font-black leading-[0.9] tracking-[-0.035em] text-transparent">
                   FOR USERS
-                  <span className="bg-linear-to-b from-(--byreix-gold) to-(--byreix-gold-soft) bg-clip-text text-transparent">
-                    {" "}
-                    AND MERCHANTS
-                  </span>
+                </span>
+                <span className="mt-1 block bg-linear-to-b from-[#f6dfb0] via-[#e3c98d] to-[#cd9f58] bg-clip-text text-[clamp(4.15rem,9.8vw,6.25rem)] font-black leading-[0.9] tracking-[-0.035em] text-transparent">
+                  AND MERCHANTS
                 </span>
               </h1>
 
-              <p className="mb-8 max-w-3xl px-2 text-balance text-base leading-relaxed text-foreground/80 sm:text-xl">
-                ByReiXwift helps people pay online, send funds, and use escrow when a transaction
-                needs protection. Fees stay visible before approval so both sides can review the
-                same terms before money moves.
+              <p className="mb-9 max-w-[40rem] px-4 text-balance text-[1.04rem] font-medium leading-[1.72] text-foreground/84 drop-shadow-[0_10px_24px_rgba(3,13,8,0.7)] sm:text-[1.12rem] lg:text-[1.2rem]">
+                Pay online, send funds, and use escrow when a transaction needs protection.
               </p>
 
               <div className="relative p-2">
                 <div className="pointer-events-none absolute inset-x-0 top-1/2 h-24 -translate-y-1/2 rounded-full bg-background/40 blur-3xl opacity-60" />
 
-                <div className="relative z-10 mx-auto flex w-full max-w-[320px] flex-col items-center justify-center gap-3 sm:max-w-none sm:flex-row sm:gap-4">
+                <div className="relative z-10 mx-auto flex w-full max-w-[320px] flex-col items-center justify-center gap-3 sm:max-w-none sm:flex-row sm:gap-5">
                   <Button
                     onClick={onConnect}
-                    className="h-12 w-full rounded-xl border border-white/10 bg-linear-to-b from-primary via-primary to-primary/95 px-8 text-base font-bold text-primary-foreground shadow-[0_8px_30px_rgb(37,201,133,0.3)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_45px_rgb(37,201,133,0.5)] sm:h-13 sm:w-auto"
+                    className="h-12 w-full rounded-xl border border-white/10 bg-linear-to-b from-primary via-primary to-primary/95 px-9 text-base font-bold text-primary-foreground shadow-[0_8px_30px_rgb(37,201,133,0.26)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_40px_rgb(37,201,133,0.38)] sm:h-13 sm:w-auto"
                   >
                     Launch App
                   </Button>
                   <Button
                     onClick={() => scrollToSection(HOME_SECTION_IDS.howItWorks)}
                     variant="outline"
-                    className="h-12 w-full rounded-xl border-white/10 bg-transparent px-8 text-base font-semibold text-foreground/82 transition-all duration-300 hover:border-white/25 hover:bg-white/5 hover:text-foreground sm:h-13 sm:w-auto"
+                    className="h-12 w-full rounded-xl border-white/10 bg-transparent px-9 text-base font-semibold text-foreground/82 transition-all duration-300 hover:border-white/25 hover:bg-white/5 hover:text-foreground sm:h-13 sm:w-auto"
                   >
                     See How It Works
                   </Button>
                 </div>
               </div>
 
-              <div className="mt-7 flex flex-wrap items-center justify-center gap-3 sm:gap-4">
-                {heroProofPoints.map((point) => (
-                  <div
-                    key={point}
-                    className="rounded-full border border-border bg-card/50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground"
-                  >
-                    {point}
-                  </div>
-                ))}
+              <div className="mt-12 w-full max-w-[46rem]">
+                <div className="relative grid border-y border-[rgba(255,255,255,0.07)] sm:grid-cols-3">
+                  <div className="pointer-events-none absolute inset-x-10 top-0 h-px bg-linear-to-r from-transparent via-(--byreix-gold-soft)/28 to-transparent" />
+                  <div className="pointer-events-none absolute inset-x-10 bottom-0 h-px bg-linear-to-r from-transparent via-white/10 to-transparent" />
+                  {heroProofPoints.map((point, index) => (
+                    <motion.div
+                      key={point.label}
+                      initial={{ opacity: 0, y: reducedMotion ? 0 : 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{
+                        duration: reducedMotion ? 0.2 : 0.45,
+                        delay: reducedMotion ? 0 : 0.45 + index * 0.08,
+                        ease: [0.22, 1, 0.36, 1],
+                      }}
+                      className="relative px-5 py-5 text-center sm:px-7"
+                    >
+                      {index < heroProofPoints.length - 1 ? (
+                        <div className="absolute bottom-0 left-8 right-8 h-px bg-linear-to-r from-transparent via-white/8 to-transparent sm:hidden" />
+                      ) : null}
+                      {index < heroProofPoints.length - 1 ? (
+                        <div className="absolute right-0 top-1/2 hidden h-14 w-px -translate-y-1/2 bg-linear-to-b from-transparent via-white/10 to-transparent sm:block" />
+                      ) : null}
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-(--byreix-gold-soft)">
+                        {point.label}
+                      </p>
+                      <p className="mx-auto mt-2 max-w-[15rem] text-sm leading-relaxed text-foreground/78">
+                        {point.value}
+                      </p>
+                    </motion.div>
+                  ))}
+                </div>
               </div>
             </motion.div>
-          </div>
-        </div>
-      </section>
-
-      <section className="border-y border-border/65 bg-[linear-gradient(180deg,rgba(7,19,13,0.92)_0%,rgba(5,15,10,0.84)_100%)]">
-        <div className="mx-auto flex max-w-6xl flex-col gap-5 px-4 py-6 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
-          <div className="max-w-md">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-(--byreix-gold-soft)">
-              Explore ByReiXwift
-            </p>
-            <p className="mt-2 text-sm leading-7 text-muted-foreground">
-              Start with the problem, move through the platform, then review the principles
-              guiding the product.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            {HOME_SECTION_RAIL_LINKS.map((link) => (
-              <button
-                key={link.id}
-                type="button"
-                onClick={() => scrollToSection(link.id)}
-                className="group inline-flex items-center rounded-full border border-white/10 bg-white/3 px-4 py-2.5 text-sm font-semibold text-foreground/80 transition-all duration-300 hover:border-primary/25 hover:bg-primary/8 hover:text-foreground"
-              >
-                <span className="mr-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-(--byreix-gold-soft) transition-colors duration-300 group-hover:text-(--byreix-gold-soft)">
-                  Jump
-                </span>
-                {link.label}
-              </button>
-            ))}
           </div>
         </div>
       </section>

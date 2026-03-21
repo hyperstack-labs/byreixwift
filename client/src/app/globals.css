@@ -196,6 +196,7 @@
   html {
     font-size: var(--font-size);
     scroll-behavior: smooth;
+    scrollbar-gutter: stable both-edges;
   }
 
   h1,
@@ -214,6 +215,16 @@
     font-feature-settings:
       "tnum" on,
       "lnum" on;
+  }
+
+  section[id]:not(#hero) {
+    scroll-margin-top: 7.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    section[id]:not(#hero) {
+      scroll-margin-top: 8.5rem;
+    }
   }
 }
 

@@ -5,7 +5,7 @@ import { ByreixLogo } from "./ByreixLogo";
 import { Button } from "./ui";
 import { Wallet, Menu, X, User, Settings, LogOut, ChevronDown } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "motion/react";
 import { PUBLIC_HOME_NAV_LINKS, HOME_SECTION_IDS, type HomeSectionId } from "@/constants/homeSections";
 import { PUBLIC_SITE_PAGES } from "@/constants/publicSite";
 
@@ -32,22 +32,15 @@ export function Navbar({
 }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showAccountMenu, setShowAccountMenu] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [scrolled, setScrolled] = useState(() =>
+    typeof window !== "undefined" ? window.scrollY > 18 : false,
+  );
   const menuRef = useRef<HTMLDivElement>(null);
-  const lastScrolledRef = useRef(false);
+  const { scrollY } = useScroll();
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const next = window.scrollY > 20;
-      if (lastScrolledRef.current !== next) {
-        lastScrolledRef.current = next;
-        setScrolled(next);
-      }
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    setScrolled(latest > 18);
+  });
 
   // Close menu on click outside
   useEffect(() => {
@@ -86,6 +79,9 @@ export function Navbar({
   );
   const publicHomeLinks = !isConnected && isPublicRoute ? PUBLIC_HOME_NAV_LINKS : [];
   const publicPageLinks = !isConnected && isPublicRoute ? PUBLIC_SITE_PAGES : [];
+  const hasDesktopNav = navLinks.length > 0 || publicHomeLinks.length > 0 || publicPageLinks.length > 0;
+  const useSolidChrome = scrolled || mobileMenuOpen || currentPage !== "home" || Boolean(isConnected);
+  const desktopBarHeight = useSolidChrome ? 68 : 80;
 
   const handleNavClick = (link: { label: string; value: string; isGated: boolean }) => {
     if (link.isGated && !isConnected) {
@@ -96,59 +92,86 @@ export function Navbar({
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 flex justify-center items-start pt-6 px-4 pointer-events-none">
+    <nav className="fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-6 lg:px-8">
       <motion.div
         initial={{ y: -100, opacity: 0 }}
-        animate={{
-          y: 0,
-          opacity: 1,
-        }}
+        animate={{ y: 0, opacity: 1 }}
         transition={{
           duration: 0.8,
           ease: [0.23, 1, 0.32, 1],
         }}
-        className={`pointer-events-auto w-full max-w-7xl border rounded-4xl md:rounded-[3rem] overflow-visible transition-[background-color,border-color,box-shadow] duration-300 ${
-          scrolled
-            ? "bg-[rgba(7,29,19,0.92)] border-[rgba(214,196,133,0.2)] shadow-[0_10px_26px_rgba(3,13,8,0.34)]"
-            : "bg-transparent border-transparent shadow-none"
-        }`}
+        className="pointer-events-none mx-auto max-w-6xl"
       >
-        <div className="px-6 md:px-12 h-16 md:h-20 flex items-center justify-between relative">
-          {/* Brand/Logo */}
-          <button
-            onClick={() => {
-              if (currentPage === "home") {
-                onSectionNavigate?.(HOME_SECTION_IDS.hero);
-                return;
-              }
-              if (isPublicRoute) {
-                onNavigate?.("/");
-                return;
-              }
-              onNavigate?.("home");
+        <motion.div
+          layout
+          animate={{
+            y: useSolidChrome ? -2 : 0,
+            scale: useSolidChrome ? 0.992 : 1,
+          }}
+          transition={{
+            duration: 0.35,
+            ease: [0.22, 1, 0.36, 1],
+          }}
+          className={`pointer-events-auto overflow-hidden rounded-[1.75rem] border transition-[background-color,border-color,box-shadow] duration-300 ${
+            useSolidChrome
+              ? "border-[rgba(214,196,133,0.16)] bg-[rgba(5,18,12,0.82)] backdrop-blur-xl shadow-[0_14px_34px_rgba(3,13,8,0.3)]"
+              : "border-transparent bg-transparent shadow-none"
+          }`}
+        >
+          <motion.div
+            layout
+            animate={{ height: desktopBarHeight }}
+            transition={{
+              duration: 0.35,
+              ease: [0.22, 1, 0.36, 1],
             }}
-            className="relative z-10 shrink-0 cursor-pointer hover:scale-105 active:scale-95 transition-all duration-500 outline-none rounded-lg"
-            title="home"
+            className="grid grid-cols-[auto_1fr_auto] items-center gap-4 px-4 sm:px-6 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:gap-6 lg:px-8"
           >
-            <ByreixLogo />
-          </button>
+          {/* Brand/Logo */}
+          <div className="flex items-center justify-start">
+            <button
+              onClick={() => {
+                if (currentPage === "home") {
+                  onSectionNavigate?.(HOME_SECTION_IDS.hero);
+                  return;
+                }
+                if (isPublicRoute) {
+                  onNavigate?.("/");
+                  return;
+                }
+                onNavigate?.("home");
+              }}
+              className="relative z-10 shrink-0 cursor-pointer rounded-lg outline-none transition-all duration-500 hover:scale-105 active:scale-95"
+              title="home"
+            >
+              <ByreixLogo variant="compact" />
+            </button>
+          </div>
 
-          {/* Desktop Navigation - Liquid Pill Indicator */}
-          {(navLinks.length > 0 || publicHomeLinks.length > 0 || publicPageLinks.length > 0) && (
-            <div className="hidden md:flex items-center gap-1 relative">
+          {/* Desktop Navigation */}
+          {hasDesktopNav && (
+            <div className="hidden min-w-0 items-center justify-center justify-self-center md:flex">
+              <motion.div
+                layout
+                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                className="flex items-center gap-10 lg:gap-12"
+              >
               {navLinks.map((link) => {
                 const isActive = currentPage === link.value;
                 return (
                   <button
                     key={link.value}
                     onClick={() => handleNavClick(link)}
-                    className={`relative px-6 py-2.5 text-sm font-bold tracking-tight transition-colors duration-500 cursor-pointer z-10 outline-none rounded-full
-                      ${isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground/85"}`}
+                    className={`relative px-1 py-2 text-sm font-semibold tracking-[-0.01em] transition-colors duration-300 cursor-pointer whitespace-nowrap outline-none ${
+                      isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground/85"
+                    }`}
                   >
-                    {isActive && (
-                      <div className="absolute inset-0 -z-10 rounded-full bg-primary/16" />
-                    )}
-                    <span className="relative z-20">{link.label}</span>
+                    <span>{link.label}</span>
+                    <span
+                      className={`absolute inset-x-0 -bottom-1.5 h-px origin-center bg-primary transition-transform duration-300 ${
+                        isActive ? "scale-x-100" : "scale-x-0"
+                      }`}
+                    />
                   </button>
                 );
               })}
@@ -156,9 +179,9 @@ export function Navbar({
                 <button
                   key={link.id}
                   onClick={() => onSectionNavigate?.(link.id)}
-                  className="relative z-10 rounded-full px-6 py-2.5 text-sm font-bold tracking-tight text-muted-foreground transition-colors duration-500 outline-none hover:text-foreground/85"
+                  className="relative px-1 py-2 text-sm font-semibold tracking-[-0.01em] text-muted-foreground transition-colors duration-300 whitespace-nowrap outline-none hover:text-foreground/85"
                 >
-                  <span className="relative z-20">{link.label}</span>
+                  <span>{link.label}</span>
                 </button>
               ))}
               {publicPageLinks.map((link) => {
@@ -168,126 +191,130 @@ export function Navbar({
                   <Link
                     key={link.value}
                     href={link.href}
-                    className={`relative z-10 rounded-full px-5 py-2.5 text-sm font-bold tracking-tight transition-colors duration-500 outline-none ${
+                    className={`relative px-1 py-2 text-sm font-semibold tracking-[-0.01em] transition-colors duration-300 whitespace-nowrap outline-none ${
                       isActive
                         ? "text-foreground"
                         : "text-muted-foreground hover:text-foreground/85"
                     }`}
                   >
-                    {isActive && <div className="absolute inset-0 -z-10 rounded-full bg-primary/16" />}
-                    <span className="relative z-20">{link.label}</span>
+                    <span>{link.label}</span>
+                    <span
+                      className={`absolute inset-x-0 -bottom-1.5 h-px origin-center bg-primary transition-transform duration-300 ${
+                        isActive ? "scale-x-100" : "scale-x-0"
+                      }`}
+                    />
                   </Link>
                 );
               })}
+              </motion.div>
             </div>
           )}
 
           {/* Action Area - Unified Auth Group */}
-          <div className="hidden md:flex items-center gap-8">
-            {!isConnected && currentPage !== "login" && (
-              <button
-                onClick={() => onNavigate?.("login")}
-                className="text-sm font-bold text-muted-foreground hover:text-foreground transition-colors duration-500 cursor-pointer whitespace-nowrap outline-none"
-              >
-                Sign In
-              </button>
-            )}
-
-            {isConnected ? (
-              <div className="relative" ref={menuRef}>
-                <motion.button
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  onClick={() => setShowAccountMenu(!showAccountMenu)}
-                  className="flex items-center gap-2 transition-all duration-500 cursor-pointer group outline-none px-2 py-1 rounded-full hover:bg-white/5 border border-transparent active:scale-95"
+          <div className="flex items-center justify-end">
+            <div className="hidden items-center gap-8 lg:gap-9 md:flex">
+              {!isConnected && currentPage !== "login" && (
+                <button
+                  onClick={() => onNavigate?.("login")}
+                  className="text-sm font-semibold tracking-[-0.01em] text-muted-foreground transition-colors duration-300 cursor-pointer whitespace-nowrap outline-none hover:text-foreground"
                 >
-                  <div className="flex flex-col items-end pl-3">
-                    <span className="text-[10px] uppercase tracking-widest text-(--byreix-gold-soft) font-bold">
-                      Connected
-                    </span>
-                    <div className="flex items-center gap-1">
-                      <span className="text-xs font-mono text-foreground/90">{connectedLabel}</span>
-                      <ChevronDown
-                        className={`w-3 h-3 text-muted-foreground transition-transform duration-300 ${showAccountMenu ? "rotate-180" : ""}`}
-                      />
-                    </div>
-                  </div>
-                </motion.button>
+                  Sign In
+                </button>
+              )}
 
-                {/* Account Dropdown */}
-                <AnimatePresence>
-                  {showAccountMenu && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
-                      className="absolute right-0 mt-3 w-64 bg-card/95 border border-border rounded-3xl overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.4)] z-50"
-                    >
-                      <div className="p-2 flex flex-col gap-1">
-                        <button
-                          onClick={() => {
-                            onNavigate?.("profile");
-                            setShowAccountMenu(false);
-                          }}
-                          className="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-primary/10 text-muted-foreground hover:text-foreground transition-all duration-500 group"
-                        >
-                          <User className="w-4 h-4 group-hover:text-primary transition-colors" />
-                          <span className="text-sm font-semibold">View Profile</span>
-                        </button>
-                        <button
-                          onClick={() => {
-                            onNavigate?.("cms");
-                            setShowAccountMenu(false);
-                          }}
-                          className="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-primary/10 text-muted-foreground hover:text-foreground transition-all duration-500 group"
-                        >
-                          <Settings className="w-4 h-4 group-hover:text-primary transition-colors" />
-                          <span className="text-sm font-semibold">CMS Dashboard</span>
-                        </button>
-                        <div className="h-px bg-border my-1 mx-2" />
-                        <button
-                          onClick={() => {
-                            onDisconnect?.();
-                            setShowAccountMenu(false);
-                          }}
-                          className="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-red-500/10 text-red-400 hover:text-red-300 transition-all duration-500 group"
-                        >
-                          <LogOut className="w-4 h-4" />
-                          <span className="text-sm font-bold">Disconnect</span>
-                        </button>
+              {isConnected ? (
+                <div className="relative" ref={menuRef}>
+                  <motion.button
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    onClick={() => setShowAccountMenu(!showAccountMenu)}
+                    className="group flex items-center gap-3 rounded-xl border border-white/10 bg-white/4 px-3 py-2 transition-all duration-300 cursor-pointer outline-none hover:border-primary/20 hover:bg-white/6 active:scale-95"
+                  >
+                    <div className="flex flex-col items-end">
+                      <span className="text-[10px] uppercase tracking-widest text-(--byreix-gold-soft) font-bold">
+                        Connected
+                      </span>
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs font-mono text-foreground/90">{connectedLabel}</span>
+                        <ChevronDown
+                          className={`w-3 h-3 text-muted-foreground transition-transform duration-300 ${showAccountMenu ? "rotate-180" : ""}`}
+                        />
                       </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            ) : (
-              <Button
-                onClick={onConnect}
-                className="group relative h-11 px-7 bg-[#0a120e] hover:bg-[#0c1a14] text-foreground font-bold rounded-full border border-white/15 hover:border-primary/40 transition-all duration-500 active:scale-95 shadow-[0_4px_12px_rgba(0,0,0,0.5)] hover:shadow-[0_8px_20px_rgba(37,201,133,0.12)] hover:-translate-y-0.5 overflow-hidden"
-              >
-                {/* Subtle Inner Highlight for Depth */}
-                <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/10 to-transparent" />
+                    </div>
+                  </motion.button>
 
-                <span className="relative flex items-center gap-2.5">
-                  <Wallet className="w-4 h-4 text-primary group-hover:scale-110 transition-transform duration-500" />
-                  {ctaLabel}
-                </span>
-              </Button>
-            )}
+                  {/* Account Dropdown */}
+                  <AnimatePresence>
+                    {showAccountMenu && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
+                        className="absolute right-0 mt-3 w-64 bg-card/95 border border-border rounded-3xl overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.4)] z-50"
+                      >
+                        <div className="p-2 flex flex-col gap-1">
+                          <button
+                            onClick={() => {
+                              onNavigate?.("profile");
+                              setShowAccountMenu(false);
+                            }}
+                            className="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-primary/10 text-muted-foreground hover:text-foreground transition-all duration-500 group"
+                          >
+                            <User className="w-4 h-4 group-hover:text-primary transition-colors" />
+                            <span className="text-sm font-semibold">View Profile</span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              onNavigate?.("cms");
+                              setShowAccountMenu(false);
+                            }}
+                            className="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-primary/10 text-muted-foreground hover:text-foreground transition-all duration-500 group"
+                          >
+                            <Settings className="w-4 h-4 group-hover:text-primary transition-colors" />
+                            <span className="text-sm font-semibold">CMS Dashboard</span>
+                          </button>
+                          <div className="h-px bg-border my-1 mx-2" />
+                          <button
+                            onClick={() => {
+                              onDisconnect?.();
+                              setShowAccountMenu(false);
+                            }}
+                            className="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-red-500/10 text-red-400 hover:text-red-300 transition-all duration-500 group"
+                          >
+                            <LogOut className="w-4 h-4" />
+                            <span className="text-sm font-bold">Disconnect</span>
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ) : (
+                <Button
+                  onClick={onConnect}
+                  className="group relative h-11 rounded-xl border border-primary/25 bg-primary/92 px-5 text-sm font-semibold text-primary-foreground transition-all duration-300 hover:bg-primary hover:shadow-[0_10px_24px_rgba(37,201,133,0.18)] active:scale-95"
+                >
+                  <span className="relative flex items-center gap-2.5">
+                    <Wallet className="w-4 h-4 text-primary-foreground/90 transition-transform duration-300 group-hover:scale-110" />
+                    {ctaLabel}
+                  </span>
+                </Button>
+              )}
+            </div>
+
+            {/* Mobile Menu Toggle */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="relative z-10 ml-auto p-2 text-muted-foreground transition-colors duration-300 hover:text-foreground md:hidden"
+              title="menu"
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
           </div>
+        </motion.div>
 
-          {/* Mobile Menu Toggle */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden relative z-10 p-2 text-muted-foreground hover:text-foreground transition-colors duration-500"
-            title="menu"
-          >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
-        </div>
-
-        {/* Mobile Menu - Staggered Animations */}
+        {/* Mobile Menu */}
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div
@@ -295,9 +322,9 @@ export function Navbar({
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
-              className="md:hidden border-t border-border bg-background/70 overflow-hidden"
+              className="overflow-hidden border-t border-[rgba(214,196,133,0.12)] bg-[rgba(5,18,12,0.96)] backdrop-blur-xl md:hidden"
             >
-              <div className="flex flex-col p-6 gap-3">
+              <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-5 sm:px-6 lg:px-8">
                 {navLinks.map((link, i) => (
                   <motion.div
                     initial={{ x: -20, opacity: 0 }}
@@ -310,8 +337,11 @@ export function Navbar({
                         handleNavClick(link);
                         setMobileMenuOpen(false);
                       }}
-                      className={`w-full text-left py-4 px-5 rounded-2xl transition-all duration-500 text-sm font-semibold
-                        ${currentPage === link.value ? "bg-primary/15 text-primary border border-primary/25" : "hover:bg-primary/10 text-muted-foreground hover:text-foreground"}`}
+                      className={`w-full border-b px-0 py-4 text-left text-sm font-semibold transition-all duration-300 ${
+                        currentPage === link.value
+                          ? "border-primary/35 text-foreground"
+                          : "border-white/8 text-muted-foreground hover:border-primary/18 hover:text-foreground"
+                      }`}
                     >
                       {link.label}
                     </button>
@@ -330,7 +360,7 @@ export function Navbar({
                         onSectionNavigate?.(link.id);
                         setMobileMenuOpen(false);
                       }}
-                      className="w-full rounded-2xl px-5 py-4 text-left text-sm font-semibold text-muted-foreground transition-all duration-500 hover:bg-primary/10 hover:text-foreground"
+                      className="w-full border-b border-white/8 px-0 py-4 text-left text-sm font-semibold text-muted-foreground transition-all duration-300 hover:border-primary/18 hover:text-foreground"
                     >
                       {link.label}
                     </button>
@@ -347,10 +377,10 @@ export function Navbar({
                     <Link
                       href={link.href}
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`block w-full rounded-2xl px-5 py-4 text-left text-sm font-semibold transition-all duration-500 ${
+                      className={`block w-full border-b px-0 py-4 text-left text-sm font-semibold transition-all duration-300 ${
                         currentPage === link.value
-                          ? "border border-primary/25 bg-primary/15 text-primary"
-                          : "text-muted-foreground hover:bg-primary/10 hover:text-foreground"
+                          ? "border-primary/35 text-foreground"
+                          : "border-white/8 text-muted-foreground hover:border-primary/18 hover:text-foreground"
                       }`}
                     >
                       {link.label}
@@ -358,14 +388,14 @@ export function Navbar({
                   </motion.div>
                 ))}
 
-                <div className="h-px bg-border my-2" />
+                <div className="my-3 h-px bg-white/8" />
 
                 {!isConnected ? (
                   <motion.div
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.3 }}
-                    className="flex flex-col gap-3"
+                    className="flex flex-col gap-3 pt-2"
                   >
                     {currentPage !== "login" && (
                       <button
@@ -373,7 +403,7 @@ export function Navbar({
                           onNavigate?.("login");
                           setMobileMenuOpen(false);
                         }}
-                        className="w-full py-4 text-sm font-bold text-muted-foreground hover:text-foreground transition-colors duration-500"
+                        className="w-full px-0 py-3 text-left text-sm font-semibold text-muted-foreground transition-colors duration-300 hover:text-foreground"
                       >
                         Sign In
                       </button>
@@ -383,7 +413,7 @@ export function Navbar({
                         onConnect?.();
                         setMobileMenuOpen(false);
                       }}
-                      className="w-full bg-primary text-primary-foreground font-extrabold rounded-2xl h-14 shadow-[0_0_20px_rgba(42,212,138,0.24)]"
+                      className="h-12 w-full rounded-xl bg-primary text-sm font-semibold text-primary-foreground shadow-[0_10px_24px_rgba(37,201,133,0.16)]"
                     >
                       <Wallet className="w-5 h-5 mr-3" />
                       {ctaLabel}
@@ -396,9 +426,9 @@ export function Navbar({
                     transition={{ delay: 0.3 }}
                     className="flex flex-col gap-3"
                   >
-                    <div className="p-4 rounded-2xl bg-card/70 border border-border flex items-center justify-between mb-2">
+                    <div className="mb-2 flex items-center justify-between rounded-2xl border border-white/10 bg-white/4 p-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-linear-to-br from-primary to-(--byreix-green-deep) border border-border" />
+                        <div className="h-10 w-10 rounded-xl border border-white/10 bg-linear-to-br from-primary to-(--byreix-green-deep)" />
                         <div className="flex flex-col">
                           <span className="text-[10px] uppercase font-bold text-primary">
                             Connected
@@ -414,7 +444,7 @@ export function Navbar({
                           onNavigate?.("profile");
                           setMobileMenuOpen(false);
                         }}
-                        className="flex items-center gap-3 px-5 py-4 rounded-2xl bg-card/60 text-muted-foreground hover:text-foreground transition-all duration-500"
+                        className="flex items-center gap-3 rounded-xl border border-white/8 bg-white/3 px-4 py-4 text-muted-foreground transition-all duration-300 hover:border-primary/18 hover:text-foreground"
                       >
                         <User className="w-4 h-4 text-primary" />
                         <span className="text-sm font-semibold">View Profile</span>
@@ -424,7 +454,7 @@ export function Navbar({
                           onNavigate?.("cms");
                           setMobileMenuOpen(false);
                         }}
-                        className="flex items-center gap-3 px-5 py-4 rounded-2xl bg-card/60 text-muted-foreground hover:text-foreground transition-all duration-500"
+                        className="flex items-center gap-3 rounded-xl border border-white/8 bg-white/3 px-4 py-4 text-muted-foreground transition-all duration-300 hover:border-primary/18 hover:text-foreground"
                       >
                         <Settings className="w-4 h-4 text-primary" />
                         <span className="text-sm font-semibold">CMS Dashboard</span>
@@ -434,7 +464,7 @@ export function Navbar({
                           onDisconnect?.();
                           setMobileMenuOpen(false);
                         }}
-                        className="flex items-center gap-3 px-5 py-4 rounded-2xl bg-red-500/10 text-red-400 hover:text-red-300 transition-all duration-500 mt-2"
+                        className="mt-2 flex items-center gap-3 rounded-xl border border-red-500/18 bg-red-500/10 px-4 py-4 text-red-400 transition-all duration-300 hover:text-red-300"
                       >
                         <LogOut className="w-4 h-4" />
                         <span className="text-sm font-bold">Disconnect</span>
@@ -446,6 +476,7 @@ export function Navbar({
             </motion.div>
           )}
         </AnimatePresence>
+        </motion.div>
       </motion.div>
     </nav>
   );
