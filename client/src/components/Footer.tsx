@@ -1,101 +1,148 @@
+import Link from "next/link";
 import { ByreixLogo } from "./ByreixLogo";
-import { Github, Twitter, Send } from "lucide-react";
-import { AdSlot, BannerAd, BannerAdSize } from "@/components/ads";
+import { ArrowUpRight } from "lucide-react";
+import { HOME_SECTION_IDS, type HomeSectionId } from "@/constants/homeSections";
 
-export function Footer() {
-  const footerLinks = [
-    {
-      title: "Product",
-      links: ["Features", "Swap", "Send", "TrendView", "Smart Escrow"],
-    },
-    {
-      title: "Resources",
-      links: ["Documentation", "API", "Support", "Community"],
-    },
-    {
-      title: "Company",
-      links: ["About", "Blog", "Careers", "Contact"],
-    },
-  ];
+interface FooterProps {
+  onSectionNavigate?: (sectionId: HomeSectionId) => void;
+}
 
+type FooterLink =
+  | {
+      label: string;
+      sectionId: HomeSectionId;
+    }
+  | {
+      label: string;
+      href: string;
+    };
+
+const footerSections: Array<{ title: string; links: FooterLink[] }> = [
+  {
+    title: "Platform",
+    links: [
+      { label: "Online Payments", sectionId: HOME_SECTION_IDS.payments },
+      { label: "Transfers", sectionId: HOME_SECTION_IDS.transfers },
+      { label: "Escrow Protection", sectionId: HOME_SECTION_IDS.escrow },
+      { label: "How It Works", sectionId: HOME_SECTION_IDS.howItWorks },
+    ],
+  },
+  {
+    title: "Company",
+    links: [
+      { label: "About", href: "/about" },
+      { label: "Team", href: "/team" },
+      { label: "Contact", href: "/contact" },
+      { label: "Home", href: "/" },
+    ],
+  },
+  {
+    title: "Trust",
+    links: [
+      { label: "Why ByReiXwift", sectionId: HOME_SECTION_IDS.why },
+      { label: "Principles", href: "/principles" },
+      { label: "Platform Overview", sectionId: HOME_SECTION_IDS.overview },
+    ],
+  },
+  {
+    title: "Resources",
+    links: [
+      {
+        label: "SidraStart Project",
+        href: "https://www.sidrastart.com/project/a9b5bab5-f9aa-4b57-b342-52e870141d00",
+      },
+      { label: "GitHub Repository", href: "https://github.com/hyperstack-labs/byreixwift" },
+    ],
+  },
+  {
+    title: "Legal",
+    links: [
+      { label: "Privacy", href: "/privacy" },
+      { label: "Terms", href: "/terms" },
+    ],
+  },
+];
+
+function hasHref(link: FooterLink): link is Extract<FooterLink, { href: string }> {
+  return "href" in link;
+}
+
+function isExternalHref(href: string) {
+  return href.startsWith("http");
+}
+
+export function Footer({ onSectionNavigate }: FooterProps) {
   return (
-    <footer className="bg-background border-t border-border mt-24">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
-          {/* Logo & Description */}
-          <div className="lg:col-span-2">
+    <footer className="mt-24 border-t border-border bg-background">
+      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 xl:grid-cols-[1.2fr_0.8fr_0.8fr_0.8fr_0.8fr]">
+          <div className="max-w-md">
             <ByreixLogo />
-            <p className="mt-4 text-sm text-muted-foreground max-w-sm">
-              Non-custodial wallet infrastructure for the Sidrachain ecosystem: secure by default,
-              clear by design.
+            <p className="mt-5 text-sm leading-relaxed text-muted-foreground">
+              Online payments for users and merchants, built around transparent fees, transfers,
+              escrow-backed protection, and a product direction shaped by Shariah principles.
             </p>
-            <div className="flex items-center gap-4 mt-6">
-              <a
-                href="#"
-                className="w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary transition-colors"
-              >
-                <Twitter className="w-4 h-4" />
-              </a>
-              <a
-                href="#"
-                className="w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary transition-colors"
-              >
-                <Github className="w-4 h-4" />
-              </a>
-              <a
-                href="#"
-                className="w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary transition-colors"
-              >
-                <Send className="w-4 h-4" />
-              </a>
+            <div className="mt-6 flex flex-wrap gap-2">
+              {["Transparent fees", "Ethical commerce", "Escrow-backed protection"].map((item) => (
+                <span
+                  key={item}
+                  className="rounded-full border border-border bg-card/55 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground"
+                >
+                  {item}
+                </span>
+              ))}
             </div>
           </div>
 
-          {/* Links */}
-          {footerLinks.map((section) => (
+          {footerSections.map((section) => (
             <div key={section.title}>
-              <h4 className="text-(--byreix-gold-soft) mb-4">{section.title}</h4>
+              <h4 className="mb-4 text-sm font-semibold uppercase tracking-[0.16em] text-(--byreix-gold-soft)">
+                {section.title}
+              </h4>
               <ul className="space-y-3">
                 {section.links.map((link) => (
-                  <li key={link}>
-                    <a
-                      href="#"
-                      className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                    >
-                      {link}
-                    </a>
+                  <li key={link.label}>
+                    {hasHref(link) ? (
+                      isExternalHref(link.href) ? (
+                        <a
+                          href={link.href}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="group inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                        >
+                          <span>{link.label}</span>
+                          <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                        </a>
+                      ) : (
+                        <Link
+                          href={link.href}
+                          className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                        >
+                          {link.label}
+                        </Link>
+                      )
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => onSectionNavigate?.(link.sectionId)}
+                        className="text-left text-sm text-muted-foreground transition-colors hover:text-foreground"
+                      >
+                        {link.label}
+                      </button>
+                    )}
                   </li>
                 ))}
               </ul>
             </div>
           ))}
         </div>
-        <AdSlot adId="footer-ads" className="mt-8">
-          <BannerAd
-            imageURL="/mockThumbnail.png"
-            linkURL="https://example.com"
-            size={BannerAdSize.MEDIUM_RECTANGLE}
-            altText="Footer Ad"
-          />
-        </AdSlot>
 
-        {/* Bottom Bar */}
-        <div className="mt-12 pt-8 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-muted-foreground">© 2026 ByReiXwift. All rights reserved.</p>
-          <div className="flex items-center gap-6">
-            <a
-              href="#"
-              className="text-sm text-muted-foreground hover:text-primary transition-colors"
-            >
-              Privacy Policy
-            </a>
-            <a
-              href="#"
-              className="text-sm text-muted-foreground hover:text-primary transition-colors"
-            >
-              Terms of Service
-            </a>
-          </div>
+        <div className="mt-12 flex flex-col gap-4 border-t border-border pt-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+          <p>Copyright 2026 ByReiXwift. Clear payments. Stronger trust.</p>
+          <p className="max-w-xl text-sm leading-relaxed sm:text-right">
+            Built for users and merchants who need online payments, transfers, and escrow-backed
+            protection with clearer terms from the start.
+          </p>
         </div>
       </div>
     </footer>

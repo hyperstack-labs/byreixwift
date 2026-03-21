@@ -31,19 +31,18 @@ export function SwapPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <Card className="p-6 bg-card border-border">
-        <div className="flex items-center justify-between mb-6">
+    <div className="mx-auto max-w-2xl">
+      <Card className="border-border bg-card p-6">
+        <div className="mb-6 flex items-center justify-between">
           <h2 className="text-2xl font-semibold">Swap Tokens</h2>
           <Button variant="ghost" size="sm" aria-label="Swap settings">
-            <Settings className="w-5 h-5" />
+            <Settings className="h-5 w-5" />
           </Button>
         </div>
 
-        {/* From Token */}
         <div className="space-y-4">
-          <div className="p-4 rounded-xl bg-background border border-border">
-            <div className="flex items-center justify-between mb-2">
+          <div className="rounded-xl border border-border bg-background p-4">
+            <div className="mb-2 flex items-center justify-between">
               <label className="text-sm text-muted-foreground">From</label>
               <span className="text-sm text-muted-foreground">Balance: {fromToken.balance}</span>
             </div>
@@ -53,20 +52,18 @@ export function SwapPage() {
                 placeholder="0.00"
                 value={fromAmount}
                 onChange={(e) => {
-                  setFromAmount(e.target.value);
-                  // Mock conversion rate
                   const value = parseFloat(e.target.value || "0");
                   setFromAmount(e.target.value);
                   setToAmount((value * CONVERSION_RATE).toFixed(6));
                 }}
-                className="flex-1 bg-transparent border-none text-3xl p-0 h-auto focus-visible:ring-0"
+                className="h-auto flex-1 border-none bg-transparent p-0 text-3xl focus-visible:ring-0"
               />
               <Button
                 variant="outline"
                 className="flex items-center gap-2 border-border bg-card hover:bg-border"
               >
                 <span className="font-semibold">{fromToken.symbol}</span>
-                <ChevronDown className="w-4 h-4" />
+                <ChevronDown className="h-4 w-4" />
               </Button>
             </div>
             <button
@@ -77,20 +74,18 @@ export function SwapPage() {
             </button>
           </div>
 
-          {/* Swap Button */}
-          <div className="flex justify-center -my-2 relative z-10">
+          <div className="relative z-10 -my-2 flex justify-center">
             <button
               aria-label="Reverse swap tokens"
               onClick={handleSwapTokens}
-              className="w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center hover:border-primary transition-colors"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card transition-colors hover:border-primary"
             >
-              <ArrowDownUp className="w-5 h-5 text-muted-foreground" />
+              <ArrowDownUp className="h-5 w-5 text-muted-foreground" />
             </button>
           </div>
 
-          {/* To Token */}
-          <div className="p-4 rounded-xl bg-background border border-border">
-            <div className="flex items-center justify-between mb-2">
+          <div className="rounded-xl border border-border bg-background p-4">
+            <div className="mb-2 flex items-center justify-between">
               <label className="text-sm text-muted-foreground">To</label>
               <span className="text-sm text-muted-foreground">Balance: {toToken.balance}</span>
             </div>
@@ -100,21 +95,20 @@ export function SwapPage() {
                 placeholder="0.00"
                 value={toAmount}
                 readOnly
-                className="flex-1 bg-transparent border-none text-3xl p-0 h-auto focus-visible:ring-0"
+                className="h-auto flex-1 border-none bg-transparent p-0 text-3xl focus-visible:ring-0"
               />
               <Button
                 variant="outline"
                 className="flex items-center gap-2 border-border bg-card hover:bg-border"
               >
                 <span className="font-semibold">{toToken.symbol}</span>
-                <ChevronDown className="w-4 h-4" />
+                <ChevronDown className="h-4 w-4" />
               </Button>
             </div>
           </div>
 
-          {/* Swap Info */}
           {fromAmount && (
-            <div className="p-4 rounded-xl bg-background border border-border space-y-2">
+            <div className="space-y-2 rounded-xl border border-border bg-background p-4">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Rate</span>
                 <span className="text-foreground">
@@ -138,27 +132,25 @@ export function SwapPage() {
             </div>
           )}
 
-          {/* Info Banner */}
-          <div className="flex items-start gap-2 p-3 rounded-lg bg-primary/10 border border-primary/20">
-            <Info className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+          <div className="flex items-start gap-2 rounded-lg border border-primary/20 bg-primary/10 p-3">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
             <p className="text-sm text-muted-foreground">
-              Swaps are executed through multiple DEXs to ensure you get the best rate available.
+              This swap surface currently previews the quote flow while live routing is still being
+              integrated.
             </p>
           </div>
 
-          {/* Swap Button */}
           <Button
             onClick={handleSwap}
-            className="w-full bg-primary hover:bg-primary/90 text-black py-6 text-lg"
+            className="w-full bg-primary py-6 text-lg text-black hover:bg-primary/90"
           >
             {fromAmount ? "Swap Tokens" : "Enter Amount"}
           </Button>
         </div>
       </Card>
 
-      {/* Recent Swaps */}
-      <Card className="mt-6 p-6 bg-card border-border">
-        <h3 className="text-lg font-semibold mb-4">Recent Swaps</h3>
+      <Card className="mt-6 border-border bg-card p-6">
+        <h3 className="mb-4 text-lg font-semibold">Recent Swaps</h3>
         <div className="space-y-3">
           {[
             { from: "BTC", to: "SDA", amount: "0.05", time: "1 day ago" },
@@ -167,15 +159,17 @@ export function SwapPage() {
           ].map((swap, index) => (
             <div
               key={index}
-              className="flex items-center justify-between p-3 rounded-lg bg-background border border-border"
+              className="flex items-center justify-between rounded-lg border border-border bg-background p-3"
             >
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                  <ArrowDownUp className="w-4 h-4 text-primary" />
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
+                  <ArrowDownUp className="h-4 w-4 text-primary" />
                 </div>
                 <div>
                   <p className="text-sm font-semibold">
-                    {swap.from} → {swap.to}
+                    {swap.from}
+                    {" -> "}
+                    {swap.to}
                   </p>
                   <p className="text-xs text-muted-foreground">{swap.time}</p>
                 </div>

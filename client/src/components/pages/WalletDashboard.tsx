@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Button, Card, Tabs, TabsContent, TabsList, TabsTrigger } from "../ui";
+import { useRouter } from "next/navigation";
+import { Button, Card } from "../ui";
 import {
   ArrowUpRight,
   ArrowDownLeft,
@@ -10,16 +11,14 @@ import {
   EyeOff,
   Copy,
   ExternalLink,
+  ShieldCheck,
 } from "lucide-react";
-import { SwapPage } from "./SwapPage";
-import { SendPage } from "./SendPage";
-import { TrendViewPage } from "./TrendViewPage";
 import { toast } from "sonner";
 import Image from "next/image";
 import { AdSlot, BannerAd, BannerAdSize } from "@/components/ads";
 
 export function WalletDashboard() {
-  const [activeTab, setActiveTab] = useState("overview");
+  const router = useRouter();
   const [balanceVisible, setBalanceVisible] = useState(true);
 
   const tokens = [
@@ -82,7 +81,7 @@ export function WalletDashboard() {
     },
     {
       type: "swap",
-      token: "BTC → SDA",
+      token: "BTC -> SDA",
       amount: "0.05 BTC",
       usdValue: "$2,150.00",
       time: "1 day ago",
@@ -99,6 +98,37 @@ export function WalletDashboard() {
     },
   ];
 
+  const routeActions = [
+    {
+      title: "Swap",
+      description: "Open the quote flow and review token conversion details.",
+      icon: ArrowUpRight,
+      href: "/app/swap",
+      primary: true,
+    },
+    {
+      title: "Send",
+      description: "Move funds to a wallet or business address with review before confirmation.",
+      icon: ArrowDownLeft,
+      href: "/app/send",
+      primary: false,
+    },
+    {
+      title: "Trends",
+      description: "Check price movement and market context before taking action.",
+      icon: TrendingUp,
+      href: "/app/trends",
+      primary: false,
+    },
+    {
+      title: "Escrow",
+      description: "Create and track protected transactions with visible state changes.",
+      icon: ShieldCheck,
+      href: "/app/escrow",
+      primary: false,
+    },
+  ] as const;
+
   const totalBalance = "$44,976.00";
 
   const copyAddress = () => {
@@ -107,223 +137,188 @@ export function WalletDashboard() {
   };
 
   return (
-    <div className="min-h-screen pt-24 pb-32 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          {/* Tab Navigation */}
-          <TabsList className="grid w-full max-w-md mx-auto grid-cols-4 mb-8 bg-card border border-border">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="swap">Swap</TabsTrigger>
-            <TabsTrigger value="send">Send</TabsTrigger>
-            <TabsTrigger value="trends">TrendView</TabsTrigger>
-          </TabsList>
-
-          {/* Overview Tab */}
-          <TabsContent value="overview" className="space-y-8">
-            {/* Wallet Address Card */}
-            <Card className="p-6 bg-card border-border">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Wallet Address</p>
-                  <div className="flex items-center gap-2">
-                    <code className="text-white font-mono">
-                      0x742d35Cc6634C0532925a3b844Bc9e7595f9aB8
-                    </code>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    aria-label="Copy wallet address"
-                    variant="ghost"
-                    size="sm"
-                    onClick={copyAddress}
-                    className="text-muted-foreground hover:text-primary"
-                  >
-                    <Copy className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-muted-foreground hover:text-primary"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            </Card>
-
-            {/* Portfolio Overview */}
-            <Card className="p-8 bg-linear-to-br from-card to-background border-border">
-              <div className="flex items-start justify-between mb-6">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-2">Total Portfolio Value</p>
-                  <div className="flex items-center gap-3">
-                    <h2 className="text-5xl font-bold">
-                      {balanceVisible ? totalBalance : "••••••"}
-                    </h2>
-                    <button
-                      onClick={() => setBalanceVisible(!balanceVisible)}
-                      className="text-muted-foreground hover:text-foreground transition-colors"
-                      aria-label={balanceVisible ? "Hide balance" : "Show balance"}
-                      aria-pressed={balanceVisible}
-                    >
-                      {balanceVisible ? (
-                        <Eye className="w-5 h-5" />
-                      ) : (
-                        <EyeOff className="w-5 h-5" />
-                      )}
-                    </button>
-                  </div>
-                  <p className="text-sm text-primary mt-2">+$2,345.50 (+5.5%) today</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <Button
-                  onClick={() => setActiveTab("swap")}
-                  className="bg-primary hover:bg-primary/90 text-black"
-                >
-                  <ArrowUpRight className="w-4 h-4 mr-2" />
-                  Swap
-                </Button>
-                <Button
-                  onClick={() => setActiveTab("send")}
-                  variant="outline"
-                  className="border-border bg-background hover:bg-border"
-                >
-                  <ArrowDownLeft className="w-4 h-4 mr-2" />
-                  Send
-                </Button>
-                <Button
-                  onClick={() => setActiveTab("trends")}
-                  variant="outline"
-                  className="border-border bg-background hover:bg-border"
-                >
-                  <TrendingUp className="w-4 h-4 mr-2" />
-                  TrendView
-                </Button>
-              </div>
-            </Card>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Token List */}
-              <div className="lg:col-span-2 space-y-4">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-semibold">Assets</h3>
-                  <Button variant="ghost" size="sm" className="text-muted-foreground">
-                    View All
-                  </Button>
-                </div>
-
-                {tokens.map((token) => (
-                  <Card
-                    key={token.symbol}
-                    className="p-4 bg-card border-border hover:border-primary/50 transition-all cursor-pointer"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <Image
-                          src={token.icon}
-                          alt={token.name}
-                          width={48}
-                          height={48}
-                          className="w-12 h-12 rounded-full"
-                        />
-                        <div>
-                          <p className="font-semibold">{token.symbol}</p>
-                          <p className="text-sm text-muted-foreground">{token.name}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-semibold">{token.amount}</p>
-                        <p className="text-sm text-muted-foreground">{token.usdValue}</p>
-                      </div>
-                      <div className="text-right">
-                        <p
-                          className={`text-sm font-semibold ${
-                            token.changePositive ? "text-primary" : "text-red-500"
-                          }`}
-                        >
-                          {token.change}
-                        </p>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-
-              {/* Recent Transactions */}
-              <div className="space-y-4">
-                <h3 className="text-xl font-semibold mb-4">Recent Activity</h3>
-
-                {transactions.map((tx, index) => (
-                  <Card key={index} className="p-4 bg-card border-border">
-                    <div className="flex items-start gap-3">
-                      <div
-                        className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                          tx.type === "send"
-                            ? "bg-red-500/10"
-                            : tx.type === "receive"
-                              ? "bg-primary/10"
-                              : "bg-accent/10"
-                        }`}
-                      >
-                        {tx.type === "send" ? (
-                          <ArrowUpRight className="w-5 h-5 text-red-500" />
-                        ) : tx.type === "receive" ? (
-                          <ArrowDownLeft className="w-5 h-5 text-primary" />
-                        ) : (
-                          <TrendingUp className="w-5 h-5 text-(--byreix-gold)" />
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-1">
-                          <p className="font-semibold capitalize">{tx.type}</p>
-                          <p className="font-semibold">{tx.amount}</p>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <p className="text-sm text-muted-foreground truncate">
-                            {tx.type === "send"
-                              ? `To ${tx.to}`
-                              : tx.type === "receive"
-                                ? `From ${tx.from}`
-                                : tx.token}
-                          </p>
-                          <p className="text-sm text-muted-foreground">{tx.usdValue}</p>
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-1">{tx.time}</p>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-                <AdSlot adId="wallet-sidebar-ad" className="mt-8">
-                  <BannerAd
-                    imageURL="/ads.mp4"
-                    linkURL="https://example.com"
-                    size={BannerAdSize.MEDIUM_RECTANGLE}
-                    altText="Video Ad"
-                    mediaType="video"
-                  />
-                </AdSlot>
+    <div className="min-h-screen px-4 pt-24 pb-32 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl space-y-8">
+        <Card className="border-border bg-card p-6">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="mb-1 text-sm text-muted-foreground">Wallet Address</p>
+              <div className="flex items-center gap-2">
+                <code className="font-mono text-white">0x742d35Cc6634C0532925a3b844Bc9e7595f9aB8</code>
               </div>
             </div>
-          </TabsContent>
+            <div className="flex items-center gap-2">
+              <Button
+                aria-label="Copy wallet address"
+                variant="ghost"
+                size="sm"
+                onClick={copyAddress}
+                className="text-muted-foreground hover:text-primary"
+              >
+                <Copy className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-muted-foreground hover:text-primary"
+              >
+                <ExternalLink className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </Card>
 
-          {/* Swap Tab */}
-          <TabsContent value="swap">
-            <SwapPage />
-          </TabsContent>
+        <Card className="border-border bg-linear-to-br from-card to-background p-8">
+          <div className="mb-6 flex items-start justify-between gap-4">
+            <div>
+              <p className="mb-2 text-sm text-muted-foreground">Total Portfolio Value</p>
+              <div className="flex items-center gap-3">
+                <h2 className="text-5xl font-bold">{balanceVisible ? totalBalance : "******"}</h2>
+                <button
+                  onClick={() => setBalanceVisible(!balanceVisible)}
+                  className="text-muted-foreground transition-colors hover:text-foreground"
+                  aria-label={balanceVisible ? "Hide balance" : "Show balance"}
+                  aria-pressed={balanceVisible}
+                >
+                  {balanceVisible ? <Eye className="h-5 w-5" /> : <EyeOff className="h-5 w-5" />}
+                </button>
+              </div>
+              <p className="mt-2 text-sm text-primary">+$2,345.50 (+5.5%) today</p>
+            </div>
+          </div>
 
-          {/* Send Tab */}
-          <TabsContent value="send">
-            <SendPage />
-          </TabsContent>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {routeActions.map((action) => (
+              <Button
+                key={action.title}
+                onClick={() => router.push(action.href)}
+                variant={action.primary ? "default" : "outline"}
+                className={
+                  action.primary
+                    ? "justify-start bg-primary text-black hover:bg-primary/90"
+                    : "justify-start border-border bg-background hover:bg-border"
+                }
+              >
+                <action.icon className="mr-2 h-4 w-4" />
+                {action.title}
+              </Button>
+            ))}
+          </div>
 
-          {/* TrendView Tab */}
-          <TabsContent value="trends">
-            <TrendViewPage />
-          </TabsContent>
-        </Tabs>
+          <div className="mt-4 grid grid-cols-1 gap-3 xl:grid-cols-4">
+            {routeActions.map((action) => (
+              <div
+                key={`${action.title}-detail`}
+                className="rounded-2xl border border-border bg-background/45 p-4"
+              >
+                <p className="text-sm font-semibold text-foreground">{action.title}</p>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">{action.description}</p>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+          <div className="space-y-4 lg:col-span-2">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-xl font-semibold">Assets</h3>
+              <Button variant="ghost" size="sm" className="text-muted-foreground">
+                View All
+              </Button>
+            </div>
+
+            {tokens.map((token) => (
+              <Card
+                key={token.symbol}
+                className="cursor-pointer border-border bg-card p-4 transition-all hover:border-primary/50"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <Image
+                      src={token.icon}
+                      alt={token.name}
+                      width={48}
+                      height={48}
+                      className="h-12 w-12 rounded-full"
+                    />
+                    <div>
+                      <p className="font-semibold">{token.symbol}</p>
+                      <p className="text-sm text-muted-foreground">{token.name}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold">{token.amount}</p>
+                    <p className="text-sm text-muted-foreground">{token.usdValue}</p>
+                  </div>
+                  <div className="text-right">
+                    <p
+                      className={`text-sm font-semibold ${
+                        token.changePositive ? "text-primary" : "text-red-500"
+                      }`}
+                    >
+                      {token.change}
+                    </p>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="mb-4 text-xl font-semibold">Recent Activity</h3>
+
+            {transactions.map((tx, index) => (
+              <Card key={index} className="border-border bg-card p-4">
+                <div className="flex items-start gap-3">
+                  <div
+                    className={`flex h-10 w-10 items-center justify-center rounded-full ${
+                      tx.type === "send"
+                        ? "bg-red-500/10"
+                        : tx.type === "receive"
+                          ? "bg-primary/10"
+                          : "bg-accent/10"
+                    }`}
+                  >
+                    {tx.type === "send" ? (
+                      <ArrowUpRight className="h-5 w-5 text-red-500" />
+                    ) : tx.type === "receive" ? (
+                      <ArrowDownLeft className="h-5 w-5 text-primary" />
+                    ) : (
+                      <TrendingUp className="h-5 w-5 text-(--byreix-gold)" />
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-1 flex items-center justify-between">
+                      <p className="font-semibold capitalize">{tx.type}</p>
+                      <p className="font-semibold">{tx.amount}</p>
+                    </div>
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="truncate text-sm text-muted-foreground">
+                        {tx.type === "send"
+                          ? `To ${tx.to}`
+                          : tx.type === "receive"
+                            ? `From ${tx.from}`
+                            : tx.token}
+                      </p>
+                      <p className="text-sm text-muted-foreground">{tx.usdValue}</p>
+                    </div>
+                    <p className="mt-1 text-xs text-muted-foreground">{tx.time}</p>
+                  </div>
+                </div>
+              </Card>
+            ))}
+
+            <AdSlot adId="wallet-sidebar-ad" className="mt-8">
+              <BannerAd
+                imageURL="/ads.mp4"
+                linkURL="https://example.com"
+                size={BannerAdSize.MEDIUM_RECTANGLE}
+                altText="Video Ad"
+                mediaType="video"
+              />
+            </AdSlot>
+          </div>
+        </div>
       </div>
     </div>
   );

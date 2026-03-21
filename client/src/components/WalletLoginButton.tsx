@@ -90,7 +90,7 @@ export function WalletLoginButton({ onConnect }: WalletLoginButtonProps) {
         ) : (
           <Wallet className="w-6 h-6 mr-3 group-hover:scale-110 transition-transform" />
         )}
-        {status === "connecting" ? "Connecting..." : "Connect with Sidra Wallet"}
+        {status === "connecting" ? "Connecting..." : "Connect with Sidra Wallet Preview"}
         <ArrowRight className="w-6 h-6 ml-3 group-hover:translate-x-1 transition-transform" />
       </Button>
 

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Manrope } from "next/font/google";
 import "./globals.css";
 import QueryProvider from "@/providers/QueryProvider";
+import { Toaster } from "@/components/ui/sonner";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -10,9 +11,9 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "ByReiXwift - You're a tap away",
+  title: "ByReiXwift",
   description:
-    "The non-custodial wallet for Sidrachain. Swap, send, and track with zero compromise.",
+    "Online payments on Sidrachain, built around transparent fees, transfers, escrow-backed protection, and Shariah-guided product principles.",
   icons: {
     icon: "/logo_transparent.png",
   },
@@ -27,6 +28,16 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className={`${manrope.variable} antialiased`}>
         <QueryProvider>{children}</QueryProvider>
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            style: {
+              background: "var(--card)",
+              border: "1px solid var(--border)",
+              color: "var(--foreground)",
+            },
+          }}
+        />
       </body>
     </html>
   );

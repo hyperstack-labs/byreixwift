@@ -33,25 +33,25 @@ export function LoginPage({
   const features: Feature[] = [
     {
       icon: Shield,
-      title: "Policy-Based Security",
-      description: "Session controls, verification checks, and encrypted transport",
+      title: "Clear account access",
+      description: "Choose the sign-in method that fits how you use the platform.",
     },
     {
       icon: Lock,
-      title: "Self-Custody",
-      description: "You control your private keys. Always.",
+      title: "User-controlled wallet flow",
+      description: "Wallet actions stay with the user instead of being hidden behind custodial language.",
     },
     {
       icon: Wallet,
-      title: "Sidrachain Native",
-      description: "Wallet workflows tuned for Sidrachain operations",
+      title: "Built for the app",
+      description: "Sign in and move straight into payments, transfers, or escrow workflows.",
     },
   ];
 
   return (
-    <div className="min-h-screen pt-24 md:pt-28 lg:pt-24 flex flex-col lg:flex-row">
+    <div className="flex min-h-screen flex-col pt-24 md:pt-28 lg:flex-row lg:pt-24">
       {/* Left Side - Login Form (Mobile First) */}
-      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12 lg:py-0 relative">
+      <div className="relative flex flex-1 items-center justify-center px-4 py-12 sm:px-6 lg:px-8 lg:py-0">
         {/* Subtle background glow for mobile */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none lg:hidden">
           <div
@@ -70,11 +70,11 @@ export function LoginPage({
           className="w-full max-w-lg relative z-10"
         >
           {/* Login Card */}
-          <Card className="border-border bg-background/70">
-            <CardHeader className="border-b border-border pb-8">
+          <Card className="border-border bg-background/72 shadow-[0_20px_60px_rgba(3,12,8,0.22)]">
+            <CardHeader className="border-b border-border pb-7">
               <CardTitle className="text-3xl">Sign In</CardTitle>
               <CardDescription className="text-base">
-                Choose a sign-in method to continue
+                Choose a sign-in method to open the app
               </CardDescription>
 
               {/* Tab Switcher with Sliding Indicator */}
@@ -147,7 +147,7 @@ export function LoginPage({
                   >
                     {/* Google Sign In Button */}
                     <Button
-                      aria-label="Sign in with Google"
+                      aria-label="Continue with Google preview"
                       disabled={isLoading}
                       onClick={onGoogleLogin}
                       variant="outline"
@@ -171,7 +171,7 @@ export function LoginPage({
                           d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                         />
                       </svg>
-                      Continue with Google
+                      Continue with Google Preview
                     </Button>
 
                     {/* Divider */}
@@ -186,17 +186,18 @@ export function LoginPage({
 
                     <WalletLoginButton onConnect={() => onWalletConnect()} />
 
-                    {/* Security Note */}
+                    {/* Access note */}
                     <div className="p-5 rounded-xl bg-card border border-border">
                       <div className="flex gap-4">
                         <Shield className="w-6 h-6 text-primary shrink-0 mt-0.5" />
                         <div>
                           <p className="text-base text-foreground font-medium mb-1.5">
-                            Secure and Private
+                            Private by design
                           </p>
                           <p className="text-sm text-muted-foreground leading-relaxed">
-                            Passwords are never persisted, and private keys remain under your
-                            control.
+                            Wallet actions stay under your control. The current sign-in routes open
+                            a preview app session while the production auth flow is still being
+                            integrated.
                           </p>
                         </div>
                       </div>
@@ -207,21 +208,21 @@ export function LoginPage({
             </CardContent>
           </Card>
 
-          {/* Sign Up Link */}
+          {/* Contact path */}
           <p className="mt-6 text-center text-sm text-muted-foreground">
-            Don&apos;t have an account?{" "}
+            Need access or have questions?{" "}
             <button
               onClick={() => onNavigate("signup")}
               className="text-primary hover:text-primary/80 font-medium transition-colors"
             >
-              Sign up
+              Contact the team
             </button>
           </p>
         </motion.div>
       </div>
 
       {/* Right Side - Branding (Desktop Only) */}
-      <div className="hidden lg:flex flex-1 bg-background relative overflow-hidden">
+      <div className="relative hidden flex-1 overflow-hidden bg-background lg:flex">
         {/* Background Effects */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           {/* Large ambient glow */}
@@ -245,26 +246,26 @@ export function LoginPage({
         </div>
 
         {/* Content */}
-        <div className="relative z-10 flex flex-col justify-center px-12 xl:px-20 max-w-2xl">
+        <div className="relative z-10 flex max-w-2xl flex-col justify-center px-12 xl:px-20">
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
-          >
-            {/* Headline */}
-            <p className="text-xs font-semibold tracking-[0.22em] uppercase text-primary/80 mb-6">
-              Access Console
-            </p>
-            <h2 className="text-5xl xl:text-6xl font-bold mb-6 leading-[1.1]">
-              <span className="text-foreground">Secure access,</span>
-              <br />
-              <span className="text-primary">operational clarity.</span>
-            </h2>
+            >
+              {/* Headline */}
+              <p className="text-xs font-semibold tracking-[0.22em] uppercase text-primary/80 mb-6">
+                Access ByReiXwift
+              </p>
+              <h2 className="text-5xl xl:text-6xl font-bold mb-6 leading-[1.1]">
+                <span className="text-foreground">Sign in and continue</span>
+                <br />
+                <span className="text-primary">with the app.</span>
+              </h2>
 
-            {/* Description */}
-            <p className="text-xl text-muted-foreground mb-12 leading-relaxed">
-              Designed for Sidrachain users who need clear account controls and direct custody.
-            </p>
+              {/* Description */}
+              <p className="text-xl text-muted-foreground mb-12 leading-relaxed">
+                Use the method that fits your workflow and move into payments, transfers, or escrow.
+              </p>
 
             {/* Features List */}
             <div className="space-y-6">
@@ -289,20 +290,20 @@ export function LoginPage({
               ))}
             </div>
 
-            {/* Trust Indicators */}
+            {/* Access indicators */}
             <div className="mt-12 pt-8 border-t border-border">
               <div className="flex items-center gap-8">
                 <div>
-                  <p className="text-3xl font-bold text-primary">Auditable</p>
-                  <p className="text-sm text-muted-foreground">Session Trails</p>
+                  <p className="text-3xl font-bold text-primary">Direct</p>
+                  <p className="text-sm text-muted-foreground">App Access</p>
                 </div>
                 <div>
-                  <p className="text-3xl font-bold text-primary">100%</p>
-                  <p className="text-sm text-muted-foreground">Self-Custody</p>
+                  <p className="text-3xl font-bold text-primary">Wallet</p>
+                  <p className="text-sm text-muted-foreground">Ready</p>
                 </div>
                 <div>
-                  <p className="text-3xl font-bold text-primary">24/7</p>
-                  <p className="text-sm text-muted-foreground">Availability</p>
+                  <p className="text-3xl font-bold text-primary">Clear</p>
+                  <p className="text-sm text-muted-foreground">Review Flow</p>
                 </div>
               </div>
             </div>
