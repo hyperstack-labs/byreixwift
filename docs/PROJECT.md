@@ -2,13 +2,13 @@
 
 ## What Is This
 
-A clean, professional web app for managing digital assets on Sidrachain. Built with MERN stack (Next.js + TypeScript for frontend).
+A clean, escrow-first web app for fixed-fee transactions on Sidrachain. The current product direction is a modern JS/TS stack with Next.js on the frontend, a Node/NestJS API, and a Solidity escrow contract.
 
 ## Target Users
 
-- Sidrachain users who want to view and manage their tokens
-- People new to Web3 who need a simple, frictionless experience
-- Future users of HyperStack ecosystem projects (Apax, Pulsar, XidraCloud, Sidraya, SidEx)
+- Buyers and sellers who need a simple escrow flow for Sidrachain transactions
+- Web3 users who want clear transaction states without extra platform complexity
+- Future HyperStack ecosystem users who need a safer payment and release flow
 
 ## Design Direction
 
@@ -24,19 +24,21 @@ A clean, professional web app for managing digital assets on Sidrachain. Built w
 ### Included
 
 - [ ] Landing page with project overview
-- [ ] Clean navigation (Home, Features, About, etc.)
-- [ ] Wallet connection (Sidra wallet / MetaMask via Sidrachain)
-- [ ] Dashboard showing basic account info
+- [ ] Wallet connection flow for Sidrachain-compatible wallets
+- [ ] Escrow creation flow with amount, fee, buyer, and seller metadata
+- [ ] Escrow lifecycle states: pending, locked, released, refunded
+- [ ] Mock API flow that mirrors the contract lifecycle for frontend testing
+- [ ] Smart escrow contract v0 with deposit, lock, release, and refund
 - [ ] Responsive design (works on mobile)
 
 ### Not Included (for later)
 
-- Trading features
-- Token swaps
-- Price charts and market data
-- Multi-chain support (ETH, Solana, zkSync — planned but not MVP)
+- Dispute resolution and arbitration
+- Multi-party or milestone escrow
+- Multi-chain support (ETH, Solana, zkSync - planned but not MVP)
 - Account verification / KYC flow
 - Notifications
+- Full database-backed production ledger and admin tooling
 
 ---
 
@@ -44,9 +46,10 @@ A clean, professional web app for managing digital assets on Sidrachain. Built w
 
 - **Frontend**: Next.js, TypeScript
 - **Styling**: Tailwind CSS (dark green theme)
-- **Backend**: Node.js, Express (future)
-- **Database**: MongoDB (future)
+- **Backend**: Node.js, NestJS
+- **Database**: PostgreSQL (planned for production persistence)
+- **Contracts**: Solidity, Hardhat
 
 ## Reference
 
-UI inspiration based on provided mockups — dark mode, green accents, wallet dashboard style.
+UI inspiration based on provided mockups - dark mode, green accents, wallet dashboard style.

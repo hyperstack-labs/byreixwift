@@ -1,6 +1,6 @@
 # Contribution Guidelines
 
-We welcome contributions to ByReiXwift—ensuring our Shariah-compliant payment system remains robust and high-quality. All contributors must follow these standards.
+We welcome contributions to ByReiXwift as we build a cleaner escrow-first product. All contributors must follow these standards.
 
 ## Branch Strategy
 

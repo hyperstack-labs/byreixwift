@@ -46,10 +46,10 @@ export function WalletLoginButton({ onConnect }: WalletLoginButtonProps) {
           // Step 3: Web3 network check to ensure that the wallet is on the sidra chain (e.g sidra testnet)
           // if not switch to sidra testnet
 
-          // Step 4: Issuance of BACKEND AUTHENTICATION (API CALL to ASP.NET Controller)
-          // API call to server controller which will issue 'nonce'.
-          // The nonce will be used to geenrate a signature which will be sent to the server
-          // send signature and address to the ASP.NET API Controller to get JWT.
+          // Step 4: Backend authentication flow
+          // API call to the Node/NestJS backend to issue a nonce.
+          // The nonce will be signed by the wallet and verified by the API
+          // before a real session token is returned.
 
           // SUCCESSFUL AUTHENTICATION
 
