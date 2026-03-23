@@ -15,5 +15,15 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "^5.4.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "cookie": "^1.0.2",
+      "flat": "^6.0.1",
+      "serialize-javascript": "^7.0.3",
+      "tmp": "^0.2.5",
+      "undici": "^6.24.0",
+      "ws": "^8.18.3"
+    }
   }
 }
