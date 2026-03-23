@@ -15,7 +15,9 @@ export const metadata: Metadata = {
   description:
     "Online payments on Sidrachain, built around transparent fees, transfers, escrow-backed protection, and Shariah-guided product principles.",
   icons: {
-    icon: "/logo_transparent.png",
+    icon: [{ url: "/logo_transparent.png", type: "image/png" }],
+    shortcut: ["/logo_transparent.png"],
+    apple: ["/logo_transparent.png"],
   },
 };
 
