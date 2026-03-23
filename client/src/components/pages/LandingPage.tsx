@@ -619,11 +619,11 @@ export function LandingPage({ onConnect }: LandingPageProps) {
             transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
             className="mx-auto flex max-w-160 flex-col items-center pt-6 text-center sm:pt-8 lg:pt-0"
           >
-            <div className="inline-flex flex-wrap items-center gap-2 rounded-full border border-white/8 bg-background/24 px-3 py-1.5 backdrop-blur-xl sm:px-4">
-              <span className="rounded-full border border-primary/24 bg-primary/12 px-2 py-0.5 text-[9px] font-black tracking-[0.08em] text-primary">
+            <div className="flex max-w-[18rem] flex-col items-center gap-1 text-center sm:max-w-none sm:flex-row sm:gap-2">
+              <span className="text-[9px] font-black tracking-[0.12em] text-primary sm:text-[10px]">
                 BYREIXWIFT
               </span>
-              <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-foreground/68 sm:text-[11px] sm:tracking-widest">
+              <span className="text-[9px] font-bold uppercase tracking-[0.14em] text-foreground/62 sm:text-[11px] sm:tracking-[0.18em]">
                 Transparent payments on Sidrachain
               </span>
             </div>
@@ -655,7 +655,7 @@ export function LandingPage({ onConnect }: LandingPageProps) {
               </Button>
             </div>
 
-            <div className="mt-6 grid w-full max-w-2xl gap-2 text-center sm:grid-cols-3">
+            <div className="mt-6 grid w-full max-w-2xl gap-1.5 text-center sm:grid-cols-3 sm:gap-2">
               {heroProofPoints.map((point, index) => (
                 <motion.div
                   key={point.label}
@@ -666,12 +666,16 @@ export function LandingPage({ onConnect }: LandingPageProps) {
                     delay: reducedMotion ? 0 : 0.35 + index * 0.08,
                     ease: [0.22, 1, 0.36, 1],
                   }}
-                  className="rounded-[1.05rem] border border-white/8 bg-white/2 px-3.5 py-2.5 sm:rounded-[1.15rem] sm:px-4 sm:py-3"
+                  className="relative flex flex-col items-center px-3 py-2.5 sm:rounded-[1.15rem] sm:border sm:border-white/8 sm:bg-white/2 sm:px-4 sm:py-3"
                 >
-                  <p className="text-[9px] font-semibold uppercase tracking-[0.2em] text-foreground/46 sm:text-[10px]">
+                  <div className="mb-2 flex items-center gap-2 sm:hidden">
+                    <span className="h-2 w-2 rounded-full bg-primary/80 shadow-[0_0_12px_rgba(37,201,133,0.22)]" />
+                    <span className="h-px w-10 bg-linear-to-r from-primary/34 to-transparent" />
+                  </div>
+                  <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-foreground/42 sm:text-[10px] sm:tracking-[0.2em]">
                     {point.label}
                   </p>
-                  <p className="mt-1.5 text-[0.9rem] font-medium leading-snug text-foreground/86 sm:text-[0.92rem]">
+                  <p className="mt-1 text-[0.96rem] font-medium leading-snug text-foreground/86 sm:mt-1.5 sm:text-[0.92rem]">
                     {point.value}
                   </p>
                 </motion.div>
