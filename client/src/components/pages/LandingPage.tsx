@@ -185,13 +185,11 @@ const sectionReveal = (reducedMotion: boolean, delay = 0) => ({
 });
 
 const previewShell = (reducedMotion: boolean) => ({
-  hidden: { opacity: 0, y: reducedMotion ? 8 : 24, scale: reducedMotion ? 1 : 0.985 },
+  hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    y: 0,
-    scale: 1,
     transition: {
-      duration: reducedMotion ? 0.2 : 0.65,
+      duration: reducedMotion ? 0.18 : 0.42,
       ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
       when: "beforeChildren" as const,
       delayChildren: reducedMotion ? 0.02 : 0.16,
