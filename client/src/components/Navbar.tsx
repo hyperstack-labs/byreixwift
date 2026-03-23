@@ -82,7 +82,7 @@ export function Navbar({
     "terms",
   ].includes(currentPage ?? "");
   const isHomeRoute = currentPage === "home";
-  const publicHomeLinks = !isConnected && isPublicRoute ? PUBLIC_HOME_NAV_LINKS : [];
+  const publicHomeLinks = !isConnected && isHomeRoute ? PUBLIC_HOME_NAV_LINKS : [];
   const publicPageLinks =
     !isConnected && isPublicRoute
       ? isHomeRoute
