@@ -183,7 +183,7 @@ export function Navbar({
                       >
                         <span>{link.label}</span>
                         <span
-                          className={`absolute inset-x-0 -bottom-1.5 h-px origin-center bg-primary transition-transform duration-300 ${
+                          className={`absolute left-1/2 -bottom-0.5 h-px w-[72%] -translate-x-1/2 origin-center bg-primary/90 transition-transform duration-300 ${
                             isActive ? "scale-x-100" : "scale-x-0"
                           }`}
                         />
@@ -214,7 +214,7 @@ export function Navbar({
                       >
                         <span>{link.label}</span>
                         <span
-                          className={`absolute inset-x-0 -bottom-1.5 h-px origin-center bg-primary transition-transform duration-300 ${
+                          className={`absolute left-1/2 -bottom-0.5 h-px w-[72%] -translate-x-1/2 origin-center bg-primary/90 transition-transform duration-300 ${
                             isActive ? "scale-x-100" : "scale-x-0"
                           }`}
                         />

@@ -1,5 +1,4 @@
 export const PUBLIC_SITE_PAGES = [
-  { label: "Home", value: "home", href: "/" },
   { label: "Principles", value: "principles", href: "/principles" },
   { label: "About", value: "about", href: "/about" },
   { label: "Contact", value: "contact", href: "/contact" },
