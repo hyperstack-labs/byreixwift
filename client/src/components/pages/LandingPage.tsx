@@ -163,6 +163,16 @@ const visibilityRows: DetailRow[] = [
   { label: "Escrow state", value: "Pending, locked, released, or refunded" },
 ];
 
+const heroAtmosphereDots = [
+  { top: "15%", left: "18%", size: "h-1 w-1", tone: "bg-white/18" },
+  { top: "22%", left: "76%", size: "h-1.5 w-1.5", tone: "bg-primary/18" },
+  { top: "33%", left: "67%", size: "h-1 w-1", tone: "bg-white/12" },
+  { top: "41%", left: "24%", size: "h-1.5 w-1.5", tone: "bg-[rgba(223,194,141,0.18)]" },
+  { top: "58%", left: "79%", size: "h-1 w-1", tone: "bg-white/12" },
+  { top: "64%", left: "13%", size: "h-1.5 w-1.5", tone: "bg-primary/16" },
+  { top: "72%", left: "61%", size: "h-1 w-1", tone: "bg-white/10" },
+] as const;
+
 const sectionReveal = (reducedMotion: boolean, delay = 0) => ({
   initial: { opacity: 0, y: reducedMotion ? 8 : 26 },
   whileInView: { opacity: 1, y: 0 },
@@ -560,8 +570,36 @@ export function LandingPage({ onConnect }: LandingPageProps) {
       >
         <div className="absolute inset-0 z-0 pointer-events-none">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(37,201,133,0.1),transparent_32%),radial-gradient(circle_at_82%_18%,rgba(223,194,141,0.06),transparent_24%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.05)_0.7px,transparent_0.7px)] bg-position-[0_0] bg-size-[22px_22px] opacity-30" />
           <div className="absolute left-[-10%] top-[6%] h-88 w-88 rounded-full bg-primary/8 blur-[120px]" />
           <div className="absolute right-[-6%] top-[12%] h-72 w-72 rounded-full bg-[rgba(223,194,141,0.06)] blur-[130px]" />
+          {heroAtmosphereDots.map((dot, index) => (
+            <motion.span
+              key={`${dot.top}-${dot.left}`}
+              className={`absolute rounded-full ${dot.size} ${dot.tone} blur-[1px]`}
+              style={{ top: dot.top, left: dot.left }}
+              animate={
+                reducedMotion
+                  ? undefined
+                  : {
+                      opacity: [0.22, 0.52, 0.22],
+                      scale: [1, 1.08, 1],
+                      x: [0, index % 2 === 0 ? 2 : -2, 0],
+                      y: [0, index % 3 === 0 ? -2 : 2, 0],
+                    }
+              }
+              transition={
+                reducedMotion
+                  ? undefined
+                  : {
+                      duration: 7.5 + index * 0.8,
+                      delay: index * 0.22,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }
+              }
+            />
+          ))}
           <div className="absolute inset-x-0 bottom-0 h-[42%] bg-linear-to-t from-background via-background/88 to-transparent" />
         </div>
 
