@@ -33,25 +33,26 @@ export function LoginPage({
   const features: Feature[] = [
     {
       icon: Shield,
-      title: "Clear account access",
+      title: "Clear access",
       description: "Choose the sign-in method that fits how you use the platform.",
     },
     {
       icon: Lock,
-      title: "User-controlled wallet flow",
-      description: "Wallet actions stay with the user instead of being hidden behind custodial language.",
+      title: "Wallet stays with you",
+      description:
+        "Wallet actions stay under your control instead of being hidden behind custodial language.",
     },
     {
       icon: Wallet,
-      title: "Built for the app",
-      description: "Sign in and move straight into payments, transfers, or escrow workflows.",
+      title: "Straight into the app",
+      description: "Sign in and move directly into payments, transfers, or escrow workflows.",
     },
   ];
 
   return (
-    <div className="flex min-h-screen flex-col pt-24 md:pt-28 lg:flex-row lg:pt-24">
+    <div className="flex min-h-screen flex-col pt-20 sm:pt-24 md:pt-28 lg:flex-row lg:pt-24">
       {/* Left Side - Login Form (Mobile First) */}
-      <div className="relative flex flex-1 items-center justify-center px-4 py-12 sm:px-6 lg:px-8 lg:py-0">
+      <div className="relative flex flex-1 items-center justify-center px-4 py-10 sm:px-6 sm:py-12 lg:px-8 lg:py-0">
         {/* Subtle background glow for mobile */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none lg:hidden">
           <div
@@ -67,18 +68,18 @@ export function LoginPage({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="w-full max-w-lg relative z-10"
+          className="relative z-10 w-full max-w-md sm:max-w-lg"
         >
           {/* Login Card */}
-          <Card className="border-border bg-background/72 shadow-[0_20px_60px_rgba(3,12,8,0.22)]">
-            <CardHeader className="border-b border-border pb-7">
-              <CardTitle className="text-3xl">Sign In</CardTitle>
-              <CardDescription className="text-base">
+          <Card className="border-border bg-background/78">
+            <CardHeader className="border-b border-border pb-6 sm:pb-7">
+              <CardTitle className="text-2xl sm:text-3xl">Sign In</CardTitle>
+              <CardDescription className="text-sm sm:text-base">
                 Choose a sign-in method to open the app
               </CardDescription>
 
               {/* Tab Switcher with Sliding Indicator */}
-              <div className="relative flex gap-2 mt-2 p-1 bg-card rounded-lg">
+              <div className="relative mt-2 flex gap-2 rounded-lg bg-card p-1">
                 {/* Sliding Background Indicator */}
                 <motion.div
                   className="absolute top-1 bottom-1 w-[calc(50%-0.375rem)] bg-primary rounded-md"
@@ -98,7 +99,7 @@ export function LoginPage({
                 <button
                   onClick={() => setActiveTab("email")}
                   aria-label="Sign in using email and password"
-                  className={`relative z-10 flex-1 py-2.5 rounded-md text-sm font-medium transition-colors ${
+                  className={`relative z-10 flex-1 rounded-md px-2 py-3 text-[0.82rem] font-medium leading-tight transition-colors sm:text-sm ${
                     activeTab === "email"
                       ? "text-background"
                       : "text-muted-foreground hover:text-foreground"
@@ -108,7 +109,7 @@ export function LoginPage({
                 </button>
                 <button
                   onClick={() => setActiveTab("social")}
-                  className={`relative z-10 flex-1 py-2.5 rounded-md text-sm font-medium transition-colors ${
+                  className={`relative z-10 flex-1 rounded-md px-2 py-3 text-[0.82rem] font-medium leading-tight transition-colors sm:text-sm ${
                     activeTab === "social"
                       ? "text-background"
                       : "text-muted-foreground hover:text-foreground"
@@ -151,7 +152,7 @@ export function LoginPage({
                       disabled={isLoading}
                       onClick={onGoogleLogin}
                       variant="outline"
-                      className="w-full border-border bg-card hover:bg-border transition-all group"
+                      className="group h-11 w-full border-border bg-card transition-all hover:bg-border sm:h-12"
                     >
                       <svg className="w-6 h-6 mr-3" viewBox="0 0 24 24">
                         <path
@@ -187,7 +188,7 @@ export function LoginPage({
                     <WalletLoginButton onConnect={() => onWalletConnect()} />
 
                     {/* Access note */}
-                    <div className="p-5 rounded-xl bg-card border border-border">
+                    <div className="rounded-xl border border-border bg-card/72 p-4 sm:p-5">
                       <div className="flex gap-4">
                         <Shield className="w-6 h-6 text-primary shrink-0 mt-0.5" />
                         <div>
@@ -209,7 +210,7 @@ export function LoginPage({
           </Card>
 
           {/* Contact path */}
-          <p className="mt-6 text-center text-sm text-muted-foreground">
+          <p className="mt-5 text-center text-sm text-muted-foreground sm:mt-6">
             Need access or have questions?{" "}
             <button
               onClick={() => onNavigate("signup")}
@@ -246,43 +247,43 @@ export function LoginPage({
         </div>
 
         {/* Content */}
-        <div className="relative z-10 flex max-w-2xl flex-col justify-center px-12 xl:px-20">
+        <div className="relative z-10 flex max-w-2xl flex-col justify-center px-10 xl:px-20">
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
-            >
-              {/* Headline */}
-              <p className="text-xs font-semibold tracking-[0.22em] uppercase text-primary/80 mb-6">
-                Access ByReiXwift
-              </p>
-              <h2 className="text-5xl xl:text-6xl font-bold mb-6 leading-[1.1]">
-                <span className="text-foreground">Sign in and continue</span>
-                <br />
-                <span className="text-primary">with the app.</span>
-              </h2>
+          >
+            {/* Headline */}
+            <p className="mb-5 text-xs font-semibold uppercase tracking-[0.22em] text-primary/80">
+              Access ByReiXwift
+            </p>
+            <h2 className="mb-5 text-[2.7rem] font-bold leading-[1.05] xl:text-[4.3rem]">
+              <span className="text-foreground">Sign in and continue</span>
+              <br />
+              <span className="text-primary">with the app.</span>
+            </h2>
 
-              {/* Description */}
-              <p className="text-xl text-muted-foreground mb-12 leading-relaxed">
-                Use the method that fits your workflow and move into payments, transfers, or escrow.
-              </p>
+            {/* Description */}
+            <p className="mb-10 max-w-xl text-base leading-relaxed text-muted-foreground xl:text-lg">
+              Use the method that fits your workflow and move into payments, transfers, or escrow.
+            </p>
 
             {/* Features List */}
-            <div className="space-y-6">
+            <div className="space-y-5">
               {features.map((feature, index) => (
                 <motion.div
                   key={feature.title}
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.6, delay: 0.3 + index * 0.1 }}
-                  className="flex items-start gap-4 group"
+                  className="flex items-start gap-3"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-card border border-border flex items-center justify-center shrink-0 group-hover:border-primary/50 group-hover:bg-primary/5 transition-all duration-300">
-                    <feature.icon className="w-6 h-6 text-primary" />
-                  </div>
-                  <div className="pt-1">
-                    <h4 className="text-lg font-semibold text-foreground mb-1">{feature.title}</h4>
-                    <p className="text-muted-foreground text-sm leading-relaxed">
+                  <feature.icon className="mt-1 h-[1.05rem] w-[1.05rem] shrink-0 text-primary/88" />
+                  <div>
+                    <h4 className="mb-1 text-base font-semibold text-foreground">
+                      {feature.title}
+                    </h4>
+                    <p className="text-sm leading-relaxed text-muted-foreground">
                       {feature.description}
                     </p>
                   </div>
@@ -291,20 +292,23 @@ export function LoginPage({
             </div>
 
             {/* Access indicators */}
-            <div className="mt-12 pt-8 border-t border-border">
-              <div className="flex items-center gap-8">
-                <div>
-                  <p className="text-3xl font-bold text-primary">Direct</p>
-                  <p className="text-sm text-muted-foreground">App Access</p>
-                </div>
-                <div>
-                  <p className="text-3xl font-bold text-primary">Wallet</p>
-                  <p className="text-sm text-muted-foreground">Ready</p>
-                </div>
-                <div>
-                  <p className="text-3xl font-bold text-primary">Clear</p>
-                  <p className="text-sm text-muted-foreground">Review Flow</p>
-                </div>
+            <div className="mt-10 border-t border-border pt-6">
+              <div className="flex flex-wrap gap-3">
+                {[
+                  { label: "Access", value: "Direct to app" },
+                  { label: "Wallet", value: "Ready when needed" },
+                  { label: "Review", value: "Clear before action" },
+                ].map((item) => (
+                  <div
+                    key={item.label}
+                    className="rounded-full border border-white/8 bg-card/60 px-3.5 py-2"
+                  >
+                    <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-foreground/44">
+                      {item.label}
+                    </p>
+                    <p className="mt-1 text-sm font-semibold text-foreground/86">{item.value}</p>
+                  </div>
+                ))}
               </div>
             </div>
           </motion.div>

@@ -27,8 +27,7 @@ const workingPrinciples = [
 
 export const metadata: Metadata = {
   title: "Team | ByReiXwift",
-  description:
-    "Meet the core team driving ByReiXwift across product, engineering, and delivery.",
+  description: "Meet the core team driving ByReiXwift across product, engineering, and delivery.",
 };
 
 export default function TeamPage() {
@@ -44,14 +43,16 @@ export default function TeamPage() {
               Team focus
             </p>
             <div className="mt-6 space-y-4">
-              <div className="rounded-[1.5rem] border border-white/8 bg-white/3 p-5">
+              <div className="rounded-[1.5rem] border border-white/8 bg-[linear-gradient(180deg,rgba(12,17,14,0.82)_0%,rgba(8,12,10,0.68)_100%)] p-5">
                 <p className="text-sm leading-7 text-muted-foreground">
-                  Product direction, delivery, and engineering stay linked so the public site, app behavior, and roadmap move in the same direction.
+                  Product direction, delivery, and engineering stay linked so the public site, app
+                  behavior, and roadmap move in the same direction.
                 </p>
               </div>
-              <div className="rounded-[1.5rem] border border-white/8 bg-white/3 p-5">
+              <div className="rounded-[1.5rem] border border-white/8 bg-[linear-gradient(180deg,rgba(12,17,14,0.82)_0%,rgba(8,12,10,0.68)_100%)] p-5">
                 <p className="text-sm leading-7 text-muted-foreground">
-                  This is a focused public view of active ownership, not a mirror of every contributor in the wider project.
+                  This is a focused public view of active ownership, not a mirror of every
+                  contributor in the wider project.
                 </p>
               </div>
             </div>
@@ -77,7 +78,8 @@ export default function TeamPage() {
                 </h3>
                 <p className="mt-2 text-sm font-medium text-primary">{member.role}</p>
                 <p className="mt-5 text-sm leading-7 text-muted-foreground">
-                  Working across product direction, implementation quality, and delivery discipline to keep the platform clear as it grows.
+                  Working across product direction, implementation quality, and delivery discipline
+                  to keep the platform clear as it grows.
                 </p>
               </div>
               <a
@@ -126,13 +128,14 @@ export default function TeamPage() {
               Want the product view behind the people?
             </h2>
             <p className="mt-4 text-sm leading-7 text-muted-foreground">
-              Learn how the platform is framed publicly, what principles guide it, and where to reach the team through official project channels.
+              Learn how the platform is framed publicly, what principles guide it, and where to
+              reach the team through official project channels.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Link
               href="/about"
-              className="rounded-full border border-border bg-background/70 px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-primary/25 hover:text-primary"
+              className="rounded-full border border-border bg-background/72 px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-primary/25 hover:text-primary"
             >
               About ByReiXwift
             </Link>

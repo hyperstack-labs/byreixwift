@@ -218,12 +218,12 @@
   }
 
   section[id]:not(#hero) {
-    scroll-margin-top: 7.5rem;
+    scroll-margin-top: 6rem;
   }
 
   @media (min-width: 1024px) {
     section[id]:not(#hero) {
-      scroll-margin-top: 8.5rem;
+      scroll-margin-top: 6.75rem;
     }
   }
 }

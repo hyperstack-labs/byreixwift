@@ -22,6 +22,6 @@ export const useAuthStore = create<AuthState>()(
         isAuthenticated: state.isAuthenticated,
         identity: state.identity,
       }),
-    },
-  ),
+    }
+  )
 );

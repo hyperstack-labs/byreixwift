@@ -35,66 +35,48 @@ interface DetailRow {
 
 const heroProofPoints = [
   {
-    label: "Fee review",
-    value: "Visible before approval",
+    label: "Fees shown upfront",
+    value: "Before you confirm",
   },
   {
-    label: "Escrow",
-    value: "Used when trust needs structure",
+    label: "Settlement visible",
+    value: "Direct payment or escrow",
   },
   {
-    label: "Audience",
-    value: "Users and merchants",
+    label: "Approval required",
+    value: "No blind approval step",
   },
 ] as const;
 
 const problemPoints = [
-  "Many Muslims still navigate digital payments with unclear charges or structures that weaken trust.",
-  "Merchants need a payment flow that feels modern without abandoning ethical standards.",
-  "Sensitive transactions sometimes need more than a receipt. They need visible protection.",
+  "You often see fees and settlement terms too late in the flow.",
+  "You should not have to trust a checkout you cannot properly review.",
+  "Some transactions need a visible release step, not just a payment confirmation.",
 ];
 
 const responsePoints = [
-  "Show the amount, fee, and destination before approval.",
-  "Support direct payments, transfers, and protected escrow flows in one product.",
-  "Keep the product story honest about what is live and what is still being built.",
-];
-
-const heroNodes = [
-  { x: 8, y: 14, delay: 0 },
-  { x: 18, y: 38, delay: 0.45 },
-  { x: 26, y: 72, delay: 0.9 },
-  { x: 34, y: 21, delay: 1.35 },
-  { x: 42, y: 56, delay: 1.8 },
-  { x: 48, y: 84, delay: 2.25 },
-  { x: 56, y: 30, delay: 2.7 },
-  { x: 62, y: 65, delay: 3.15 },
-  { x: 70, y: 18, delay: 3.6 },
-  { x: 76, y: 52, delay: 4.05 },
-  { x: 84, y: 74, delay: 4.5 },
-  { x: 90, y: 28, delay: 4.95 },
-  { x: 14, y: 88, delay: 5.4 },
-  { x: 58, y: 9, delay: 5.85 },
-  { x: 94, y: 58, delay: 6.3 },
+  "Put the amount, fees, recipient, and settlement mode in front of you before approval.",
+  "Make transfers and merchant payments feel readable, not like raw token actions.",
+  "Add escrow only when the transaction needs structure, then show its state clearly.",
 ];
 
 const platformPillars: FeatureCard[] = [
   {
     title: "Online Payments",
-    description: "Review the amount, fee, and destination before a purchase is approved.",
-    reason: "Buyers and merchants see the same transaction terms from the start.",
+    description: "Review the total, fees, and destination before you approve checkout.",
+    reason: "You get a payment review first, not a wallet prompt dropped in too early.",
     icon: Wallet,
   },
   {
     title: "Transfers",
-    description: "Send value to people, teams, or businesses with a cleaner payout flow.",
-    reason: "It supports everyday movement of money, not just crypto-native actions.",
+    description: "Send funds with a named recipient, purpose, and confirmation step.",
+    reason: "Your everyday transfers feel intentional instead of opaque or overly technical.",
     icon: Send,
   },
   {
     title: "Escrow Protection",
-    description: "Hold funds until terms are met, then release or refund with visible state changes.",
-    reason: "Trust becomes part of the payment flow instead of an afterthought.",
+    description: "Lock value until terms are met, then release or refund with visible states.",
+    reason: "Protection becomes part of the flow instead of an off-platform promise.",
     icon: ShieldCheck,
   },
 ];
@@ -107,32 +89,25 @@ const paymentReviewRows: DetailRow[] = [
   { label: "Total before approval", value: "1,275.40 SDA" },
 ];
 
-const transferDetails: DetailRow[] = [
-  { label: "Recipient", value: "Amina Textiles" },
-  { label: "Purpose", value: "Supplier settlement" },
-  { label: "Transfer amount", value: "480 SDA" },
-  { label: "Fee handling", value: "Fixed before approval" },
-];
-
 const escrowStates = [
   {
     title: "Locked",
-    copy: "Funds can stay held while both sides review the terms of the transaction.",
+    copy: "Funds stay held while both sides review the terms.",
     icon: LockKeyhole,
   },
   {
     title: "Released",
-    copy: "The agreed amount moves when the transaction condition is met.",
+    copy: "The amount moves when the transaction condition is met.",
     icon: CheckCircle2,
   },
   {
     title: "Refunded",
-    copy: "If the transaction should not continue, value can return cleanly.",
+    copy: "If the transaction should not continue, value returns cleanly.",
     icon: Repeat,
   },
   {
     title: "Visible State",
-    copy: "Both sides can see whether the transaction is pending, locked, released, or refunded.",
+    copy: "Both sides can see whether it is pending, locked, released, or refunded.",
     icon: Eye,
   },
 ];
@@ -140,15 +115,15 @@ const escrowStates = [
 const principles = [
   {
     title: "Fixed transparent fees",
-    copy: "Charges should be visible before approval, not discovered after money moves.",
+    copy: "You should see the charge before approval, not discover it after money moves.",
   },
   {
     title: "Ethical transaction design",
-    copy: "The product is framed around fair dealing, clear terms, and responsible digital commerce.",
+    copy: "The product should feel grounded in fair dealing, clear terms, and responsible digital commerce.",
   },
   {
     title: "User control",
-    copy: "Approval stays with the user. Transactions should never feel hidden or abstracted away.",
+    copy: "Approval stays with you. Transactions should never feel hidden or abstracted away.",
   },
   {
     title: "Governance path",
@@ -160,19 +135,25 @@ const workflowSteps = [
   {
     step: "01",
     title: "Connect",
-    copy: "Start the flow with a wallet connection so payments and approvals stay tied to the user.",
+    copy: "Connect your wallet only when you're ready to approve.",
   },
   {
     step: "02",
     title: "Review",
-    copy: "See the amount, fee, destination, and whether the transaction should settle directly or use escrow.",
+    copy: "See the amount, fees, destination, and settlement mode first.",
   },
   {
     step: "03",
-    title: "Pay or secure",
-    copy: "Approve a direct payment or hold funds in escrow until the transaction can be released or refunded.",
+    title: "Approve",
+    copy: "Pay directly or place funds in escrow and track the result.",
   },
 ];
+
+const transferHighlights = [
+  { label: "Recipient", value: "Named before send" },
+  { label: "Fee", value: "Visible before approval" },
+  { label: "Protection", value: "Escrow when needed" },
+] as const;
 
 const visibilityRows: DetailRow[] = [
   { label: "Payment amount", value: "Shown before approval" },
@@ -193,23 +174,369 @@ const sectionReveal = (reducedMotion: boolean, delay = 0) => ({
   },
 });
 
-function NeuralNode({ delay = 0, x = 0, y = 0 }: { delay?: number; x?: number; y?: number }) {
+const previewShell = (reducedMotion: boolean) => ({
+  hidden: { opacity: 0, y: reducedMotion ? 8 : 24, scale: reducedMotion ? 1 : 0.985 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: reducedMotion ? 0.2 : 0.65,
+      ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+      when: "beforeChildren" as const,
+      delayChildren: reducedMotion ? 0.02 : 0.16,
+      staggerChildren: reducedMotion ? 0.03 : 0.08,
+    },
+  },
+});
+
+const previewCover = (reducedMotion: boolean) => ({
+  hidden: { opacity: 1, y: 0 },
+  visible: {
+    opacity: reducedMotion ? 0 : 0.18,
+    y: "108%",
+    transition: {
+      duration: reducedMotion ? 0.2 : 0.82,
+      delay: reducedMotion ? 0 : 0.06,
+      ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+    },
+  },
+});
+
+const previewItem = (reducedMotion: boolean) => ({
+  hidden: {
+    opacity: 0,
+    y: reducedMotion ? 6 : 18,
+    filter: reducedMotion ? "blur(0px)" : "blur(10px)",
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: {
+      duration: reducedMotion ? 0.2 : 0.46,
+      ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+    },
+  },
+});
+
+const previewMaskStyle = {
+  maskImage: "linear-gradient(to bottom, black 0%, black 80%, transparent 100%)",
+  WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 80%, transparent 100%)",
+};
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: [0.18, 0.5, 0.18] }}
-      transition={{ duration: 4.6, repeat: Infinity, delay }}
-      className="absolute h-1.5 w-1.5 rounded-full bg-primary/30 blur-[1px]"
-      style={{ left: `${x}%`, top: `${y}%` }}
+    <span className="inline-flex items-center text-[0.78rem] font-bold uppercase tracking-[0.24em] text-primary/92 sm:text-[0.82rem]">
+      {children}
+    </span>
+  );
+}
+
+const sectionWrapClass =
+  "rounded-[2.1rem] bg-[linear-gradient(180deg,rgba(9,13,11,0.56)_0%,rgba(7,10,8,0.28)_100%)] sm:rounded-[2.75rem]";
+
+const contentCardClass =
+  "rounded-[1.7rem] border border-white/8 bg-[linear-gradient(180deg,rgba(10,15,12,0.94)_0%,rgba(7,11,9,0.9)_100%)] sm:rounded-[2rem]";
+
+const insetCardClass =
+  "rounded-[1.5rem] border border-white/8 bg-[linear-gradient(180deg,rgba(12,17,14,0.82)_0%,rgba(8,12,10,0.68)_100%)]";
+
+function LiveDot({ reducedMotion }: { reducedMotion: boolean }) {
+  return (
+    <motion.span
+      className="inline-block h-2 w-2 rounded-full bg-primary"
+      animate={
+        reducedMotion
+          ? undefined
+          : {
+              opacity: [0.4, 1, 0.4],
+              scale: [0.9, 1.15, 0.9],
+            }
+      }
+      transition={
+        reducedMotion ? undefined : { duration: 2.1, repeat: Infinity, ease: "easeInOut" }
+      }
     />
   );
 }
 
-function SectionLabel({ children }: { children: React.ReactNode }) {
+function PreviewShell({
+  children,
+  reducedMotion,
+}: {
+  children: React.ReactNode;
+  reducedMotion: boolean;
+}) {
   return (
-    <span className="inline-flex items-center rounded-full border border-white/10 bg-white/4 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-primary/90">
-      {children}
-    </span>
+    <motion.div
+      variants={previewShell(reducedMotion)}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.34 }}
+      className="relative"
+    >
+      <div className="absolute inset-0 rounded-4xl bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.04),transparent_58%),radial-gradient(circle_at_bottom,rgba(37,201,133,0.08),transparent_46%)] blur-2xl sm:rounded-[2.4rem]" />
+      <div className="relative overflow-hidden rounded-4xl border border-white/8 bg-[linear-gradient(180deg,rgba(10,15,12,0.98)_0%,rgba(6,9,7,1)_100%)] p-4 shadow-[0_26px_80px_rgba(0,0,0,0.34)] sm:rounded-[2.4rem] sm:p-5 lg:p-6">
+        <motion.div
+          variants={previewItem(reducedMotion)}
+          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/16 to-transparent"
+        />
+        <motion.div
+          variants={previewCover(reducedMotion)}
+          className="pointer-events-none absolute inset-px z-20 rounded-[calc(2rem-1px)] bg-[linear-gradient(180deg,rgba(9,12,10,0.98)_0%,rgba(9,12,10,0.98)_74%,rgba(9,12,10,0.72)_100%)] sm:rounded-[calc(2.4rem-1px)]"
+        />
+        <div
+          className="relative overflow-hidden rounded-3xl sm:rounded-[1.85rem]"
+          style={previewMaskStyle}
+        >
+          {children}
+        </div>
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-[#060907] via-[#060907]/96 to-transparent sm:h-28" />
+      </div>
+    </motion.div>
+  );
+}
+
+function PaymentPreview({ reducedMotion }: { reducedMotion: boolean }) {
+  const signals = [
+    { label: "Counterparty", value: "Matched" },
+    { label: "Approval gate", value: "Manual review" },
+    { label: "Escrow mode", value: "Ready when needed" },
+  ];
+
+  return (
+    <PreviewShell reducedMotion={reducedMotion}>
+      <div className="min-h-84 bg-[radial-gradient(circle_at_top,rgba(37,201,133,0.08),transparent_52%)] p-1 sm:min-h-98 lg:min-h-104">
+        <motion.div
+          variants={previewItem(reducedMotion)}
+          className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-white/8 bg-white/3 px-3 py-1.5"
+        >
+          <div className="flex items-center gap-2">
+            <span className="rounded-lg bg-white/8 px-2.5 py-1 text-[10px] font-semibold text-foreground">
+              Checkout
+            </span>
+            <span className="rounded-lg border border-white/8 px-2.5 py-1 text-[10px] text-foreground/62">
+              Waiting for approval
+            </span>
+          </div>
+          <div className="flex items-center gap-2 text-[10px] font-medium text-foreground/66">
+            <LiveDot reducedMotion={reducedMotion} />
+            Live review
+          </div>
+        </motion.div>
+
+        <motion.div
+          variants={previewItem(reducedMotion)}
+          className="mt-3.5 rounded-[1.4rem] border border-white/8 bg-white/3 p-3.5"
+        >
+          <div className="flex flex-wrap items-start justify-between gap-3 border-b border-white/8 pb-3.5">
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                Payment summary
+              </p>
+              <p className="mt-1.5 text-[1.1rem] font-semibold text-foreground sm:text-[1.18rem]">
+                Merchant payment
+              </p>
+            </div>
+            <div className="rounded-full border border-primary/18 bg-primary/10 px-3 py-1 text-[10px] font-semibold text-primary">
+              Review first
+            </div>
+          </div>
+
+          <div className="mt-3.5 space-y-2.5">
+            {paymentReviewRows.map((row) => (
+              <motion.div
+                key={row.label}
+                variants={previewItem(reducedMotion)}
+                className="flex items-center justify-between gap-3 rounded-[0.95rem] border border-white/6 bg-background/32 px-3 py-2.5"
+              >
+                <span className="text-[0.88rem] text-muted-foreground">{row.label}</span>
+                <span className="text-[0.88rem] font-semibold text-foreground">{row.value}</span>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.div variants={previewItem(reducedMotion)} className="mt-4">
+            <div className="flex items-center justify-between text-[10px] text-foreground/58">
+              <span>Readiness check</span>
+              <span>72% confirmed</span>
+            </div>
+            <div className="mt-1.5 h-1.5 rounded-full bg-white/6">
+              <motion.div
+                className="h-full rounded-full bg-linear-to-r from-primary to-[#dfc28d]"
+                initial={{ width: "0%" }}
+                whileInView={{ width: reducedMotion ? "72%" : ["56%", "82%", "72%"] }}
+                viewport={{ once: true, amount: 0.4 }}
+                transition={
+                  reducedMotion
+                    ? { duration: 0.25 }
+                    : { duration: 4.5, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }
+                }
+              />
+            </div>
+          </motion.div>
+        </motion.div>
+
+        <div className="mt-3.5 grid gap-2.5 sm:grid-cols-3">
+          {signals.map((item) => (
+            <motion.div
+              key={item.label}
+              variants={previewItem(reducedMotion)}
+              className="rounded-[1.05rem] border border-white/8 bg-white/2.5 p-3"
+            >
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-foreground/48">
+                {item.label}
+              </p>
+              <p className="mt-1.5 text-[0.82rem] font-semibold text-foreground/86 sm:text-[0.86rem]">
+                {item.value}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </PreviewShell>
+  );
+}
+
+function TransferPreview({ reducedMotion }: { reducedMotion: boolean }) {
+  const reviewSteps = [
+    { label: "Recipient verified", value: "Amina Textiles", state: "Matched" },
+    { label: "Purpose attached", value: "Supplier settlement", state: "Included" },
+    { label: "Fee handling", value: "Fixed before send", state: "Visible" },
+  ];
+
+  return (
+    <PreviewShell reducedMotion={reducedMotion}>
+      <div className="min-h-90 bg-[radial-gradient(circle_at_top,rgba(223,194,141,0.06),transparent_46%)] p-1 sm:min-h-108 lg:min-h-116">
+        <motion.div
+          variants={previewItem(reducedMotion)}
+          className="flex flex-wrap gap-2 rounded-[1.1rem] border border-white/8 bg-white/3 px-3 py-2"
+        >
+          {["Family support", "Merchant payout", "Invoice settlement"].map((tag) => (
+            <span
+              key={tag}
+              className="rounded-lg border border-white/8 bg-white/3 px-2.5 py-1 text-[11px] font-medium text-foreground/72"
+            >
+              {tag}
+            </span>
+          ))}
+        </motion.div>
+
+        <motion.div
+          variants={previewItem(reducedMotion)}
+          className="mt-4 rounded-[1.55rem] border border-white/8 bg-white/3 p-4"
+        >
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/8 pb-4">
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                Transfer review
+              </p>
+              <p className="mt-2 text-xl font-semibold text-foreground">Ready to send</p>
+            </div>
+            <div className="flex items-center gap-2 rounded-full border border-white/8 bg-white/3 px-3 py-1 text-[11px] font-medium text-foreground/68">
+              <LiveDot reducedMotion={reducedMotion} />
+              Confirmation required
+            </div>
+          </div>
+
+          <div className="mt-4 space-y-3">
+            {reviewSteps.map((item) => (
+              <motion.div
+                key={item.label}
+                variants={previewItem(reducedMotion)}
+                className="flex flex-col gap-2 rounded-2xl border border-white/6 bg-background/32 px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
+              >
+                <div>
+                  <p className="text-xs text-muted-foreground">{item.label}</p>
+                  <p className="mt-1 text-sm font-semibold text-foreground">{item.value}</p>
+                </div>
+                <span className="rounded-full border border-white/8 bg-white/4 px-2.5 py-1 text-[11px] font-medium text-foreground/70">
+                  {item.state}
+                </span>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        <div className="mt-4 grid gap-2.5 sm:grid-cols-3">
+          {[
+            { label: "Status", value: "Visible to both sides" },
+            { label: "Review step", value: "Before send" },
+            { label: "Trust layer", value: "Escrow optional" },
+          ].map((item) => (
+            <motion.div
+              key={item.label}
+              variants={previewItem(reducedMotion)}
+              className="rounded-[1.2rem] border border-white/8 bg-white/2.5 p-4 text-center"
+            >
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-foreground/48">
+                {item.label}
+              </p>
+              <p className="mt-2 text-sm font-semibold text-foreground/86">{item.value}</p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </PreviewShell>
+  );
+}
+
+function ApprovalPreview({ reducedMotion }: { reducedMotion: boolean }) {
+  return (
+    <PreviewShell reducedMotion={reducedMotion}>
+      <div className="min-h-90 bg-[radial-gradient(circle_at_top,rgba(37,201,133,0.07),transparent_50%)] p-1 sm:min-h-108 lg:min-h-116">
+        <motion.div
+          variants={previewItem(reducedMotion)}
+          className="flex flex-wrap items-center justify-between gap-3 rounded-[1.1rem] border border-white/8 bg-white/3 px-3 py-2"
+        >
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+              Before approval
+            </p>
+            <p className="mt-1 text-sm font-semibold text-foreground">Readable workflow</p>
+          </div>
+          <div className="rounded-full border border-primary/18 bg-primary/10 px-3 py-1 text-[11px] font-semibold text-primary">
+            Review layer
+          </div>
+        </motion.div>
+
+        <div className="mt-4 space-y-3">
+          {workflowSteps.map((item) => (
+            <motion.div
+              key={item.step}
+              variants={previewItem(reducedMotion)}
+              className="rounded-[1.35rem] border border-white/8 bg-white/3 p-4"
+            >
+              <div className="flex items-start gap-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-primary/18 bg-primary/10 text-sm font-black text-primary">
+                  {item.step}
+                </div>
+                <div>
+                  <h3 className="text-sm font-semibold text-foreground">{item.title}</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{item.copy}</p>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          {visibilityRows.slice(0, 4).map((row) => (
+            <motion.div
+              key={row.label}
+              variants={previewItem(reducedMotion)}
+              className="rounded-[1.2rem] border border-white/8 bg-white/2.5 px-4 py-3"
+            >
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-foreground/48">
+                {row.label}
+              </p>
+              <p className="mt-2 text-sm font-semibold text-foreground/86">{row.value}</p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </PreviewShell>
   );
 }
 
@@ -229,178 +556,111 @@ export function LandingPage({ onConnect }: LandingPageProps) {
     <div className="min-h-screen bg-background selection:bg-primary/30 selection:text-foreground">
       <section
         id={HOME_SECTION_IDS.hero}
-        className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8 noise-overlay"
+        className="relative overflow-hidden px-4 sm:px-6 lg:px-8 noise-overlay"
       >
-        <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
-          <div className="absolute left-[-5%] top-[-10%] h-[40%] w-[40%] rounded-full bg-primary/10 blur-[120px] animate-organic-float" />
-          <div
-            className="absolute bottom-[10%] right-[-5%] h-[35%] w-[35%] rounded-full bg-(--byreix-gold)/10 blur-[100px] animate-organic-float"
-            style={{ animationDelay: "-5s" }}
-          />
-
-          {heroNodes.map((node, index) => (
-            <NeuralNode key={index} x={node.x} y={node.y} delay={node.delay} />
-          ))}
-
-          <svg className="absolute inset-0 h-full w-full opacity-20">
-            <defs>
-              <linearGradient id="line-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="transparent" />
-                <stop offset="50%" stopColor="var(--color-primary)" />
-                <stop offset="100%" stopColor="transparent" />
-              </linearGradient>
-            </defs>
-            <motion.path
-              d="M 10,20 Q 50,50 90,80"
-              stroke="url(#line-grad)"
-              strokeWidth="0.5"
-              fill="transparent"
-              initial={{ pathLength: 0 }}
-              animate={{ pathLength: 1 }}
-              transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-            />
-            <motion.path
-              d="M 80,10 Q 40,60 20,90"
-              stroke="url(#line-grad)"
-              strokeWidth="0.5"
-              fill="transparent"
-              initial={{ pathLength: 0 }}
-              animate={{ pathLength: 1 }}
-              transition={{ duration: 12, repeat: Infinity, ease: "linear", delay: 2 }}
-            />
-          </svg>
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(37,201,133,0.1),transparent_32%),radial-gradient(circle_at_82%_18%,rgba(223,194,141,0.06),transparent_24%)]" />
+          <div className="absolute left-[-10%] top-[6%] h-88 w-88 rounded-full bg-primary/8 blur-[120px]" />
+          <div className="absolute right-[-6%] top-[12%] h-72 w-72 rounded-full bg-[rgba(223,194,141,0.06)] blur-[130px]" />
+          <div className="absolute inset-x-0 bottom-0 h-[42%] bg-linear-to-t from-background via-background/88 to-transparent" />
         </div>
 
-        <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden">
-          <div className="absolute inset-x-0 top-0 z-10 h-[58%] bg-linear-to-b from-background via-background/72 to-transparent" />
+        <div className="relative z-10 mx-auto flex min-h-svh w-full max-w-4xl items-center justify-center pb-10 pt-20 sm:pb-12 sm:pt-24 lg:pt-28">
+          <motion.div
+            initial={{ opacity: 0, scale: 1.03 }}
+            animate={{ opacity: 0.28, scale: 1 }}
+            transition={{ duration: 2.2, ease: [0.22, 1, 0.36, 1], delay: 0.12 }}
+            className="pointer-events-none absolute left-1/2 top-[50svh] h-[50svh] w-[220vw] max-w-none -translate-x-1/2 sm:w-[176vw] lg:w-[132vw]"
+          >
+            <Image src="/horizon_glow.png" alt="" fill className="object-cover mix-blend-screen" />
+          </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, scale: 1.05 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 2.5, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
-            className="flex h-full w-full flex-col items-center justify-center"
+            initial={{ opacity: 0, y: 28 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+            className="mx-auto flex max-w-160 flex-col items-center pt-6 text-center sm:pt-8 lg:pt-0"
           >
-            <div className="relative aspect-21/9 w-[158%] max-w-none -translate-y-6.5 opacity-[0.78] sm:w-[132%] sm:translate-y-[3.2rem] sm:opacity-[0.84] lg:w-full lg:translate-y-19 lg:opacity-[0.9]">
-              <Image
-                src="/horizon_glow.png"
-                alt=""
-                fill
-                className="object-cover mix-blend-screen"
-                style={{
-                  maskImage: "linear-gradient(to bottom, transparent, black 15%)",
-                  WebkitMaskImage: "linear-gradient(to bottom, transparent, black 15%)",
-                }}
-              />
+            <div className="inline-flex flex-wrap items-center gap-2 rounded-full border border-white/8 bg-background/24 px-3 py-1.5 backdrop-blur-xl sm:px-4">
+              <span className="rounded-full border border-primary/24 bg-primary/12 px-2 py-0.5 text-[9px] font-black tracking-[0.08em] text-primary">
+                BYREIXWIFT
+              </span>
+              <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-foreground/68 sm:text-[11px] sm:tracking-widest">
+                Transparent payments on Sidrachain
+              </span>
+            </div>
+
+            <h1 className="mt-6 text-[clamp(2.35rem,14vw,3.75rem)] font-extrabold leading-[0.92] tracking-[-0.05em] text-foreground sm:mt-7 sm:text-[clamp(2.8rem,6vw,4.45rem)] sm:leading-[0.96]">
+              Review payment
+              <span className="mt-2 block text-(--byreix-gold-soft)">before approval.</span>
+            </h1>
+
+            <p className="mt-5 max-w-136 text-[0.98rem] leading-[1.72] text-muted-foreground sm:text-[1.04rem] lg:text-[1.1rem]">
+              See the merchant, amount, fees, and settlement mode before you confirm. Use escrow
+              only when the transaction needs a visible release step.
+            </p>
+
+            <div className="mt-7 flex w-full max-w-lg flex-col gap-3 sm:w-auto sm:max-w-none sm:flex-row sm:justify-center">
+              <Button
+                onClick={() => scrollToSection(HOME_SECTION_IDS.payments)}
+                className="h-12 w-full justify-center rounded-xl border border-white/10 bg-primary px-7 text-base font-semibold text-primary-foreground shadow-[0_14px_34px_rgba(3,13,8,0.34)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary/92 sm:w-auto"
+              >
+                Learn More
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+              <Button
+                onClick={onConnect}
+                variant="outline"
+                className="h-12 w-full justify-center rounded-xl border-white/10 bg-white/2 px-7 text-base font-semibold text-foreground/84 transition-all duration-300 hover:border-white/22 hover:bg-white/5 hover:text-foreground sm:w-auto"
+              >
+                Launch App
+              </Button>
+            </div>
+
+            <div className="mt-6 grid w-full max-w-2xl gap-2 text-center sm:grid-cols-3">
+              {heroProofPoints.map((point, index) => (
+                <motion.div
+                  key={point.label}
+                  initial={{ opacity: 0, y: reducedMotion ? 0 : 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    duration: reducedMotion ? 0.2 : 0.45,
+                    delay: reducedMotion ? 0 : 0.35 + index * 0.08,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                  className="rounded-[1.05rem] border border-white/8 bg-white/2 px-3.5 py-2.5 sm:rounded-[1.15rem] sm:px-4 sm:py-3"
+                >
+                  <p className="text-[9px] font-semibold uppercase tracking-[0.2em] text-foreground/46 sm:text-[10px]">
+                    {point.label}
+                  </p>
+                  <p className="mt-1.5 text-[0.9rem] font-medium leading-snug text-foreground/86 sm:text-[0.92rem]">
+                    {point.value}
+                  </p>
+                </motion.div>
+              ))}
             </div>
           </motion.div>
         </div>
-
-        <div className="relative z-20 mx-auto w-full max-w-6xl pt-24 sm:pt-28 lg:pt-32">
-          <div className="mx-auto max-w-5xl px-4 text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
-              className="flex -translate-y-2 flex-col items-center sm:-translate-y-3 lg:-translate-y-4"
-            >
-              <div className="mb-7 inline-flex items-center gap-2.5 rounded-full border border-white/8 bg-background/18 px-4 py-1.5 backdrop-blur-xl">
-                <span className="rounded-full border border-primary/24 bg-primary/12 px-2 py-0.5 text-[9px] font-black tracking-[0.08em] text-primary">
-                  BYREIXWIFT
-                </span>
-                <span className="text-[11px] font-bold uppercase tracking-widest text-primary/90">
-                  Online payments on Sidrachain
-                </span>
-              </div>
-
-              <h1 className="mb-6 flex max-w-[64rem] flex-col items-center">
-                <span className="mb-5 text-[clamp(2.15rem,4.1vw,3.85rem)] font-medium leading-none tracking-[-0.045em] text-foreground/86">
-                  Clearer payments
-                </span>
-                <span className="block bg-linear-to-b from-white via-white to-white/75 bg-clip-text text-[clamp(4.15rem,9.8vw,6.25rem)] font-black leading-[0.9] tracking-[-0.035em] text-transparent">
-                  FOR USERS
-                </span>
-                <span className="mt-1 block bg-linear-to-b from-[#f6dfb0] via-[#e3c98d] to-[#cd9f58] bg-clip-text text-[clamp(4.15rem,9.8vw,6.25rem)] font-black leading-[0.9] tracking-[-0.035em] text-transparent">
-                  AND MERCHANTS
-                </span>
-              </h1>
-
-              <p className="mb-9 max-w-[40rem] px-4 text-balance text-[1.04rem] font-medium leading-[1.72] text-foreground/84 drop-shadow-[0_10px_24px_rgba(3,13,8,0.7)] sm:text-[1.12rem] lg:text-[1.2rem]">
-                Pay online, send funds, and use escrow when a transaction needs protection.
-              </p>
-
-              <div className="relative p-2">
-                <div className="pointer-events-none absolute inset-x-0 top-1/2 h-24 -translate-y-1/2 rounded-full bg-background/40 blur-3xl opacity-60" />
-
-                <div className="relative z-10 mx-auto flex w-full max-w-[320px] flex-col items-center justify-center gap-3 sm:max-w-none sm:flex-row sm:gap-5">
-                  <Button
-                    onClick={onConnect}
-                    className="h-12 w-full rounded-xl border border-white/10 bg-linear-to-b from-primary via-primary to-primary/95 px-9 text-base font-bold text-primary-foreground shadow-[0_8px_30px_rgb(37,201,133,0.26)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_40px_rgb(37,201,133,0.38)] sm:h-13 sm:w-auto"
-                  >
-                    Launch App
-                  </Button>
-                  <Button
-                    onClick={() => scrollToSection(HOME_SECTION_IDS.howItWorks)}
-                    variant="outline"
-                    className="h-12 w-full rounded-xl border-white/10 bg-transparent px-9 text-base font-semibold text-foreground/82 transition-all duration-300 hover:border-white/25 hover:bg-white/5 hover:text-foreground sm:h-13 sm:w-auto"
-                  >
-                    See How It Works
-                  </Button>
-                </div>
-              </div>
-
-              <div className="mt-12 w-full max-w-[46rem]">
-                <div className="relative grid border-y border-[rgba(255,255,255,0.07)] sm:grid-cols-3">
-                  <div className="pointer-events-none absolute inset-x-10 top-0 h-px bg-linear-to-r from-transparent via-(--byreix-gold-soft)/28 to-transparent" />
-                  <div className="pointer-events-none absolute inset-x-10 bottom-0 h-px bg-linear-to-r from-transparent via-white/10 to-transparent" />
-                  {heroProofPoints.map((point, index) => (
-                    <motion.div
-                      key={point.label}
-                      initial={{ opacity: 0, y: reducedMotion ? 0 : 12 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{
-                        duration: reducedMotion ? 0.2 : 0.45,
-                        delay: reducedMotion ? 0 : 0.45 + index * 0.08,
-                        ease: [0.22, 1, 0.36, 1],
-                      }}
-                      className="relative px-5 py-5 text-center sm:px-7"
-                    >
-                      {index < heroProofPoints.length - 1 ? (
-                        <div className="absolute bottom-0 left-8 right-8 h-px bg-linear-to-r from-transparent via-white/8 to-transparent sm:hidden" />
-                      ) : null}
-                      {index < heroProofPoints.length - 1 ? (
-                        <div className="absolute right-0 top-1/2 hidden h-14 w-px -translate-y-1/2 bg-linear-to-b from-transparent via-white/10 to-transparent sm:block" />
-                      ) : null}
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-(--byreix-gold-soft)">
-                        {point.label}
-                      </p>
-                      <p className="mx-auto mt-2 max-w-[15rem] text-sm leading-relaxed text-foreground/78">
-                        {point.value}
-                      </p>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
       </section>
 
-      <section id={HOME_SECTION_IDS.why} className="px-4 py-24 sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:gap-12">
+      <section
+        id={HOME_SECTION_IDS.why}
+        className="relative z-10 px-4 pb-14 pt-10 sm:px-6 sm:pb-16 sm:pt-12 lg:px-8 lg:pb-20 lg:pt-16"
+      >
+        <div className="mx-auto grid max-w-6xl gap-6 sm:gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:gap-12">
           <motion.div {...sectionReveal(reducedMotion)} className="max-w-xl">
             <SectionLabel>Why ByReiXwift Exists</SectionLabel>
-            <h2 className="mt-6 text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-              Digital payments are easy to start and hard to review.
+            <h2 className="mt-5 text-[1.95rem] font-bold leading-[1.02] tracking-tight text-foreground sm:mt-6 sm:text-[2.55rem] lg:text-[3.25rem]">
+              Digital payments are easy to start and hard to verify.
             </h2>
-            <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-              Too often, users face unclear fees, vague settlement terms, or trust gaps that only
-              become obvious after a transaction begins. ByReiXwift is being built to make the
-              payment flow easier to understand before approval.
+            <p className="mt-5 text-[1rem] leading-[1.72] text-muted-foreground sm:mt-6 sm:text-lg">
+              Fees, settlement terms, and trust gaps still show up too late. ByReiXwift is being
+              built so you can review the deal before money moves.
             </p>
           </motion.div>
 
           <motion.div {...sectionReveal(reducedMotion, 0.08)} className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-[2rem] border border-border bg-card/70 p-6">
+            <div className={`${contentCardClass} p-5 sm:p-6`}>
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/85">
                 What users still face
               </p>
@@ -413,7 +673,7 @@ export function LandingPage({ onConnect }: LandingPageProps) {
                 ))}
               </div>
             </div>
-            <div className="rounded-[2rem] border border-border bg-linear-to-br from-card via-card to-background/60 p-6">
+            <div className={`${contentCardClass} p-5 sm:p-6`}>
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-(--byreix-gold-soft)">
                 What ByReiXwift changes
               </p>
@@ -429,34 +689,42 @@ export function LandingPage({ onConnect }: LandingPageProps) {
           </motion.div>
         </div>
       </section>
-      <section id={HOME_SECTION_IDS.overview} className="px-4 py-24 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-6xl">
-          <motion.div {...sectionReveal(reducedMotion)} className="max-w-3xl">
-            <SectionLabel>What ByReiXwift Is</SectionLabel>
-            <h2 className="mt-6 text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-              One platform for payments, transfers, and escrow-backed protection.
+      <section
+        id={HOME_SECTION_IDS.overview}
+        className="px-4 py-14 sm:px-6 sm:py-16 lg:px-8 lg:py-20"
+      >
+        <div
+          className={`mx-auto max-w-6xl ${sectionWrapClass} px-5 py-8 sm:px-8 sm:py-10 lg:px-10`}
+        >
+          <motion.div
+            {...sectionReveal(reducedMotion)}
+            className="mx-auto flex max-w-3xl flex-col items-center text-center"
+          >
+            <p className="text-[0.78rem] font-bold uppercase tracking-[0.24em] text-primary/92 sm:text-[0.82rem]">
+              What ByReiXwift Is
+            </p>
+            <h2 className="mt-4 text-[1.95rem] font-bold leading-[1.02] tracking-tight text-foreground sm:mt-5 sm:text-[2.5rem] lg:text-[3.2rem]">
+              One product, three clear flows.
             </h2>
-            <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
-              ByReiXwift brings three core flows into one product: online payments, direct
-              transfers, and escrow when a transaction needs more structure than a direct payment
-              can provide.
+            <p className="mt-5 text-[1rem] leading-[1.72] text-muted-foreground sm:text-lg">
+              Pay, send, or protect a transaction without guessing what happens next.
             </p>
           </motion.div>
 
-          <div className="mt-12 grid gap-5 lg:grid-cols-3">
+          <div className="mt-10 grid gap-4 sm:mt-12 lg:grid-cols-3 lg:gap-5">
             {platformPillars.map((pillar, index) => {
               const Icon = pillar.icon;
               return (
                 <motion.article
                   key={pillar.title}
                   {...sectionReveal(reducedMotion, 0.04 * index)}
-                  className="rounded-[2rem] border border-border bg-card/75 p-6"
+                  className={`${contentCardClass} p-5 sm:p-6`}
                 >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10">
-                    <Icon className="h-5 w-5 text-primary" />
+                  <div className="flex items-center gap-3">
+                    <Icon className="h-[1.05rem] w-[1.05rem] shrink-0 text-primary/88" />
+                    <h3 className="text-2xl font-semibold text-foreground">{pillar.title}</h3>
                   </div>
-                  <h3 className="mt-6 text-2xl font-semibold text-foreground">{pillar.title}</h3>
-                  <p className="mt-3 text-base leading-relaxed text-muted-foreground">
+                  <p className="mt-3 text-[0.98rem] leading-[1.68] text-muted-foreground sm:text-base">
                     {pillar.description}
                   </p>
                   <p className="mt-5 border-t border-border pt-5 text-sm leading-relaxed text-foreground/82">
@@ -469,34 +737,35 @@ export function LandingPage({ onConnect }: LandingPageProps) {
 
           <motion.div
             {...sectionReveal(reducedMotion, 0.12)}
-            className="mt-6 rounded-[2rem] border border-border bg-background/55 px-5 py-4"
+            className="mt-6 border-t border-white/8 pt-5 sm:px-1"
           >
             <p className="text-sm leading-relaxed text-muted-foreground">
               <span className="font-semibold text-foreground">Supporting capability:</span> swap
-              support may complement payment flows where conversion matters, but it is not the
-              public identity of ByReiXwift.
+              support can complement a payment flow when conversion matters, but it stays secondary
+              to the review experience.
             </p>
           </motion.div>
         </div>
       </section>
 
-      <section id={HOME_SECTION_IDS.payments} className="px-4 py-24 sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[0.92fr_1.08fr] lg:gap-14">
+      <section
+        id={HOME_SECTION_IDS.payments}
+        className="px-4 py-14 sm:px-6 sm:py-16 lg:px-8 lg:py-20"
+      >
+        <div className="mx-auto grid max-w-6xl items-center gap-8 sm:gap-10 lg:grid-cols-[0.96fr_0.9fr] lg:gap-16">
           <motion.div {...sectionReveal(reducedMotion)} className="max-w-xl">
             <SectionLabel>Payment Transparency</SectionLabel>
-            <h2 className="mt-6 text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
+            <h2 className="mt-5 text-[2.05rem] font-bold leading-[1.02] tracking-tight text-foreground sm:mt-6 sm:text-[2.65rem] lg:text-[3.55rem]">
               See the payment before you approve it.
             </h2>
-            <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-              Amount, fee, destination, and settlement mode stay visible before money moves. That
-              gives users and merchants a clearer review step instead of a last-second confirmation
-              screen.
+            <p className="mt-5 text-[1rem] leading-[1.72] text-muted-foreground sm:mt-6 sm:text-lg">
+              Check the amount, fee, destination, and settlement mode before money moves.
             </p>
             <div className="mt-8 space-y-4">
               {[
-                "Payment totals stay visible before confirmation.",
-                "Fixed platform fees are part of the review.",
-                "Escrow can be added when the transaction needs protection.",
+                "See the amount, fees, and destination in one review step.",
+                "See the settlement mode before approval.",
+                "Use escrow only when it helps.",
               ].map((point) => (
                 <div key={point} className="flex gap-3">
                   <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
@@ -506,135 +775,37 @@ export function LandingPage({ onConnect }: LandingPageProps) {
             </div>
           </motion.div>
 
-          <motion.div {...sectionReveal(reducedMotion, 0.08)} className="relative">
-            <div className="absolute inset-0 rounded-[2rem] bg-linear-to-br from-primary/8 via-transparent to-(--byreix-gold)/8 blur-3xl" />
-            <div className="relative rounded-[2rem] border border-border bg-card/88 p-6 shadow-[0_22px_55px_rgba(3,13,8,0.28)]">
-              <div className="flex items-center justify-between border-b border-border pb-4">
-                <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-                    Illustrative payment review
-                  </p>
-                  <p className="mt-1 text-lg font-semibold text-foreground">Checkout summary</p>
-                </div>
-                <div className="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-                  Review first
-                </div>
-              </div>
-
-              <div className="mt-6 rounded-[1.5rem] border border-border bg-background/45 p-5">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                      Purchase purpose
-                    </p>
-                    <p className="mt-2 text-2xl font-semibold text-foreground">Merchant payment</p>
-                  </div>
-                  <div className="rounded-2xl border border-border bg-card/75 px-3 py-2 text-right">
-                    <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-                      Settlement mode
-                    </p>
-                    <p className="mt-1 text-sm font-semibold text-foreground">Direct or escrow</p>
-                  </div>
-                </div>
-
-                <div className="mt-6 space-y-3">
-                  {paymentReviewRows.map((row) => (
-                    <div key={row.label} className="flex items-center justify-between gap-4">
-                      <span className="text-sm text-muted-foreground">{row.label}</span>
-                      <span className="text-sm font-semibold text-foreground">{row.value}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="mt-5 grid gap-3 sm:grid-cols-3">
-                {[
-                  { label: "Fee visibility", value: "Before approval" },
-                  { label: "Counterparty", value: "Shown clearly" },
-                  { label: "Optional conversion", value: "Supporting utility" },
-                ].map((item) => (
-                  <div
-                    key={item.label}
-                    className="rounded-2xl border border-border bg-background/38 p-4"
-                  >
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                      {item.label}
-                    </p>
-                    <p className="mt-2 text-sm font-semibold text-foreground">{item.value}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
+          <div className="relative lg:max-w-136 lg:justify-self-end">
+            <PaymentPreview reducedMotion={reducedMotion} />
+          </div>
         </div>
       </section>
-      <section id={HOME_SECTION_IDS.transfers} className="px-4 py-24 sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[1.02fr_0.98fr] lg:gap-14">
-          <motion.div {...sectionReveal(reducedMotion, 0.04)} className="order-2 lg:order-1">
-            <div className="rounded-[2rem] border border-border bg-card/85 p-6 shadow-[0_18px_46px_rgba(0,0,0,0.22)]">
-              <div className="flex flex-wrap gap-2 border-b border-border pb-4">
-                {["Family support", "Merchant payout", "Invoice settlement"].map((tag) => (
-                  <span
-                    key={tag}
-                    className="rounded-full border border-border bg-background/45 px-3 py-1 text-xs font-semibold text-muted-foreground"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-
-              <div className="mt-5 rounded-[1.5rem] border border-border bg-background/45 p-5">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-                  Transfer review
-                </p>
-                <div className="mt-5 space-y-3">
-                  {transferDetails.map((row) => (
-                    <div key={row.label} className="flex items-center justify-between gap-4">
-                      <span className="text-sm text-muted-foreground">{row.label}</span>
-                      <span className="text-sm font-semibold text-foreground">{row.value}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="mt-5 grid gap-3 sm:grid-cols-3">
-                {[
-                  { label: "Status", value: "Visible to both sides" },
-                  { label: "Confirmation", value: "Review before send" },
-                  { label: "Trust layer", value: "Escrow when needed" },
-                ].map((item) => (
-                  <div
-                    key={item.label}
-                    className="rounded-2xl border border-border bg-background/38 p-4 text-center"
-                  >
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                      {item.label}
-                    </p>
-                    <p className="mt-2 text-sm font-semibold text-foreground">{item.value}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
+      <section
+        id={HOME_SECTION_IDS.transfers}
+        className="px-4 py-14 sm:px-6 sm:py-16 lg:px-8 lg:py-20"
+      >
+        <div className="mx-auto grid max-w-6xl items-center gap-8 sm:gap-10 lg:grid-cols-[1.02fr_0.98fr] lg:gap-14">
+          <div className="order-2 lg:order-1">
+            <TransferPreview reducedMotion={reducedMotion} />
+          </div>
 
           <motion.div {...sectionReveal(reducedMotion)} className="order-1 max-w-xl lg:order-2">
             <SectionLabel>Transfers</SectionLabel>
-            <h2 className="mt-6 text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
+            <h2 className="mt-5 text-[1.95rem] font-bold leading-[1.02] tracking-tight text-foreground sm:mt-6 sm:text-[2.55rem] lg:text-[3.25rem]">
               Send with context, not guesswork.
             </h2>
-            <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-              Transfers should make the recipient, purpose, fee, and confirmation state easy to
-              review. The goal is a cleaner payment experience, not a raw token form.
+            <p className="mt-5 text-[1rem] leading-[1.72] text-muted-foreground sm:mt-6 sm:text-lg">
+              Send with a named recipient, clear purpose, and visible fee before you approve.
             </p>
-            <div className="mt-8 space-y-4">
-              {[
-                "Useful for person-to-person and merchant-side transfers.",
-                "Clear recipient review helps reduce mistakes.",
-                "Escrow can be added when a transfer needs structure.",
-              ].map((point) => (
-                <div key={point} className="flex gap-3">
-                  <Send className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
-                  <p className="text-sm leading-relaxed text-muted-foreground">{point}</p>
+            <div className="mt-7 grid gap-3 sm:grid-cols-3">
+              {transferHighlights.map((item) => (
+                <div key={item.label} className={`${insetCardClass} px-3.5 py-3 text-left`}>
+                  <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-foreground/48">
+                    {item.label}
+                  </p>
+                  <p className="mt-1.5 text-[0.9rem] font-semibold leading-snug text-foreground/88">
+                    {item.value}
+                  </p>
                 </div>
               ))}
             </div>
@@ -642,19 +813,21 @@ export function LandingPage({ onConnect }: LandingPageProps) {
         </div>
       </section>
 
-      <section id={HOME_SECTION_IDS.escrow} className="px-4 py-24 sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[0.92fr_1.08fr] lg:gap-14">
+      <section
+        id={HOME_SECTION_IDS.escrow}
+        className="px-4 py-14 sm:px-6 sm:py-16 lg:px-8 lg:py-20"
+      >
+        <div className="mx-auto grid max-w-6xl gap-8 sm:gap-10 lg:grid-cols-[0.92fr_1.08fr] lg:gap-14">
           <motion.div {...sectionReveal(reducedMotion)} className="max-w-xl">
             <SectionLabel>Escrow as Trust Layer</SectionLabel>
-            <h2 className="mt-6 text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
+            <h2 className="mt-5 text-[1.95rem] font-bold leading-[1.02] tracking-tight text-foreground sm:mt-6 sm:text-[2.55rem] lg:text-[3.25rem]">
               Use escrow when trust needs structure.
             </h2>
-            <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-              Some transactions need more than a payment confirmation. ByReiXwift adds a visible
-              protection layer so funds can be held, released, or refunded with a state both sides
-              can understand.
+            <p className="mt-5 text-[1rem] leading-[1.72] text-muted-foreground sm:mt-6 sm:text-lg">
+              When a payment needs more structure, lock it first and release or refund with a clear
+              state.
             </p>
-            <div className="mt-8 rounded-[2rem] border border-border bg-card/72 p-6">
+            <div className={`mt-8 ${contentCardClass} p-5 sm:p-6`}>
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary/85">
                 When it helps most
               </p>
@@ -673,52 +846,63 @@ export function LandingPage({ onConnect }: LandingPageProps) {
             </div>
           </motion.div>
 
-          <motion.div {...sectionReveal(reducedMotion, 0.08)} className="grid gap-5 sm:grid-cols-2">
+          <motion.div
+            {...sectionReveal(reducedMotion, 0.08)}
+            className="grid items-start gap-3 sm:grid-cols-2 sm:gap-4"
+          >
             {escrowStates.map((state) => {
               const Icon = state.icon;
               return (
                 <article
                   key={state.title}
-                  className="rounded-[2rem] border border-border bg-card/78 p-6"
+                  className={`${contentCardClass} self-start p-3.5 sm:p-4.5`}
                 >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10">
-                    <Icon className="h-5 w-5 text-primary" />
+                  <div className="flex items-center gap-3">
+                    <Icon className="h-[1.05rem] w-[1.05rem] shrink-0 text-primary/88" />
+                    <h3 className="text-[1.4rem] font-semibold tracking-tight text-foreground sm:text-[1.55rem]">
+                      {state.title}
+                    </h3>
                   </div>
-                  <h3 className="mt-5 text-2xl font-semibold text-foreground">{state.title}</h3>
-                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{state.copy}</p>
+                  <p className="mt-2 text-[0.88rem] leading-[1.6] text-muted-foreground sm:text-[0.9rem]">
+                    {state.copy}
+                  </p>
                 </article>
               );
             })}
           </motion.div>
         </div>
       </section>
-      <section id={HOME_SECTION_IDS.principles} className="px-4 py-24 sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[0.88fr_1.12fr] lg:gap-14">
+      <section
+        id={HOME_SECTION_IDS.principles}
+        className="px-4 py-14 sm:px-6 sm:py-16 lg:px-8 lg:py-20"
+      >
+        <div
+          className={`mx-auto grid max-w-6xl gap-8 ${sectionWrapClass} px-5 py-8 sm:gap-10 sm:px-8 sm:py-10 lg:grid-cols-[0.88fr_1.12fr] lg:gap-14 lg:px-10`}
+        >
           <motion.div {...sectionReveal(reducedMotion)} className="max-w-xl">
             <SectionLabel>Principles</SectionLabel>
-            <h2 className="mt-6 text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
+            <h2 className="mt-5 text-[1.95rem] font-bold leading-[1.02] tracking-tight text-foreground sm:mt-6 sm:text-[2.55rem] lg:text-[3.25rem]">
               The product has to earn its language.
             </h2>
-            <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
-              ByReiXwift should reflect its principles in product behavior: clear fees, visible
-              review, understandable transaction states, and a governance path that stays honest
-              about what is live and what is still in progress.
+            <p className="mt-5 text-[1rem] leading-[1.72] text-muted-foreground sm:mt-6 sm:text-lg">
+              Clear fees, visible approval, understandable states, and honest governance should show
+              up in the product, not just the copy.
             </p>
           </motion.div>
 
           <motion.div
             {...sectionReveal(reducedMotion, 0.08)}
-            className="space-y-3 rounded-[2rem] border border-border bg-card/72 p-4 sm:p-5"
+            className={`space-y-3 ${contentCardClass} p-4 sm:p-5`}
           >
             {principles.map((principle) => (
               <div
                 key={principle.title}
-                className="flex flex-col gap-2 rounded-[1.5rem] border border-border bg-background/32 px-4 py-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6"
+                className={`flex flex-col gap-2 ${insetCardClass} px-4 py-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6`}
               >
-                <div className="sm:max-w-[240px]">
+                <div className="sm:max-w-60">
                   <p className="text-sm font-semibold text-foreground">{principle.title}</p>
                 </div>
-                <p className="text-sm leading-relaxed text-muted-foreground sm:max-w-[360px] sm:text-right">
+                <p className="text-sm leading-relaxed text-muted-foreground sm:max-w-90 sm:text-right">
                   {principle.copy}
                 </p>
               </div>
@@ -727,93 +911,72 @@ export function LandingPage({ onConnect }: LandingPageProps) {
         </div>
       </section>
 
-      <section id={HOME_SECTION_IDS.howItWorks} className="px-4 py-24 sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-6xl items-start gap-12 lg:grid-cols-[0.92fr_1.08fr] lg:gap-14">
+      <section
+        id={HOME_SECTION_IDS.howItWorks}
+        className="px-4 py-14 sm:px-6 sm:py-16 lg:px-8 lg:py-20"
+      >
+        <div className="mx-auto grid max-w-6xl items-start gap-8 sm:gap-10 lg:grid-cols-[0.92fr_1.08fr] lg:gap-14">
           <motion.div {...sectionReveal(reducedMotion)}>
             <SectionLabel>How It Works</SectionLabel>
-            <h2 className="mt-6 text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
+            <h2 className="mt-5 text-[1.95rem] font-bold leading-[1.02] tracking-tight text-foreground sm:mt-6 sm:text-[2.55rem] lg:text-[3.25rem]">
               A payment flow that stays readable.
             </h2>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-              The goal is not to add more screens. It is to give users enough context before they
-              approve a payment, transfer, or protected transaction.
+            <p className="mt-5 max-w-xl text-[1rem] leading-[1.72] text-muted-foreground sm:mt-6 sm:text-lg">
+              Connect, review, approve. That is the flow.
             </p>
 
-            <div className="mt-10 space-y-8">
+            <div className="mt-9 space-y-7 sm:mt-10 sm:space-y-8">
               {workflowSteps.map((item) => (
-                <div key={item.step} className="flex gap-6">
-                  <div className="text-3xl font-black tracking-tight text-primary/30">{item.step}</div>
+                <div key={item.step} className="flex gap-4 sm:gap-6">
+                  <div className="text-2xl font-black tracking-tight text-primary/30 sm:text-3xl">
+                    {item.step}
+                  </div>
                   <div>
                     <h3 className="text-xl font-semibold text-foreground">{item.title}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.copy}</p>
+                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                      {item.copy}
+                    </p>
                   </div>
                 </div>
               ))}
             </div>
           </motion.div>
 
-          <motion.div
-            {...sectionReveal(reducedMotion, 0.08)}
-            className="rounded-[2rem] border border-border bg-card/82 p-6 shadow-[0_18px_44px_rgba(0,0,0,0.22)]"
-          >
-            <div className="flex items-center justify-between border-b border-border pb-4">
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-                  What stays visible
-                </p>
-                <p className="mt-1 text-lg font-semibold text-foreground">Before approval</p>
-              </div>
-              <div className="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-                Review layer
-              </div>
-            </div>
-
-            <div className="mt-6 space-y-3">
-              {visibilityRows.map((row) => (
-                <div
-                  key={row.label}
-                  className="flex flex-col gap-1 rounded-[1.25rem] border border-border bg-background/35 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
-                >
-                  <span className="text-sm text-muted-foreground">{row.label}</span>
-                  <span className="text-sm font-semibold text-foreground">{row.value}</span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
+          <div>
+            <ApprovalPreview reducedMotion={reducedMotion} />
+          </div>
         </div>
       </section>
 
-      <section className="px-4 py-24 sm:px-6 lg:px-8">
+      <section className="px-4 py-14 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
         <motion.div {...sectionReveal(reducedMotion)} className="mx-auto max-w-4xl text-center">
-          <div className="relative overflow-hidden rounded-[2.5rem] border border-border bg-card p-12 sm:p-16">
-            <div className="absolute inset-0 bg-linear-to-b from-primary/8 via-transparent to-transparent" />
+          <div className="relative overflow-hidden rounded-[2.1rem] border border-white/8 bg-[linear-gradient(180deg,rgba(10,15,12,0.96)_0%,rgba(7,11,9,0.92)_100%)] p-8 sm:rounded-[2.5rem] sm:p-12 lg:p-16">
+            <div className="absolute inset-0 bg-linear-to-b from-primary/8 via-transparent to-[rgba(223,194,141,0.05)]" />
 
             <div className="relative z-10">
-              <h2 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-                Start with clear terms.
+              <h2 className="text-[1.95rem] font-bold leading-[1.02] tracking-tight text-foreground sm:text-[2.55rem] lg:text-[3.2rem]">
+                Start with the flow, then launch when ready.
               </h2>
-              <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-                ByReiXwift is being built for users and merchants who want online payments with
-                visible fees, clearer approval, and escrow-backed protection when a transaction
-                needs more trust.
+              <p className="mx-auto mt-5 max-w-2xl text-[1rem] leading-[1.72] text-muted-foreground sm:mt-6 sm:text-lg">
+                Review the flow first, then open the app when you are ready.
               </p>
 
               <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
                 <Button
                   onClick={onConnect}
                   size="lg"
-                  className="h-12 rounded-lg bg-primary px-7 text-base font-semibold text-background transition-colors duration-200 hover:bg-primary/90"
+                  className="h-12 w-full rounded-lg bg-primary px-7 text-base font-semibold text-primary-foreground shadow-[0_14px_34px_rgba(3,13,8,0.28)] transition-colors duration-200 hover:bg-primary/90 sm:w-auto"
                 >
                   Launch App
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
                 <Button
-                  onClick={() => scrollToSection(HOME_SECTION_IDS.principles)}
+                  onClick={() => scrollToSection(HOME_SECTION_IDS.payments)}
                   variant="outline"
                   size="lg"
-                  className="h-12 rounded-lg border-white/10 bg-transparent px-7 text-base font-semibold text-foreground/84 hover:border-white/25 hover:bg-white/5 hover:text-foreground"
+                  className="h-12 w-full rounded-lg border-white/10 bg-transparent px-7 text-base font-semibold text-foreground/84 hover:border-white/25 hover:bg-white/5 hover:text-foreground sm:w-auto"
                 >
-                  Read the Principles
+                  Review the Payment Flow
                 </Button>
               </div>
             </div>

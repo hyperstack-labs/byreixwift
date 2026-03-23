@@ -70,7 +70,10 @@ export default function TermsPage() {
         <PublicGlassPanel>
           <div className="grid gap-4">
             {expectationPoints.map((item) => (
-              <div key={item} className="rounded-[1.5rem] border border-white/8 bg-white/3 p-5">
+              <div
+                key={item}
+                className="rounded-[1.5rem] border border-white/8 bg-[linear-gradient(180deg,rgba(12,17,14,0.82)_0%,rgba(8,12,10,0.68)_100%)] p-5"
+              >
                 <p className="text-sm leading-7 text-muted-foreground">{item}</p>
               </div>
             ))}

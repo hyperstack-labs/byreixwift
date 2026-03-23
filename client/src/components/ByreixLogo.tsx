@@ -22,9 +22,7 @@ export function ByreixLogo({ className = "", variant = "default" }: ByreixLogoPr
       {/* Wordmark - Gradient text */}
       <span
         className={`bg-linear-to-r from-(--byreix-gold-soft) via-(--byreix-gold) to-[#ead39e] bg-clip-text font-semibold tracking-[-0.035em] text-transparent ${
-          isCompact
-            ? "text-[1.42rem] sm:text-[1.5rem]"
-            : "text-[1.54rem] sm:text-[1.66rem]"
+          isCompact ? "text-[1.42rem] sm:text-[1.5rem]" : "text-[1.54rem] sm:text-[1.66rem]"
         }`}
         style={{ fontFamily: "var(--font-heading)" }}
       >

@@ -50,21 +50,23 @@ export default function PrinciplesPage() {
       <PublicPageHero
         eyebrow="Principles"
         title="The product should show its principles in the flow."
-        description="ByReiXwift is being built around visible fees, clear approval, and transaction states users can understand. This page explains the standards guiding the product and where governance work is still in progress."
+        description="ByReiXwift is being built around visible fees, clear approval, and transaction states people can actually understand. This page explains the standards guiding the product and where governance work is still in progress."
         aside={
           <PublicGlassPanel className="max-w-xl lg:max-w-none">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-(--byreix-gold-soft)">
               How to read this page
             </p>
             <div className="mt-6 space-y-4">
-              <div className="rounded-[1.5rem] border border-white/8 bg-white/3 p-5">
+              <div className="rounded-[1.5rem] border border-white/8 bg-[linear-gradient(180deg,rgba(12,17,14,0.82)_0%,rgba(8,12,10,0.68)_100%)] p-5">
                 <p className="text-sm leading-7 text-muted-foreground">
-                  This page explains the standards shaping the product. It is not a substitute for governance, legal review, or qualified Shariah oversight.
+                  This page explains the standards shaping the product. It is not a substitute for
+                  governance, legal review, or qualified Shariah oversight.
                 </p>
               </div>
-              <div className="rounded-[1.5rem] border border-white/8 bg-white/3 p-5">
+              <div className="rounded-[1.5rem] border border-white/8 bg-[linear-gradient(180deg,rgba(12,17,14,0.82)_0%,rgba(8,12,10,0.68)_100%)] p-5">
                 <p className="text-sm leading-7 text-muted-foreground">
-                  Strong wording without operational substance weakens trust. The product has to earn the language it uses.
+                  Strong wording without operational substance weakens trust. The product has to
+                  earn the language it uses.
                 </p>
               </div>
             </div>
@@ -76,7 +78,7 @@ export default function PrinciplesPage() {
         <PublicSectionHeading
           eyebrow="Trust pillars"
           title="Four principles should stay visible in every core flow."
-          description="If users cannot review the amount, fee, destination, or escrow state before they act, trust depends too much on assumption. These principles exist to keep the product legible as it grows."
+          description="If people cannot review the amount, fee, destination, or escrow state before they act, trust depends too much on assumption. These principles exist to keep the product legible as it grows."
         />
         <div className="mt-10 grid gap-6 md:grid-cols-2">
           {trustPillars.map((pillar) => (
@@ -101,7 +103,9 @@ export default function PrinciplesPage() {
             <div>
               <p className="text-base font-semibold text-foreground">Product behavior</p>
               <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                Users should be able to review a payment before approval, understand how a fee is applied, and see whether a protected transaction is pending, locked, released, or refunded.
+                Users should be able to review a payment before approval, understand how a fee is
+                applied, and see whether a protected transaction is pending, locked, released, or
+                refunded.
               </p>
             </div>
           </div>
@@ -119,23 +123,28 @@ export default function PrinciplesPage() {
             </h2>
             <div className="mt-8 grid gap-4">
               {productImplications.map((item) => (
-                <div key={item} className="rounded-[1.5rem] border border-white/8 bg-white/3 p-5">
+                <div
+                  key={item}
+                  className="rounded-[1.5rem] border border-white/8 bg-[linear-gradient(180deg,rgba(12,17,14,0.82)_0%,rgba(8,12,10,0.68)_100%)] p-5"
+                >
                   <p className="text-sm leading-7 text-foreground/85">{item}</p>
                 </div>
               ))}
             </div>
           </div>
-          <div className="rounded-[1.75rem] border border-border bg-background/60 p-6">
+          <div className="rounded-[1.75rem] border border-white/8 bg-[linear-gradient(180deg,rgba(12,17,14,0.82)_0%,rgba(8,12,10,0.68)_100%)] p-6">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-(--byreix-gold-soft)">
               Governance in progress
             </p>
             <p className="mt-5 text-sm leading-7 text-muted-foreground">
-              Strong public trust needs more than a polished homepage. Governance, legal review, and qualified Shariah oversight still matter. This page exists to define the product behavior we expect, not to skip the work required to sustain it.
+              Strong public trust needs more than a polished homepage. Governance, legal review, and
+              qualified Shariah oversight still matter. This page exists to define the product
+              behavior we expect, not to skip the work required to sustain it.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 href="/about"
-                className="rounded-full border border-border bg-card/65 px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-primary/25 hover:text-primary"
+                className="rounded-full border border-border bg-background/72 px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-primary/25 hover:text-primary"
               >
                 About the platform
               </Link>

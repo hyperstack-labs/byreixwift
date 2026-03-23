@@ -13,6 +13,7 @@ export type HomeSectionId = (typeof HOME_SECTION_IDS)[keyof typeof HOME_SECTION_
 
 export const PUBLIC_HOME_NAV_LINKS: Array<{ label: string; id: HomeSectionId }> = [
   { label: "How It Works", id: HOME_SECTION_IDS.howItWorks },
+  { label: "Principles", id: HOME_SECTION_IDS.principles },
 ];
 
 export const HOME_SECTION_RAIL_LINKS: Array<{ label: string; id: HomeSectionId }> = [

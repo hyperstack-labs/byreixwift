@@ -144,7 +144,9 @@ export function WalletDashboard() {
             <div>
               <p className="mb-1 text-sm text-muted-foreground">Wallet Address</p>
               <div className="flex items-center gap-2">
-                <code className="font-mono text-white">0x742d35Cc6634C0532925a3b844Bc9e7595f9aB8</code>
+                <code className="font-mono text-white">
+                  0x742d35Cc6634C0532925a3b844Bc9e7595f9aB8
+                </code>
               </div>
             </div>
             <div className="flex items-center gap-2">

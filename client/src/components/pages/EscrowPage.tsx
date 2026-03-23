@@ -89,7 +89,9 @@ export function EscrowPage() {
       setShowCreateDialog(false);
       resetForm();
     } catch (mutationError) {
-      toast.error(mutationError instanceof Error ? mutationError.message : "Failed to create escrow");
+      toast.error(
+        mutationError instanceof Error ? mutationError.message : "Failed to create escrow"
+      );
     }
   };
 
@@ -125,7 +127,8 @@ export function EscrowPage() {
           <div>
             <h1 className="text-2xl font-semibold">Escrow</h1>
             <p className="text-sm text-muted-foreground mt-1">
-              {escrows.length} records - {totalLocked.toLocaleString(undefined, {
+              {escrows.length} records -{" "}
+              {totalLocked.toLocaleString(undefined, {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               })}{" "}
@@ -376,7 +379,8 @@ export function EscrowPage() {
 
             {!selectedEscrowId && (
               <p className="text-sm text-muted-foreground">
-                Select an escrow record to inspect its created, locked, released, or refunded events.
+                Select an escrow record to inspect its created, locked, released, or refunded
+                events.
               </p>
             )}
 
@@ -413,4 +417,3 @@ export function EscrowPage() {
     </div>
   );
 }
-

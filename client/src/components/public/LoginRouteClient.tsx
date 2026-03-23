@@ -65,7 +65,7 @@ export function LoginRouteClient() {
         onWalletConnect={() =>
           finishLogin(
             "Preview wallet access granted. Open the app to continue.",
-            "wallet@byreixwift.local",
+            "wallet@byreixwift.local"
           )
         }
       />

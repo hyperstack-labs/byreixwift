@@ -42,7 +42,7 @@ export function AppShell({ children }: AppShellProps) {
   const connectedLabel =
     typeof identity === "string" && identity.length > 18
       ? `${identity.slice(0, 8)}...${identity.slice(-6)}`
-      : identity ?? undefined;
+      : (identity ?? undefined);
 
   useEffect(() => {
     if (!isAuthenticated) {

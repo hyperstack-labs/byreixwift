@@ -52,7 +52,7 @@ export default function ContactPage() {
       <PublicPageHero
         eyebrow="Contact"
         title="Use the public routes that are active today."
-        description="Use the route that best fits your question, whether it is about the product, partnerships, principles, or implementation. We keep this page simple on purpose so the paths listed here stay real and maintained."
+        description="Use the route that fits your question, whether it is about the product, partnerships, principles, or implementation. This page stays simple on purpose so the paths listed here stay real and maintained."
         aside={
           <PublicGlassPanel className="max-w-xl lg:max-w-none">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-(--byreix-gold-soft)">
@@ -60,7 +60,10 @@ export default function ContactPage() {
             </p>
             <div className="mt-6 space-y-4">
               {reachOutTopics.map((topic) => (
-                <div key={topic} className="rounded-[1.5rem] border border-white/8 bg-white/3 p-4">
+                <div
+                  key={topic}
+                  className="rounded-[1.5rem] border border-white/8 bg-[linear-gradient(180deg,rgba(12,17,14,0.82)_0%,rgba(8,12,10,0.68)_100%)] p-4"
+                >
                   <p className="text-sm leading-7 text-muted-foreground">{topic}</p>
                 </div>
               ))}
@@ -84,7 +87,9 @@ export default function ContactPage() {
                 <div>
                   <route.icon className="h-6 w-6 text-primary" />
                   <h3 className="mt-6 text-xl font-semibold text-foreground">{route.title}</h3>
-                  <p className="mt-3 text-sm leading-7 text-muted-foreground">{route.description}</p>
+                  <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                    {route.description}
+                  </p>
                 </div>
                 {isExternal ? (
                   <a
@@ -124,7 +129,10 @@ export default function ContactPage() {
               "Include the workflow or use case you care about: payments, transfers, or escrow protection.",
               "If your question depends on implementation details, point to the relevant page, flow, or repository issue.",
             ].map((item) => (
-              <div key={item} className="rounded-[1.5rem] border border-white/8 bg-white/3 p-5">
+              <div
+                key={item}
+                className="rounded-[1.5rem] border border-white/8 bg-[linear-gradient(180deg,rgba(12,17,14,0.82)_0%,rgba(8,12,10,0.68)_100%)] p-5"
+              >
                 <p className="text-sm leading-7 text-muted-foreground">{item}</p>
               </div>
             ))}
@@ -142,19 +150,20 @@ export default function ContactPage() {
               Need background before you contact us?
             </h2>
             <p className="mt-4 text-sm leading-7 text-muted-foreground">
-              Start with the product story, review the principles, or meet the core team before opening a conversation.
+              Start with the product story, review the principles, or meet the core team before
+              opening a conversation.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Link
               href="/about"
-              className="rounded-full border border-border bg-background/70 px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-primary/25 hover:text-primary"
+              className="rounded-full border border-border bg-background/72 px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-primary/25 hover:text-primary"
             >
               About ByReiXwift
             </Link>
             <Link
               href="/principles"
-              className="rounded-full border border-border bg-background/70 px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-primary/25 hover:text-primary"
+              className="rounded-full border border-border bg-background/72 px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-primary/25 hover:text-primary"
             >
               View principles
             </Link>

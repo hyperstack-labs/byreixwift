@@ -73,10 +73,10 @@ function isExternalHref(href: string) {
 
 export function Footer({ onSectionNavigate }: FooterProps) {
   return (
-    <footer className="mt-24 border-t border-border bg-background">
-      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 xl:grid-cols-[1.2fr_0.8fr_0.8fr_0.8fr_0.8fr]">
-          <div className="max-w-md">
+    <footer className="mt-20 border-t border-border bg-background sm:mt-24">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-14 lg:px-8">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:gap-10 xl:grid-cols-[1.2fr_0.8fr_0.8fr_0.8fr_0.8fr]">
+          <div className="max-w-md sm:col-span-2 xl:col-span-1">
             <ByreixLogo />
             <p className="mt-5 text-sm leading-relaxed text-muted-foreground">
               Online payments for users and merchants, built around transparent fees, transfers,
@@ -96,7 +96,7 @@ export function Footer({ onSectionNavigate }: FooterProps) {
 
           {footerSections.map((section) => (
             <div key={section.title}>
-              <h4 className="mb-4 text-sm font-semibold uppercase tracking-[0.16em] text-(--byreix-gold-soft)">
+              <h4 className="mb-3 text-sm font-semibold uppercase tracking-[0.16em] text-(--byreix-gold-soft)">
                 {section.title}
               </h4>
               <ul className="space-y-3">
@@ -137,7 +137,7 @@ export function Footer({ onSectionNavigate }: FooterProps) {
           ))}
         </div>
 
-        <div className="mt-12 flex flex-col gap-4 border-t border-border pt-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-10 flex flex-col gap-4 border-t border-border pt-7 text-sm text-muted-foreground sm:mt-12 sm:flex-row sm:items-center sm:justify-between sm:pt-8">
           <p>Copyright 2026 ByReiXwift. Clear payments. Stronger trust.</p>
           <p className="max-w-xl text-sm leading-relaxed sm:text-right">
             Built for users and merchants who need online payments, transfers, and escrow-backed
