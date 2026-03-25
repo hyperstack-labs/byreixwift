@@ -166,7 +166,6 @@ function useMockEscrows() {
   return { data: escrows, isLoading: false, error: null, refresh };
 }
 
-
 function useMockEscrowEvents(id: string | null) {
   const [events, setEvents] = useState<EscrowEventRecord[]>(id ? (_mockEventStore[id] ?? []) : []);
   const refresh = useCallback((newId: string | null) =>
