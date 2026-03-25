@@ -40,9 +40,16 @@ export function Navbar({
   const menuRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useScroll();
 
-  useEffect(() => {
+ useEffect(() => {
+  const handleScroll = () => {
     setScrolled(window.scrollY > 18);
-  }, []);
+  };
+  window.addEventListener("scroll", handleScroll);
+
+  requestAnimationFrame(handleScroll);
+
+  return () => window.removeEventListener("scroll", handleScroll);
+}, []);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setScrolled(latest > 18);
