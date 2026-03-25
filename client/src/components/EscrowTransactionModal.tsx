@@ -46,7 +46,6 @@ export function EscrowStatusBadge({ state }: { state: EscrowState }) {
 
 }
 
-
 export function StateStepper({ state }: { state: EscrowState }) {
 
   if (state === "refunded") {
