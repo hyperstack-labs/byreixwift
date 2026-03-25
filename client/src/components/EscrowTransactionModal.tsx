@@ -19,7 +19,7 @@ const USE_MOCK = true;
 //  State config 
 const STATE_STEPS: EscrowState[] = ["pending", "locked", "released"];
 
-const STATE_CONFIG: Record<EscrowState, { label: string; Icon: React.ElementType; dotClass: string; badgeClass: string; description: string }> = {
+export const STATE_CONFIG: Record<EscrowState, { label: string; Icon: React.ElementType; dotClass: string; badgeClass: string; description: string }> = {
 
   pending: { label: "Pending", Icon: Clock, dotClass: "bg-yellow-400", badgeClass: "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20", description: "Awaiting buyer confirmation to lock funds into the contract." },
   locked: { label: "Locked", Icon: Lock, dotClass: "bg-amber-400", badgeClass: "bg-amber-500/10 text-amber-400 border border-amber-500/20", description: "Funds are secured in the smart contract. Neither party can access them until release or refund." },

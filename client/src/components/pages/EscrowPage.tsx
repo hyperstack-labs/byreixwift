@@ -36,7 +36,7 @@ import {
   EscrowState, EscrowRecord, EscrowEventRecord
 } from "@/types/escrow";
 
-import { EscrowTransactionModal, EscrowStatusBadge } from "@/components/EscrowTransactionModal";
+import { EscrowTransactionModal, EscrowStatusBadge, STATE_CONFIG } from "@/components/EscrowTransactionModal";
 //  Types 
 
 let _mockStore: EscrowRecord[] = [
