@@ -1,7 +1,5 @@
 "use client";
 
-const USE_MOCK = true;
-
 import { useState, useCallback } from "react";
 
 import {
@@ -24,20 +22,19 @@ import {
 
 import { toast } from "sonner";
 import {
-  useCreateEscrow as _useCreateEscrow,
-  useEscrowEvents as _useEscrowEvents,
-  useEscrows as _useEscrows,
-  useLockEscrow as _useLockEscrow,
-  useRefundEscrow as _useRefundEscrow,
-  useReleaseEscrow as _useReleaseEscrow,
+  useCreateEscrow,
+  useEscrowEvents,
+  useEscrows,
+  useLockEscrow,
+  useRefundEscrow,
+  useReleaseEscrow
 } from "@/hooks";
 
 import { 
   EscrowState, EscrowRecord, EscrowEventRecord
 } from "@/types/escrow";
 
-import { EscrowTransactionModal, EscrowStatusBadge, STATE_CONFIG } from "@/components/EscrowTransactionModal";
-//  Types 
+import { EscrowTransactionModal, EscrowStatusBadge, STATE_CONFIG, USE_MOCK } from "@/components/EscrowTransactionModal";
 
 let _mockStore: EscrowRecord[] = [
   {
@@ -51,40 +48,6 @@ let _mockStore: EscrowRecord[] = [
     updatedAt: new Date(Date.now() - 1000 * 60 * 30).toISOString()
 
   },
-
-  {
-    id: "esc-002-mock",
-    buyer: "0x742d35Cc6634C0532925a3b844Bc454e7595f9aB8",
-    seller: "0xAbC12345678901234567890123456789012345aB",
-    amount: 1200, tokenSymbol: "SDA", fixedFee: 20,
-    description: "Smart contract audit — full scope",
-    state: "locked",
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(),
-    updatedAt: new Date(Date.now() - 1000 * 60 * 30).toISOString()
-  },
-
-  {
-    id: "esc-003-mock",
-    buyer: "0xDeF9876543210987654321098765432109876543",
-    seller: "0x9f3aD15A12e1F3514d8B8E9c6F16C2E8922A7cD2",
-    amount: 80, tokenSymbol: "SDA", fixedFee: 2,
-    description: "Logo design package",
-    state: "released",
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-    updatedAt: new Date(Date.now() - 1000 * 60 * 30).toISOString()
-  },
-
-  {
-
-    id: "esc-004-mock",
-    buyer: "0x742d35Cc6634C0532925a3b844Bc454e7595f9aB8",
-    seller: "0xAbC12345678901234567890123456789012345aB",
-    amount: 500, tokenSymbol: "SDA", fixedFee: 10,
-    description: "API integration — cancelled",
-    state: "refunded",
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
-    updatedAt: new Date(Date.now() - 1000 * 60 * 30).toISOString()
-  },
 ];
 
 const _mockEventStore: Record<string, EscrowEventRecord[]> = {
@@ -96,62 +59,7 @@ const _mockEventStore: Record<string, EscrowEventRecord[]> = {
       state: "pending", 
       occurredAt: new Date(Date.now() - 1000 * 60 * 30).toISOString() 
     },
-  ],
-  "esc-002-mock": [
-    { 
-      id: "e2", 
-      escrowId: "esc-002-mock", 
-      type: "EscrowCreated", 
-      state: "pending", 
-      occurredAt: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString() 
-    },
-    { 
-      id: "e3", 
-      escrowId: "esc-002-mock", 
-      type: "TransactionLocked", 
-      state: "locked", 
-      occurredAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString() 
-    },
-  ],
-  "esc-003-mock": [
-    { 
-      id: "e4", 
-      escrowId: "esc-003-mock", 
-      type: "EscrowCreated", 
-      state: "pending", 
-      occurredAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString() 
-    },
-    { 
-      id: "e5", 
-      escrowId: "esc-003-mock", 
-      type: "TransactionLocked", 
-      state: "locked", 
-      occurredAt: new Date(Date.now() - 1000 * 60 * 60 * 20).toISOString() 
-    },
-    { 
-      id: "e6", 
-      escrowId: "esc-003-mock", 
-      type: "FundsReleased", 
-      state: "released", 
-      occurredAt: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString() 
-    },
-  ],
-  "esc-004-mock": [
-    { 
-      id: "e7", 
-      escrowId: "esc-004-mock", 
-      type: "EscrowCreated", 
-      state: "pending", 
-      occurredAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString() 
-    },
-    { 
-      id: "e8", 
-      escrowId: "esc-004-mock", 
-      type: "FundsRefunded", 
-      state: "refunded", 
-      occurredAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString() 
-    },
-  ],
+  ]
 };
 
 
@@ -172,8 +80,6 @@ function useMockEscrowEvents(id: string | null) {
   return { data: events, refresh };
 }
 
-
-
 function useMockCreateEscrow(refreshEscrows: () => void) {
   const [isPending, setIsPending] = useState(false);
   const mutateAsync = useCallback(async (payload: Omit<EscrowRecord, "id" | "state" | "createdAt">) => {
@@ -190,8 +96,6 @@ function useMockCreateEscrow(refreshEscrows: () => void) {
   return { isPending, mutateAsync };
 
 }
-
-
 function useMockTransition(refreshEscrows: () => void, refreshEvents: (id: string | null) => void) {
   const [isPending, setIsPending] = useState(false);
   const mutate = useCallback(async (action: "lock" | "release" | "refund", id: string) => {
@@ -231,12 +135,12 @@ export function EscrowPage() {
   const mockTransition = useMockTransition(mockEscrows.refresh, mockEvents.refresh);
 
   // Real hooks (always constructed, only used when USE_MOCK = false)
-  const realEscrows = _useEscrows();
-  const realEvents = _useEscrowEvents(USE_MOCK ? null : selectedEscrowId);
-  const realCreate = _useCreateEscrow();
-  const realLock = _useLockEscrow();
-  const realRelease = _useReleaseEscrow();
-  const realRefund = _useRefundEscrow();
+  const realEscrows = useEscrows();
+  const realEvents = useEscrowEvents(USE_MOCK ? null : selectedEscrowId);
+  const createEscrow = useCreateEscrow();
+  const lockEscrow = useLockEscrow();
+  const releaseEscrow = useReleaseEscrow();
+  const refundEscrow = useRefundEscrow();
 
   const escrows = USE_MOCK ? mockEscrows.data : (realEscrows.data ?? []);
   const events = USE_MOCK ? mockEvents.data : (realEvents.data ?? []);
@@ -248,7 +152,7 @@ export function EscrowPage() {
   const totalLocked = escrows.filter((e) => e.state === "pending" || e.state === "locked").reduce((s, e) => s + e.amount, 0);
   const isMutating = USE_MOCK
     ? mockCreate.isPending || mockTransition.isPending
-    : realCreate.isPending || realLock.isPending || realRelease.isPending || realRefund.isPending;
+    : createEscrow.isPending || lockEscrow.isPending || releaseEscrow.isPending || refundEscrow.isPending;
 
   const resetForm = () => setFormData({ buyer: DEFAULT_BUYER, seller: DEFAULT_SELLER, amount: "", token: "SDA", description: "", fixedFee: "0" });
 
@@ -263,12 +167,18 @@ export function EscrowPage() {
 
     if (!isValidAddress(formData.seller)) { toast.error("Seller wallet address is invalid (0x + 40 hex chars)"); return; }
 
-
-    const payload = { buyer: formData.buyer, seller: formData.seller, amount: Number(formData.amount), tokenSymbol: formData.token, description: formData.description, fixedFee: Number(formData.fixedFee || "0"), state: "pending", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+    const payload = { buyer: formData.buyer, 
+      seller: formData.seller, 
+      amount: Number(formData.amount), 
+      tokenSymbol: formData.token, 
+      description: formData.description, 
+      fixedFee: Number(formData.fixedFee || "0"), 
+      state: "pending", createdAt: new Date().toISOString(), 
+      updatedAt: new Date().toISOString() };
 
     try {
 
-      const result = USE_MOCK ? await mockCreate.mutateAsync(payload) : await realCreate.mutateAsync(payload);
+      const result = USE_MOCK ? await mockCreate.mutateAsync(payload) : await createEscrow.mutateAsync(payload);
       toast.success("Escrow created");
       setSelectedEscrowId(result.escrow.id);
       setShowCreateDialog(false);
@@ -286,9 +196,9 @@ export function EscrowPage() {
       if (USE_MOCK) {
         await mockTransition.mutate(action, id);
       } else {
-        if (action === "lock") await realLock.mutateAsync({ id, payload: { actor } });
-        if (action === "release") await realRelease.mutateAsync({ id, payload: { actor } });
-        if (action === "refund") await realRefund.mutateAsync({ id, payload: { actor } });
+        if (action === "lock") await lockEscrow.mutateAsync({ id, payload: { actor } });
+        if (action === "release") await releaseEscrow.mutateAsync({ id, payload: { actor } });
+        if (action === "refund") await refundEscrow.mutateAsync({ id, payload: { actor } });
       }
       toast.success({ lock: "Escrow locked", release: "Funds released", refund: "Escrow refunded" }[action]);
     } catch (err) {
@@ -421,7 +331,6 @@ export function EscrowPage() {
           </div>
         )}
       </div>
-
 
       {/* Transaction modal */}
       {selectedEscrow && (

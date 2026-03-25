@@ -13,8 +13,14 @@ import {
 } from "@/types/escrow";
 
 
+interface TransactionModalProps {
+  escrow: EscrowRecord; events: EscrowEventRecord[]; isMutating: boolean;
+  onLock: () => void; onRelease: () => void; onRefund: () => void; onClose: () => void;
+}
+
+
 // Need to turn this off in production
-const USE_MOCK = true;
+export const USE_MOCK = true;
 
 //  State config 
 const STATE_STEPS: EscrowState[] = ["pending", "locked", "released"];
@@ -68,7 +74,7 @@ export function StateStepper({ state }: { state: EscrowState }) {
         const isDone = i < currentIdx, isCurrent = i === currentIdx, isLast = i === STATE_STEPS.length - 1;
         return (
 
-          <div key={step} className="flex items-center flex-1 min-w-0">
+          <div key={step} className={`flex items-center min-w-0 ${isLast ? "" : "flex-1"}`}>
             <div className="flex flex-col items-center gap-1.5 shrink-0">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center border transition-all ${isDone ? "bg-primary/20 border-primary/40" : isCurrent ? "bg-primary/20 border-primary" : "bg-card border-border"}`}>
                 <Icon className={`w-4 h-4 transition-colors ${isDone || isCurrent ? "text-primary" : "text-muted-foreground/40"}`} />
@@ -114,10 +120,6 @@ export function TrustlessIndicators() {
 }
 
 
-interface TransactionModalProps {
-  escrow: EscrowRecord; events: EscrowEventRecord[]; isMutating: boolean;
-  onLock: () => void; onRelease: () => void; onRefund: () => void; onClose: () => void;
-}
 
 
 export function EscrowTransactionModal({ escrow, events, isMutating, onLock, onRelease, onRefund, onClose }: TransactionModalProps) {
@@ -154,7 +156,11 @@ export function EscrowTransactionModal({ escrow, events, isMutating, onLock, onR
 
           <div>
             <p className="text-xs text-muted-foreground font-medium mb-3 uppercase tracking-wider">Transaction lifecycle</p>
-            <StateStepper state={escrow.state} />
+            {/* take full wid to show the steps */}
+            <div className="w-full flex justify-center ">
+                <StateStepper state={escrow.state} />
+            </div>
+          
           </div>
 
           <div>
