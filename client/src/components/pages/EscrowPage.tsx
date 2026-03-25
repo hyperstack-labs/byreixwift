@@ -19,8 +19,7 @@ import {
 } from "../ui";
 
 import {
-  Loader2, Plus, Lock, CheckCircle2, Clock,
-  RotateCcw, ShieldCheck
+  Loader2, Plus, ShieldCheck
 } from "lucide-react";
 
 import { toast } from "sonner";
@@ -218,14 +217,6 @@ const DEFAULT_SELLER = "0x9f3aD15A12e1F3514d8B8E9c6F16C2E8922A7cD2";
 const isValidAddress = (a: string) => /^0x[0-9a-fA-F]{40}$/.test(a);
 
 export function EscrowPage() {
-
-  const STATE_CONFIG: Record<EscrowState, { label: string; Icon: React.ElementType; dotClass: string; badgeClass: string; description: string }> = {
-
-  pending: { label: "Pending", Icon: Clock, dotClass: "bg-yellow-400", badgeClass: "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20", description: "Awaiting buyer confirmation to lock funds into the contract." },
-  locked: { label: "Locked", Icon: Lock, dotClass: "bg-amber-400", badgeClass: "bg-amber-500/10 text-amber-400 border border-amber-500/20", description: "Funds are secured in the smart contract. Neither party can access them until release or refund." },
-  released: { label: "Released", Icon: CheckCircle2, dotClass: "bg-green-400", badgeClass: "bg-green-500/10 text-green-400 border border-green-500/20", description: "Funds have been successfully released to the seller." },
-  refunded: { label: "Refunded", Icon: RotateCcw, dotClass: "bg-blue-400", badgeClass: "bg-blue-500/10 text-blue-400 border border-blue-500/20", description: "Funds have been returned to the buyer wallet." },
-};
 
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [selectedEscrowId, setSelectedEscrowId] = useState<string | null>(null);
