@@ -135,17 +135,17 @@ export function EscrowPage() {
   const mockTransition = useMockTransition(mockEscrows.refresh, mockEvents.refresh);
 
   // Real hooks (always constructed, only used when USE_MOCK = false)
-  const realEscrows = useEscrows();
-  const realEvents = useEscrowEvents(USE_MOCK ? null : selectedEscrowId);
+  const escrowRecord = useEscrows();
+  const escrowEvents = useEscrowEvents(USE_MOCK ? null : selectedEscrowId);
   const createEscrow = useCreateEscrow();
   const lockEscrow = useLockEscrow();
   const releaseEscrow = useReleaseEscrow();
   const refundEscrow = useRefundEscrow();
 
-  const escrows = USE_MOCK ? mockEscrows.data : (realEscrows.data ?? []);
-  const events = USE_MOCK ? mockEvents.data : (realEvents.data ?? []);
-  const isLoading = USE_MOCK ? false : realEscrows.isLoading;
-  const error = USE_MOCK ? null : realEscrows.error;
+  const escrows = USE_MOCK ? mockEscrows.data : (escrowRecord.data ?? []);
+  const events = USE_MOCK ? mockEvents.data : (escrowEvents.data ?? []);
+  const isLoading = USE_MOCK ? false : escrowRecord.isLoading;
+  const error = USE_MOCK ? null : escrowRecord.error;
 
 
   const selectedEscrow = selectedEscrowId ? escrows.find((e) => e.id === selectedEscrowId) ?? null : null;
