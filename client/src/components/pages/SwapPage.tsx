@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Card, Button, Input } from "../ui";
 import { ArrowDownUp, Settings, ChevronDown, Info } from "lucide-react";
 import { toast } from "sonner";
+import { useSidraTokens } from "@/hooks/useSidraTokens";
 
 export function SwapPage() {
     const [fromToken, setFromToken] = useState({ symbol: "SDA", balance: "12,450.50" });
@@ -11,6 +12,20 @@ export function SwapPage() {
     const [fromAmount, setFromAmount] = useState("");
     const [toAmount, setToAmount] = useState("");
     const [slippage] = useState("0.5");
+
+    const networkFee = 2.5; // mock for now
+    const priceImpact = 0.3; // example %
+    const minimumReceived = parseFloat(toAmount || "0") * (1 - priceImpact / 100);
+
+    const { data: tokens } = useSidraTokens();
+
+    const fromTokenData = tokens?.find(t => t.symbol === fromToken.symbol);
+    const toTokenData = tokens?.find(t => t.symbol === toToken.symbol);
+    
+    const conversionRate =
+      fromTokenData && toTokenData
+        ? fromTokenData.priceUsd / toTokenData.priceUsd
+        : 0;
 
     const handleSwapTokens = () => {
         const temp = fromToken;
@@ -20,7 +35,6 @@ export function SwapPage() {
         setToAmount(fromAmount);
     };
 
-    const CONVERSION_RATE = 0.00042;
 
     const handleSwap = () => {
         if (!fromAmount || parseFloat(fromAmount) <= 0) {
@@ -63,7 +77,7 @@ export function SwapPage() {
                                     // Mock conversion rate
                                     const value = parseFloat(e.target.value || "0");
                                     setFromAmount(e.target.value);
-                                    setToAmount((value * CONVERSION_RATE).toFixed(6));
+                                    setToAmount((value * conversionRate).toFixed(6));
                                 }}
                                 className="flex-1 bg-transparent border-none text-3xl p-0 h-auto focus-visible:ring-0"
                             />
@@ -124,21 +138,33 @@ export function SwapPage() {
                     {fromAmount && (
                         <div className="p-4 rounded-xl bg-[#0A0A0A] border border-[#1E1E1E] space-y-2">
                             <div className="flex items-center justify-between text-sm">
-                                <span className="text-[#A0A0A0]">Rate</span>
-                                <span className="text-white">1 {fromToken.symbol} = {CONVERSION_RATE} {toToken.symbol}</span>
-                            </div>
-                            <div className="flex items-center justify-between text-sm">
-                                <span className="text-[#A0A0A0]">Slippage Tolerance</span>
-                                <span className="text-white">{slippage}%</span>
-                            </div>
-                            <div className="flex items-center justify-between text-sm">
-                                <span className="text-[#A0A0A0]">Network Fee</span>
-                                <span className="text-white">~$2.50</span>
-                            </div>
-                            <div className="flex items-center justify-between text-sm">
-                                <span className="text-[#A0A0A0]">Minimum Received</span>
-                                <span className="text-white">{(parseFloat(toAmount || "0") * 0.995).toFixed(6)} {toToken.symbol}</span>
-                            </div>
+                                    <span className="text-[#A0A0A0]">Rate</span>
+                                    <span className="text-white">
+                                        1 {fromToken.symbol} = {conversionRate.toFixed(6)} {toToken.symbol}
+                                    </span>
+                                </div>
+                                                    
+                                <div className="flex items-center justify-between text-sm">
+                                    <span className="text-[#A0A0A0]">Slippage Tolerance</span>
+                                    <span className="text-white">{slippage}%</span>
+                                </div>
+                                                    
+                                <div className="flex items-center justify-between text-sm">
+                                    <span className="text-[#A0A0A0]">Price Impact</span>
+                                    <span className="text-white">{priceImpact}%</span>
+                                </div>
+                                                    
+                                <div className="flex items-center justify-between text-sm">
+                                    <span className="text-[#A0A0A0]">Network Fee</span>
+                                    <span className="text-white">~${networkFee}</span>
+                                </div>
+                                                    
+                                <div className="flex items-center justify-between text-sm">
+                                    <span className="text-[#A0A0A0]">Minimum Received</span>
+                                    <span className="text-white">
+                                        {minimumReceived.toFixed(6)} {toToken.symbol}
+                                    </span>
+                                </div>
                         </div>
                     )}
 
