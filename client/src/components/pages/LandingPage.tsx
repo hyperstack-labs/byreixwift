@@ -1,5 +1,5 @@
 "use client";
-
+import { useSyncExternalStore } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { motion, useReducedMotion } from "motion/react";
@@ -31,6 +31,14 @@ interface FeatureCard {
 interface DetailRow {
   label: string;
   value: string;
+}
+
+function useIsMounted() {
+  return useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
 }
 
 const heroProofPoints = [
@@ -549,7 +557,9 @@ function ApprovalPreview({ reducedMotion }: { reducedMotion: boolean }) {
 }
 
 export function LandingPage({ onConnect }: LandingPageProps) {
-  const reducedMotion = useReducedMotion() ?? false;
+  const prefersReducedMotion = useReducedMotion();
+  const isMounted = useIsMounted();
+  const reducedMotion = !isMounted || (prefersReducedMotion ?? false);
 
   const scrollToSection = (sectionId: string) => {
     const section = document.getElementById(sectionId);
