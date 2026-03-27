@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Card, Button, Input } from "../ui";
 import { ArrowDownUp, Settings, ChevronDown, Info } from "lucide-react";
 import { toast } from "sonner";
+import { useSidraTokens } from "@/hooks/useSidraTokens";
 
 export function SwapPage() {
   const [fromToken, setFromToken] = useState({ symbol: "SDA", balance: "12,450.50" });
@@ -11,6 +12,19 @@ export function SwapPage() {
   const [fromAmount, setFromAmount] = useState("");
   const [toAmount, setToAmount] = useState("");
   const [slippage] = useState("0.5");
+  
+  const { data: tokens } = useSidraTokens();
+  const fromTokenData = tokens?.find(t => t.symbol === fromToken.symbol);
+  const toTokenData = tokens?.find(t => t.symbol === toToken.symbol);
+
+  const fromPriceUsd = fromTokenData?.priceUsd || 0;
+  const toPriceUsd = toTokenData?.priceUsd || 0;
+  const numericAmount = parseFloat(fromAmount || "0");
+
+  const networkFeeUsd = 2.5;
+  const usdValue = numericAmount * fromPriceUsd;
+  const totalUsd = usdValue + networkFeeUsd;
+  const priceImpact = numericAmount > 1000 ? 0.8 : 0.2;
 
   const handleSwapTokens = () => {
     const temp = fromToken;
@@ -20,7 +34,9 @@ export function SwapPage() {
     setToAmount(fromAmount);
   };
 
-  const CONVERSION_RATE = 0.00042;
+  const conversionRate = fromPriceUsd && toPriceUsd
+  ? fromPriceUsd / toPriceUsd
+  : 0;
 
   const handleSwap = () => {
     if (!fromAmount || parseFloat(fromAmount) <= 0) {
@@ -54,7 +70,7 @@ export function SwapPage() {
                 onChange={(e) => {
                   const value = parseFloat(e.target.value || "0");
                   setFromAmount(e.target.value);
-                  setToAmount((value * CONVERSION_RATE).toFixed(6));
+                  setToAmount((value * conversionRate).toFixed(6));
                 }}
                 className="h-auto flex-1 border-none bg-transparent p-0 text-3xl focus-visible:ring-0"
               />
@@ -108,29 +124,64 @@ export function SwapPage() {
           </div>
 
           {fromAmount && (
-            <div className="space-y-2 rounded-xl border border-border bg-background p-4">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Rate</span>
-                <span className="text-foreground">
-                  1 {fromToken.symbol} = {CONVERSION_RATE} {toToken.symbol}
-                </span>
+              <div className="space-y-2 rounded-xl border border-border bg-background p-4">
+              
+                {/* RATE */}
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Rate</span>
+                  <span className="text-foreground">
+                    1 {fromToken.symbol} = {conversionRate.toFixed(6)} {toToken.symbol}
+                  </span>
+                </div>
+
+                {/* USD VALUE  */}
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Value (USD)</span>
+                  <span className="text-foreground">
+                    ${usdValue.toFixed(2)}
+                  </span>
+                </div>
+
+                {/* PRICE IMPACT  */}
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Price Impact</span>
+                  <span className="text-yellow-500">
+                    {priceImpact.toFixed(2)}%
+                  </span>
+                </div>
+
+                {/* SLIPPAGE */}
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Slippage Tolerance</span>
+                  <span className="text-foreground">{slippage}%</span>
+                </div>
+
+                {/* NETWORK FEE */}
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Network Fee</span>
+                  <span className="text-foreground">
+                    ${networkFeeUsd.toFixed(2)}
+                  </span>
+                </div>
+
+                {/* MIN RECEIVED */}
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Minimum Received</span>
+                  <span className="text-foreground">
+                    {(parseFloat(toAmount || "0") * 0.995).toFixed(6)} {toToken.symbol}
+                  </span>
+                </div>
+
+                {/* TOTAL COST  */}
+                <div className="flex items-center justify-between text-sm pt-2 border-t border-border">
+                  <span className="text-muted-foreground">Total Cost</span>
+                  <span className="text-foreground font-semibold">
+                    ${totalUsd.toFixed(2)}
+                  </span>
+                </div>
+
               </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Slippage Tolerance</span>
-                <span className="text-foreground">{slippage}%</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Network Fee</span>
-                <span className="text-foreground">~$2.50</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Minimum Received</span>
-                <span className="text-foreground">
-                  {(parseFloat(toAmount || "0") * 0.995).toFixed(6)} {toToken.symbol}
-                </span>
-              </div>
-            </div>
-          )}
+            )}
 
           <div className="flex items-start gap-2 rounded-lg border border-primary/20 bg-primary/10 p-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />

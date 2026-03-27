@@ -14,6 +14,7 @@ import {
 } from "../ui";
 import { Send, QrCode, Scan, ChevronDown, AlertCircle, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { useSidraTokens } from "@/hooks/useSidraTokens";
 
 export function SendPage() {
   const [recipient, setRecipient] = useState("");
@@ -22,6 +23,19 @@ export function SendPage() {
   const [memo, setMemo] = useState("");
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isValidAddress, setIsValidAddress] = useState(true);
+  const { data: tokens } = useSidraTokens();
+
+  const selectedTokenData = tokens?.find(
+    (t) => t.symbol === selectedToken.symbol
+  );
+
+  const priceUsd = selectedTokenData?.priceUsd || 0;
+
+  const numericAmount = parseFloat(amount || "0");
+
+  const networkFeeUsd = 1.5;
+  const usdValue = numericAmount * priceUsd;
+  const totalUsd = usdValue + networkFeeUsd;
 
   const validateAddress = (address: string) => {
     const isValid = address.length === 0 || /^0x[a-fA-F0-9]{40}$/.test(address);
@@ -164,8 +178,14 @@ export function SendPage() {
           {amount && (
             <div className="p-4 rounded-xl bg-background border border-border space-y-2">
               <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Token Value (USD)</span>
+                <span className="text-foreground">
+                  ${usdValue.toFixed(2)}
+                </span>
+               </div>
+              <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Network Fee</span>
-                <span className="text-foreground">~$1.50</span>
+                <span className="text-foreground">${networkFeeUsd.toFixed(2)} </span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Total Amount</span>
@@ -173,6 +193,12 @@ export function SendPage() {
                   {amount} {selectedToken.symbol}
                 </span>
               </div>
+              <div className="flex items-center justify-between text-sm">
+                 <span className="text-muted-foreground">Total Cost</span>
+                 <span className="text-foreground font-semibold">
+                   ${totalUsd.toFixed(2)}
+                 </span>
+             </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Estimated Time</span>
                 <span className="text-foreground">~30 seconds</span>
@@ -227,6 +253,19 @@ export function SendPage() {
           <div className="space-y-4 my-4">
             <div className="p-4 rounded-lg bg-background border border-border space-y-3">
               <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Token Price</span>
+                <span className="text-sm">
+                  ${priceUsd.toFixed(4)}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">USD Value</span>
+                <span className="text-sm">
+                  ${usdValue.toFixed(2)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">To</span>
                 <span className="text-sm font-mono">{recipient}</span>
               </div>
@@ -244,7 +283,7 @@ export function SendPage() {
               )}
               <div className="flex items-center justify-between pt-3 border-t border-border">
                 <span className="text-sm text-muted-foreground">Network Fee</span>
-                <span className="text-sm">~$1.50</span>
+                <span className="text-sm"> ${networkFeeUsd.toFixed(2)}</span>
               </div>
             </div>
 
@@ -253,6 +292,12 @@ export function SendPage() {
               <p className="text-sm text-yellow-200">
                 This transaction cannot be reversed. Please verify all details.
               </p>
+            </div>
+            <div className="flex items-center justify-between pt-3 border-t border-border">
+              <span className="text-sm text-muted-foreground">Total Cost</span>
+              <span className="text-sm font-semibold">
+                ${totalUsd.toFixed(2)}
+              </span>
             </div>
           </div>
 
