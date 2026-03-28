@@ -140,29 +140,29 @@ export function WalletDashboard() {
     <div className="min-h-screen px-4 pt-24 pb-32 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl space-y-8">
         <Card className="border-border bg-card p-6">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className="mb-1 text-sm text-muted-foreground">Wallet Address</p>
-              <div className="flex items-center gap-2">
-                <code className="font-mono text-white">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0 flex-1">
+              <p className="mb-2 text-sm text-muted-foreground">Wallet Address</p>
+              <div className="rounded-2xl border border-border bg-background/45 px-4 py-3">
+                <code className="block overflow-hidden text-ellipsis break-all font-mono text-sm text-white sm:text-base">
                   0x742d35Cc6634C0532925a3b844Bc9e7595f9aB8
                 </code>
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex shrink-0 items-center gap-2 self-end sm:self-start">
               <Button
                 aria-label="Copy wallet address"
                 variant="ghost"
                 size="sm"
                 onClick={copyAddress}
-                className="text-muted-foreground hover:text-primary"
+                className="h-10 w-10 rounded-xl border border-border bg-background/45 p-0 text-muted-foreground hover:text-primary"
               >
                 <Copy className="h-4 w-4" />
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-muted-foreground hover:text-primary"
+                className="h-10 w-10 rounded-xl border border-border bg-background/45 p-0 text-muted-foreground hover:text-primary"
               >
                 <ExternalLink className="h-4 w-4" />
               </Button>
