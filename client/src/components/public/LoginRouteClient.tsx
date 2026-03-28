@@ -60,11 +60,12 @@ export function LoginRouteClient() {
 
           router.push("/");
         }}
-        onEmailLogin={({ email }) => finishLogin(`Preview access granted for ${email}.`, email)}
-        onGoogleLogin={() => finishLogin("Preview Google access granted.", "demo@byreixwift.local")}
+        onGoogleLogin={() =>
+          finishLogin("Google access granted. Open the app to continue.", "demo@byreixwift.local")
+        }
         onWalletConnect={() =>
           finishLogin(
-            "Preview wallet access granted. Open the app to continue.",
+            "Wallet access granted. Open the app to continue.",
             "wallet@byreixwift.local"
           )
         }

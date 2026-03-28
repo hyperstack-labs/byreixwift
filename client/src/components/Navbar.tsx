@@ -98,9 +98,8 @@ export function Navbar({
       : [];
   const hasDesktopNav =
     navLinks.length > 0 || publicHomeLinks.length > 0 || publicPageLinks.length > 0;
-  const useSolidChrome =
-    scrolled || mobileMenuOpen || currentPage !== "home" || Boolean(isConnected);
-  const useQuietHomeCta = isHomeRoute && !useSolidChrome && !isConnected;
+  const useSolidChrome = scrolled || mobileMenuOpen || Boolean(isConnected);
+  const useQuietPublicCta = isPublicRoute && !useSolidChrome && !isConnected;
   const desktopBarHeight = useSolidChrome ? 58 : 68;
 
   const handleNavClick = (link: { label: string; value: string; isGated: boolean }) => {
@@ -239,7 +238,7 @@ export function Navbar({
                   <button
                     onClick={() => onNavigate?.("login")}
                     className={`text-sm font-semibold tracking-[-0.01em] transition-colors duration-300 cursor-pointer whitespace-nowrap outline-none ${
-                      useQuietHomeCta
+                      useQuietPublicCta
                         ? "text-foreground/62 hover:text-foreground/86"
                         : "text-muted-foreground hover:text-foreground"
                     }`}
@@ -322,7 +321,7 @@ export function Navbar({
                   <Button
                     onClick={onConnect}
                     className={`group relative h-9 rounded-lg px-4 text-[0.92rem] font-semibold transition-all duration-300 active:scale-95 sm:h-10 sm:rounded-xl sm:px-[1.125rem] sm:text-sm ${
-                      useQuietHomeCta
+                      useQuietPublicCta
                         ? "border border-white/10 bg-white/[0.03] text-foreground shadow-none hover:border-white/18 hover:bg-white/[0.05]"
                         : "border border-primary/25 bg-primary/92 text-primary-foreground hover:bg-primary hover:shadow-[0_10px_24px_rgba(37,201,133,0.18)]"
                     }`}
@@ -330,7 +329,7 @@ export function Navbar({
                     <span className="relative flex items-center gap-2.5">
                       <Wallet
                         className={`w-4 h-4 transition-transform duration-300 group-hover:scale-110 ${
-                          useQuietHomeCta ? "text-foreground/76" : "text-primary-foreground/90"
+                          useQuietPublicCta ? "text-foreground/76" : "text-primary-foreground/90"
                         }`}
                       />
                       {ctaLabel}

@@ -13,9 +13,10 @@ interface EthereumProvider {
 
 interface WalletLoginButtonProps {
   onConnect: (address: string) => void;
+  disabled?: boolean;
 }
 
-export function WalletLoginButton({ onConnect }: WalletLoginButtonProps) {
+export function WalletLoginButton({ onConnect, disabled = false }: WalletLoginButtonProps) {
   const [status, setStatus] = useState<"idle" | "connecting" | "error" | "no-wallet">("idle");
 
   const [error, setError] = useState("");
@@ -82,7 +83,7 @@ export function WalletLoginButton({ onConnect }: WalletLoginButtonProps) {
     >
       <Button
         onClick={handleConnect}
-        disabled={status === "connecting"}
+        disabled={status === "connecting" || disabled}
         className="flex items-center w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-7 text-base transition-all hover:shadow-[0_0_30px_rgba(38,213,120,0.3)] group"
       >
         {status === "connecting" ? (
@@ -90,7 +91,7 @@ export function WalletLoginButton({ onConnect }: WalletLoginButtonProps) {
         ) : (
           <Wallet className="w-6 h-6 mr-3 group-hover:scale-110 transition-transform" />
         )}
-        {status === "connecting" ? "Connecting..." : "Connect with Sidra Wallet Preview"}
+        {status === "connecting" ? "Connecting..." : "Connect Sidra Wallet"}
         <ArrowRight className="w-6 h-6 ml-3 group-hover:translate-x-1 transition-transform" />
       </Button>
 
