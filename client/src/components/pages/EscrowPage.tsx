@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useCallback } from "react";
-
 import {
   Card,
   Button,
@@ -15,9 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui";
-
-import { Loader2, Plus, ShieldCheck } from "lucide-react";
-
+import { Loader2, Plus, Inbox, Wallet, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import {
   useCreateEscrow,
@@ -27,9 +24,7 @@ import {
   useRefundEscrow,
   useReleaseEscrow,
 } from "@/hooks";
-
 import { EscrowState, EscrowRecord, EscrowEventRecord } from "@/types/escrow";
-
 import {
   EscrowTransactionModal,
   EscrowStatusBadge,
@@ -66,7 +61,8 @@ const _mockEventStore: Record<string, EscrowEventRecord[]> = {
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-// Mock hooks
+// Mock hooks 
+
 function useMockEscrows() {
   const [escrows, setEscrows] = useState<EscrowRecord[]>(_mockStore);
   const refresh = useCallback(() => setEscrows([..._mockStore]), []);
@@ -110,7 +106,6 @@ function useMockCreateEscrow(refreshEscrows: () => void) {
     },
     [refreshEscrows]
   );
-
   return { isPending, mutateAsync };
 }
 
@@ -148,13 +143,12 @@ function useMockTransition(refreshEscrows: () => void, refreshEvents: (id: strin
     },
     [refreshEscrows, refreshEvents]
   );
-
   return { isPending, mutate };
 }
 
+// EscrowPage
 const DEFAULT_BUYER = "0x742d35Cc6634C0532925a3b844Bc454e7595f9aB";
 const DEFAULT_SELLER = "0x9f3aD15A12e1F3514d8B8E9c6F16C2E8922A7cD2";
-
 const isValidAddress = (a: string) => /^0x[0-9a-fA-F]{40}$/.test(a);
 
 export function EscrowPage() {
@@ -169,11 +163,13 @@ export function EscrowPage() {
     fixedFee: "0",
   });
 
+  // Mock hooks (always constructed — hooks can't be conditional)
   const mockEscrows = useMockEscrows();
   const mockEvents = useMockEscrowEvents(selectedEscrowId);
   const mockCreate = useMockCreateEscrow(mockEscrows.refresh);
   const mockTransition = useMockTransition(mockEscrows.refresh, mockEvents.refresh);
 
+  // Real hooks (always constructed, only used when USE_MOCK = false)
   const escrowRecord = useEscrows();
   const escrowEvents = useEscrowEvents(USE_MOCK ? null : selectedEscrowId);
   const createEscrow = useCreateEscrow();
@@ -189,9 +185,11 @@ export function EscrowPage() {
   const selectedEscrow = selectedEscrowId
     ? (escrows.find((e) => e.id === selectedEscrowId) ?? null)
     : null;
+
   const totalLocked = escrows
     .filter((e) => e.state === "pending" || e.state === "locked")
     .reduce((s, e) => s + e.amount, 0);
+
   const isMutating = USE_MOCK
     ? mockCreate.isPending || mockTransition.isPending
     : createEscrow.isPending ||
@@ -215,12 +213,8 @@ export function EscrowPage() {
       return;
     }
 
-    if (!isValidAddress(formData.buyer)) {
-      toast.error("Buyer wallet address is invalid (0x + 40 hex chars)");
-      return;
-    }
-    if (!isValidAddress(formData.seller)) {
-      toast.error("Seller wallet address is invalid (0x + 40 hex chars)");
+    if (!isValidAddress(formData.buyer) || !isValidAddress(formData.seller)) {
+      toast.error("Invalid wallet address (0x + 40 hex chars)");
       return;
     }
 
@@ -262,6 +256,7 @@ export function EscrowPage() {
         if (action === "release") await releaseEscrow.mutateAsync({ id, payload: { actor } });
         if (action === "refund") await refundEscrow.mutateAsync({ id, payload: { actor } });
       }
+      // Action Feedback
       toast.success(
         { lock: "Escrow locked", release: "Funds released", refund: "Escrow refunded" }[action]
       );
@@ -273,10 +268,12 @@ export function EscrowPage() {
   return (
     <div className="min-h-screen pt-24 pb-32 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
+        
+        {/* Header */}
         <div className="flex items-center justify-between mb-8 gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-semibold">Escrow</h1>
+              <h1 className="text-2xl font-semibold text-foreground">Escrow</h1>
               {USE_MOCK && (
                 <span className="text-xs px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20">
                   Demo Mode
@@ -289,7 +286,7 @@ export function EscrowPage() {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               })}{" "}
-              units currently locked
+              units locked
             </p>
           </div>
 
@@ -300,13 +297,9 @@ export function EscrowPage() {
                 New
               </Button>
             </DialogTrigger>
-            {/* CRITERIA CHECK: "Mobile and desktop layouts remain clean"
-               - fixed left-1/2... centers the modal exactly on all screen heights.
-               - w-[calc(100%-2rem)] ensures a clean 16px gap on mobile.
-               - max-w-md prevents it from looking stretched on desktop.
-            */}
+            
             <DialogContent className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] max-w-md bg-card border-border p-0 overflow-hidden flex flex-col max-h-[90vh]">
-              <DialogHeader className="p-6 border-b border-border">
+              <DialogHeader className="p-6 border-b border-border shrink-0">
                 <DialogTitle>New Escrow</DialogTitle>
                 <DialogDescription>
                   Funds will be held by the smart contract until all parties act.
@@ -314,87 +307,75 @@ export function EscrowPage() {
               </DialogHeader>
 
               <div className="p-6 space-y-4 overflow-y-auto flex-1">
-                <div>
-                  <Label htmlFor="buyer" className="text-sm">
-                    Buyer Wallet
-                  </Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="buyer" className="text-sm">Buyer Wallet</Label>
                   <Input
                     id="buyer"
                     placeholder="0x..."
                     value={formData.buyer}
                     onChange={(e) => setFormData({ ...formData, buyer: e.target.value })}
-                    className="mt-1 bg-background border-border font-mono text-sm"
+                    className="bg-background border-border font-mono text-sm"
                   />
                 </div>
 
-                <div>
-                  <Label htmlFor="seller" className="text-sm">
-                    Seller Wallet
-                  </Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="seller" className="text-sm">Seller Wallet</Label>
                   <Input
                     id="seller"
                     placeholder="0x..."
                     value={formData.seller}
                     onChange={(e) => setFormData({ ...formData, seller: e.target.value })}
-                    className="mt-1 bg-background border-border font-mono text-sm"
+                    className="bg-background border-border font-mono text-sm"
                   />
                 </div>
 
                 <div className="grid grid-cols-3 gap-3">
-                  <div>
-                    <Label htmlFor="amount" className="text-sm">
-                      Amount
-                    </Label>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="amount" className="text-sm">Amount</Label>
                     <Input
                       id="amount"
                       type="number"
                       placeholder="0.00"
                       value={formData.amount}
                       onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                      className="mt-1 bg-background border-border"
+                      className="bg-background border-border"
                     />
                   </div>
-                  <div>
-                    <Label htmlFor="fixedFee" className="text-sm">
-                      Fixed Fee
-                    </Label>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="fixedFee" className="text-sm">Fee</Label>
                     <Input
                       id="fixedFee"
                       type="number"
                       placeholder="0.00"
                       value={formData.fixedFee}
                       onChange={(e) => setFormData({ ...formData, fixedFee: e.target.value })}
-                      className="mt-1 bg-background border-border"
+                      className="bg-background border-border"
                     />
                   </div>
-                  <div>
-                    <Label htmlFor="token" className="text-sm">
-                      Token
-                    </Label>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="token" className="text-sm">Token</Label>
                     <Input
                       id="token"
                       value={formData.token}
-                      readOnly
-                      className="mt-1 bg-background border-border"
+                      onChange={(e) => setFormData({ ...formData, token: e.target.value })}
+                      className="bg-background border-border"
                     />
                   </div>
                 </div>
 
-                <div>
-                  <Label htmlFor="description" className="text-sm">
-                    Transaction Description
-                  </Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="description" className="text-sm">Description</Label>
                   <Textarea
                     id="description"
                     placeholder="Purpose of transaction"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="mt-1 bg-background border-border min-h-20"
+                    className="bg-background border-border min-h-20"
                   />
                 </div>
               </div>
 
-              <div className="p-6 border-t border-border bg-card flex gap-2">
+              <div className="p-6 border-t border-border bg-card flex gap-2 shrink-0">
                 <Button
                   variant="outline"
                   onClick={() => {
@@ -417,21 +398,28 @@ export function EscrowPage() {
           </Dialog>
         </div>
 
+        {/* Error State */}
         {error && (
           <Card className="p-4 mb-4 border-red-500/40 bg-red-500/10 text-red-200">
             {error instanceof Error ? error.message : "Failed to load escrow records"}
           </Card>
         )}
 
+        {/* Loading State */}
         {isLoading && (
-          <Card className="p-6 bg-card border-border">
-            <div className="flex items-center gap-3 text-muted-foreground">
-              <Loader2 className="w-4 h-4 animate-spin" />
-              Loading escrow records…
-            </div>
-          </Card>
+          <div className="space-y-3">
+            {[1, 2].map((i) => (
+              <Card key={i} className="p-6 bg-card border-border animate-pulse">
+                <div className="flex items-center gap-3 text-muted-foreground">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Loading escrow records…
+                </div>
+              </Card>
+            ))}
+          </div>
         )}
 
+        {/* List View */}
         <div className="space-y-3">
           {escrows.map((escrow) => {
             const cfg = STATE_CONFIG[escrow.state as keyof typeof STATE_CONFIG];
@@ -439,27 +427,29 @@ export function EscrowPage() {
               <Card
                 key={escrow.id}
                 onClick={() => setSelectedEscrowId(escrow.id)}
-                className="p-4 bg-card border-border hover:border-primary/30 transition-colors cursor-pointer"
+                className="p-4 bg-card border-border hover:border-primary/30 transition-all cursor-pointer group active:scale-[0.99]"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-3 min-w-0">
-                    <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${cfg.dotClass}`} />
+                    <div className={`w-2.5 h-2.5 rounded-full mt-1.5 shrink-0 ${cfg.dotClass}`} />
                     <div className="min-w-0">
-                      <p className="font-medium truncate">{escrow.description}</p>
-                      <p className="text-xs text-muted-foreground font-mono mt-0.5">
-                        {escrow.buyer.slice(0, 8)}… → {escrow.seller.slice(0, 8)}…
+                      <p className="font-medium truncate group-hover:text-primary transition-colors">
+                        {escrow.description}
                       </p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {new Date(escrow.createdAt).toLocaleString()}
+                      <div className="flex items-center gap-1.5 mt-0.5 text-xs text-muted-foreground font-mono">
+                        <Wallet className="w-3 h-3 shrink-0" />
+                        <span className="truncate">{escrow.buyer.slice(0, 8)}…</span>
+                        <ArrowRight className="w-2.5 h-2.5 opacity-40 shrink-0" />
+                        <span className="truncate">{escrow.seller.slice(0, 8)}…</span>
+                      </div>
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground/50 mt-1.5 font-medium">
+                        {new Date(escrow.createdAt).toLocaleDateString()} at {new Date(escrow.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </p>
                     </div>
                   </div>
-                  <div className="flex flex-col items-end gap-2 shrink-0">
-                    <p className="font-semibold text-sm">
-                      {escrow.amount}{" "}
-                      <span className="text-xs text-muted-foreground font-normal">
-                        {escrow.tokenSymbol}
-                      </span>
+                  <div className="flex flex-col items-end gap-2 shrink-0 text-right">
+                    <p className="font-bold text-sm">
+                      {escrow.amount} <span className="text-[10px] text-muted-foreground font-medium">{escrow.tokenSymbol}</span>
                     </p>
                     <EscrowStatusBadge state={escrow.state} />
                   </div>
@@ -469,15 +459,27 @@ export function EscrowPage() {
           })}
         </div>
 
+        {/* Empty State */}
         {!isLoading && escrows.length === 0 && (
-          <div className="text-center py-12 text-muted-foreground">
-            <ShieldCheck className="w-10 h-10 mx-auto mb-3 opacity-20" />
-            <p>No escrow records yet</p>
-            <p className="text-sm mt-1">Create a new escrow to start a trustless transaction.</p>
+          <div className="text-center py-20 border border-dashed border-border rounded-xl bg-card/40">
+            <Inbox className="w-12 h-12 mx-auto mb-4 opacity-10 text-primary" />
+            <h3 className="text-sm font-semibold text-foreground">No active escrows</h3>
+            <p className="text-xs text-muted-foreground mt-1 max-w-60 mx-auto">
+              Securely hold funds for services or goods until both parties are satisfied.
+            </p>
+            <Button 
+              variant="outline" 
+              size="sm"
+              className="mt-6 border-border hover:bg-background"
+              onClick={() => setShowCreateDialog(true)}
+            >
+              Initialize First Escrow
+            </Button>
           </div>
         )}
       </div>
 
+      {/* Transaction Modal */}
       {selectedEscrow && (
         <EscrowTransactionModal
           escrow={selectedEscrow}
