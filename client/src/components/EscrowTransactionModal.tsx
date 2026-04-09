@@ -35,9 +35,9 @@ export const USE_MOCK = true;
 // State config 
 const STATE_STEPS: EscrowState[] = ["pending", "locked", "released"];
 
-/**
- * Visual configuration for the various stages of the escrow lifecycle.
- */
+
+// Visual configuration for the various stages of the escrow lifecycle.
+ 
 export const STATE_CONFIG: Record<
   EscrowState,
   {
@@ -190,10 +190,10 @@ export function EscrowTransactionModal({
         
         {/* Action Feedback */}
         {isMutating && (
-          <div className="absolute inset-0 z-50 bg-background/40 backdrop-blur-[1px] flex items-center justify-center">
+          <div className="absolute inset-0 z-50 bg-background/40 backdrop-blur-[2px] flex items-center justify-center animate-in fade-in duration-200">
             <div className="bg-card p-4 rounded-xl border border-border shadow-xl flex items-center gap-3">
               <Loader2 className="w-5 h-5 animate-spin text-primary" />
-              <span className="text-sm font-medium">Confirming...</span>
+              <span className="text-sm font-medium">Processing...</span>
             </div>
           </div>
         )}
@@ -201,7 +201,7 @@ export function EscrowTransactionModal({
         {/* Header */}
         <div className="flex items-start justify-between p-5 border-b border-border shrink-0">
           <div className="space-y-3 min-w-0 pr-4">
-            <p className="font-semibold truncate">{escrow.description}</p>
+            <p className="font-bold truncate">{escrow.description}</p>
             <div className="flex items-center gap-2 flex-wrap">
               <EscrowStatusBadge state={escrow.state} />
               <span className="text-xs text-muted-foreground">{new Date(escrow.createdAt).toLocaleDateString()}</span>
@@ -220,10 +220,10 @@ export function EscrowTransactionModal({
           
           {/* ERROR STATE */}
           {error && (
-            <div className="flex items-start gap-2.5 p-3 rounded-xl border border-red-500/20 bg-red-500/10 text-red-400 animate-in fade-in slide-in-from-top-1">
+            <div className="flex items-start gap-2.5 p-3 rounded-xl border border-red-500/20 bg-red-500/10 text-red-400 animate-in fade-in slide-in-from-top-2 duration-300">
               <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
               <div className="text-sm">
-                <p className="font-semibold text-xs uppercase tracking-wider mb-0.5">Transaction Error</p>
+                <p className="font-bold text-xs uppercase tracking-widest mb-0.5">Transaction Error</p>
                 <p>{error}</p>
               </div>
             </div>
@@ -257,10 +257,10 @@ export function EscrowTransactionModal({
                   { icon: Wallet, label: "Seller", val: escrow.seller },
                   { icon: Hash, label: "ID", val: escrow.id },
                 ].map(({ icon: Icon, label, val }) => (
-                  <div key={label} className="flex items-center gap-3">
-                    <Icon className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                    <span className="text-[10px] text-muted-foreground w-8">{label}</span>
-                    <span className="text-xs font-mono ml-auto text-foreground">{val.slice(0, 6)}...{val.slice(-4)}</span>
+                  <div key={label} className="flex items-center gap-3 group">
+                    <Icon className="w-3.5 h-3.5 text-muted-foreground shrink-0 group-hover:text-primary transition-colors" />
+                    <span className="text-[10px] text-muted-foreground w-12 uppercase">{label}</span>
+                    <span className="text-xs font-mono ml-auto text-foreground bg-muted/30 px-2 py-0.5 rounded">{val.slice(0, 6)}...{val.slice(-4)}</span>
                   </div>
                 ))}
               </div>
@@ -273,16 +273,20 @@ export function EscrowTransactionModal({
             <p className="text-[10px] text-muted-foreground font-medium mb-3 uppercase tracking-wider">Event log</p>
             <div className="space-y-2">
               {events.length > 0 ? (
-                events.map((ev) => (
-                  <div key={ev.id} className="flex items-start gap-3 rounded-xl border border-border bg-background/40 p-3">
-                    <FileText className="w-3.5 h-3.5 text-muted-foreground mt-0.5 shrink-0" />
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium">{ev.type}</p>
-                      <p className="text-[10px] text-muted-foreground mt-0.5 capitalize">State: {ev.state}</p>
-                      <p className="text-[10px] text-muted-foreground opacity-60">{new Date(ev.occurredAt).toLocaleString()}</p>
+               events.map((ev) => (
+                <div key={ev.id} className="flex items-start gap-3 rounded-xl border border-border bg-background/40 p-3 hover:bg-muted/20 transition-colors">
+                  <FileText className="w-3.5 h-3.5 text-muted-foreground mt-1 shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex justify-between items-start">
+                      <p className="text-sm font-semibold">{ev.type}</p>
+                      <p className="text-[9px] text-muted-foreground opacity-60 uppercase">
+                        {new Date(ev.occurredAt).toLocaleTimeString()}
+                      </p>
                     </div>
+                    <p className="text-[10px] text-muted-foreground mt-0.5 capitalize">Final State: {ev.state}</p>
                   </div>
-                ))
+                </div>
+              ))
               ) : (
                 <div className="flex flex-col items-center justify-center p-8 border border-dashed border-border rounded-xl">
                   <Inbox className="w-6 h-6 text-muted-foreground/20 mb-2" /> {/* Empty state */}
@@ -298,35 +302,35 @@ export function EscrowTransactionModal({
           <div className="border-t border-border p-5 flex flex-col sm:flex-row gap-3 shrink-0 bg-card">
             {escrow.state === "pending" && (
               <Button
-                size="sm"
+                size="lg"
                 disabled={isMutating}
                 onClick={onLock}
-                className="bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 flex-1 h-11 cursor-pointer"
+                className="bg-amber-600 hover:bg-amber-700 text-white flex-1 transition-all cursor-pointer"
               >
-                <Lock className="w-4 h-4 mr-2" />
+                {isMutating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Lock className="w-4 h-4 mr-2" />}
                 Lock funds
               </Button>
             )}
 
             {escrow.state === "locked" && (
               <Button
-                size="sm"
+                size="lg"
                 disabled={isMutating}
                 onClick={onRelease}
-                className="bg-primary/20 hover:bg-primary/30 text-primary border border-primary/30 flex-1 h-11 cursor-pointer"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground flex-1 transition-all cursor-pointer"
               >
-                <CheckCircle2 className="w-4 h-4 mr-2" />
+                {isMutating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <CheckCircle2 className="w-4 h-4 mr-2" />}
                 Release funds
               </Button>
             )}
             <Button
-              size="sm"
+              size="lg"
               variant="outline"
               disabled={isMutating}
               onClick={onRefund}
-              className="border-border hover:bg-secondary flex-1 h-11 cursor-pointer"
+              className="border-border hover:bg-secondary flex-1 transition-all cursor-pointer"
             >
-              <RotateCcw className="w-4 h-4 mr-2" />
+              {isMutating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RotateCcw className="w-4 h-4 mr-2" />}
               Refund
             </Button>
           </div>

@@ -32,7 +32,7 @@ import {
   USE_MOCK,
 } from "@/components/EscrowTransactionModal";
 
-let _mockStore: EscrowRecord[] = [
+let _mockStore: EscrowRecord[] = [ // Temporarily remove value to see empty state
   {
     id: "esc-001-mock",
     buyer: "0x742d35Cc6634C0532925a3b844Bc454e7595f9aB8",
@@ -61,7 +61,7 @@ const _mockEventStore: Record<string, EscrowEventRecord[]> = {
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-// Mock hooks 
+// Mock hooks
 
 function useMockEscrows() {
   const [escrows, setEscrows] = useState<EscrowRecord[]>(_mockStore);
@@ -179,9 +179,9 @@ export function EscrowPage() {
 
   const escrows = USE_MOCK ? mockEscrows.data : (escrowRecord.data ?? []);
   const events = USE_MOCK ? mockEvents.data : (escrowEvents.data ?? []);
-  const isLoading = USE_MOCK ? false : escrowRecord.isLoading;
-  const error = USE_MOCK ? null : escrowRecord.error;
-
+  const isLoading = USE_MOCK ? false : escrowRecord.isLoading; // Set to true temporarily to see skeleton rendering
+  const error = USE_MOCK ? null : escrowRecord.error; // const error = "Failed to synchronize with the smart contract. Please check your connection"; // replace with for temporary error feedback rendering
+  
   const selectedEscrow = selectedEscrowId
     ? (escrows.find((e) => e.id === selectedEscrowId) ?? null)
     : null;
@@ -249,6 +249,7 @@ export function EscrowPage() {
     actor: string
   ) => {
     try {
+      // throw new Error("User rejected the transaction request."); // For error testing purposes
       if (USE_MOCK) {
         await mockTransition.mutate(action, id);
       } else {
@@ -268,7 +269,6 @@ export function EscrowPage() {
   return (
     <div className="min-h-screen pt-24 pb-32 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
-        
         {/* Header */}
         <div className="flex items-center justify-between mb-8 gap-4">
           <div>
@@ -280,24 +280,35 @@ export function EscrowPage() {
                 </span>
               )}
             </div>
-            <p className="text-sm text-muted-foreground mt-1">
-              {escrows.length} records —{" "}
-              {totalLocked.toLocaleString(undefined, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}{" "}
-              units locked
-            </p>
+            <div className="min-h-10">
+              {!isLoading ? (
+                <p className="text-sm text-muted-foreground mt-1 animate-in fade-in duration-500">
+                  {escrows.length} records —{" "}
+                  <span className="font-medium text-foreground">
+                    {totalLocked.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </span>{" "}
+                  units locked
+                </p>
+              ) : (
+                <div className="h-4 w-48 bg-muted/20 animate-pulse rounded mt-2" />
+              )}
+            </div>
           </div>
 
           <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
             <DialogTrigger asChild>
-              <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground">
+              <Button
+                size="sm"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground cursor-pointer"
+              >
                 <Plus className="w-4 h-4 mr-1" />
                 New
               </Button>
             </DialogTrigger>
-            
+
             <DialogContent className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] max-w-md bg-card border-border p-0 overflow-hidden flex flex-col max-h-[90vh]">
               <DialogHeader className="p-6 border-b border-border shrink-0">
                 <DialogTitle>New Escrow</DialogTitle>
@@ -308,7 +319,9 @@ export function EscrowPage() {
 
               <div className="p-6 space-y-4 overflow-y-auto flex-1">
                 <div className="space-y-1.5">
-                  <Label htmlFor="buyer" className="text-sm">Buyer Wallet</Label>
+                  <Label htmlFor="buyer" className="text-sm">
+                    Buyer Wallet
+                  </Label>
                   <Input
                     id="buyer"
                     placeholder="0x..."
@@ -319,7 +332,9 @@ export function EscrowPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="seller" className="text-sm">Seller Wallet</Label>
+                  <Label htmlFor="seller" className="text-sm">
+                    Seller Wallet
+                  </Label>
                   <Input
                     id="seller"
                     placeholder="0x..."
@@ -331,7 +346,9 @@ export function EscrowPage() {
 
                 <div className="grid grid-cols-3 gap-3">
                   <div className="space-y-1.5">
-                    <Label htmlFor="amount" className="text-sm">Amount</Label>
+                    <Label htmlFor="amount" className="text-sm">
+                      Amount
+                    </Label>
                     <Input
                       id="amount"
                       type="number"
@@ -342,7 +359,9 @@ export function EscrowPage() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="fixedFee" className="text-sm">Fee</Label>
+                    <Label htmlFor="fixedFee" className="text-sm">
+                      Fee
+                    </Label>
                     <Input
                       id="fixedFee"
                       type="number"
@@ -353,18 +372,22 @@ export function EscrowPage() {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="token" className="text-sm">Token</Label>
+                    <Label htmlFor="token" className="text-sm">
+                      Token
+                    </Label>
                     <Input
                       id="token"
                       value={formData.token}
                       onChange={(e) => setFormData({ ...formData, token: e.target.value })}
-                      className="bg-background border-border"
+                      className="bg-background border-border text-muted-foreground"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="description" className="text-sm">Description</Label>
+                  <Label htmlFor="description" className="text-sm">
+                    Description
+                  </Label>
                   <Textarea
                     id="description"
                     placeholder="Purpose of transaction"
@@ -382,14 +405,14 @@ export function EscrowPage() {
                     setShowCreateDialog(false);
                     resetForm();
                   }}
-                  className="flex-1 border-border"
+                  className="flex-1 border-border cursor-pointer"
                 >
                   Cancel
                 </Button>
                 <Button
                   onClick={handleCreateEscrow}
                   disabled={isMutating}
-                  className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground"
+                  className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground cursor-pointer"
                 >
                   {isMutating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Create"}
                 </Button>
@@ -408,13 +431,23 @@ export function EscrowPage() {
         {/* Loading State */}
         {isLoading && (
           <div className="space-y-3">
-            {[1, 2].map((i) => (
-              <Card key={i} className="p-6 bg-card border-border animate-pulse">
-                <div className="flex items-center gap-3 text-muted-foreground">
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Loading escrow records…
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="h-25 w-full rounded-xl border border-border bg-card/50 animate-pulse flex items-center px-4 justify-between"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-3 h-3 rounded-full bg-muted" />
+                  <div className="space-y-2">
+                    <div className="h-4 w-40 bg-muted rounded" />
+                    <div className="h-3 w-24 bg-muted/50 rounded" />
+                  </div>
                 </div>
-              </Card>
+                <div className="space-y-2 flex flex-col items-end">
+                  <div className="h-4 w-16 bg-muted rounded" />
+                  <div className="h-5 w-20 bg-muted/50 rounded-full" />
+                </div>
+              </div>
             ))}
           </div>
         )}
@@ -427,29 +460,42 @@ export function EscrowPage() {
               <Card
                 key={escrow.id}
                 onClick={() => setSelectedEscrowId(escrow.id)}
-                className="p-4 bg-card border-border hover:border-primary/30 transition-all cursor-pointer group active:scale-[0.99]"
+                className="p-4 bg-card border-border hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all cursor-pointer group active:scale-[0.98] duration-200"
               >
                 <div className="flex items-start justify-between gap-4">
-                  <div className="flex items-start gap-3 min-w-0">
-                    <div className={`w-2.5 h-2.5 rounded-full mt-1.5 shrink-0 ${cfg.dotClass}`} />
+                  <div className="flex items-start gap-3 min-w-0 text-left">
+                    <div
+                      className={`w-2.5 h-2.5 rounded-full mt-1.5 shrink-0 shadow-[0_0_8px_rgba(0,0,0,0.1)] ${cfg.dotClass}`}
+                    />
                     <div className="min-w-0">
-                      <p className="font-medium truncate group-hover:text-primary transition-colors">
+                      <p className="font-semibold truncate group-hover:text-primary transition-all duration-200 group-hover:translate-x-0.5">
                         {escrow.description}
                       </p>
-                      <div className="flex items-center gap-1.5 mt-0.5 text-xs text-muted-foreground font-mono">
-                        <Wallet className="w-3 h-3 shrink-0" />
-                        <span className="truncate">{escrow.buyer.slice(0, 8)}…</span>
-                        <ArrowRight className="w-2.5 h-2.5 opacity-40 shrink-0" />
-                        <span className="truncate">{escrow.seller.slice(0, 8)}…</span>
+                      <div className="flex items-center gap-1.5 mt-1 text-xs text-muted-foreground/70 font-mono">
+                        <Wallet className="w-3 h-3 shrink-0 opacity-60" />
+                        <span>{escrow.buyer.slice(0, 6)}...</span>
+                        <ArrowRight className="w-2.5 h-2.5 opacity-30 shrink-0" />
+                        <span>{escrow.seller.slice(0, 6)}...</span>
                       </div>
-                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground/50 mt-1.5 font-medium">
-                        {new Date(escrow.createdAt).toLocaleDateString()} at {new Date(escrow.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground/40 mt-2 font-bold">
+                        {new Date(escrow.createdAt).toLocaleDateString(undefined, {
+                          month: "short",
+                          day: "numeric",
+                        })}{" "}
+                        •{" "}
+                        {new Date(escrow.createdAt).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
                       </p>
                     </div>
                   </div>
-                  <div className="flex flex-col items-end gap-2 shrink-0 text-right">
-                    <p className="font-bold text-sm">
-                      {escrow.amount} <span className="text-[10px] text-muted-foreground font-medium">{escrow.tokenSymbol}</span>
+                  <div className="flex flex-col items-end gap-2 shrink-0">
+                    <p className="font-bold text-sm tabular-nums text-right">
+                      {escrow.amount}{" "}
+                      <span className="text-[10px] text-muted-foreground/60 font-medium">
+                        {escrow.tokenSymbol}
+                      </span>
                     </p>
                     <EscrowStatusBadge state={escrow.state} />
                   </div>
@@ -461,18 +507,22 @@ export function EscrowPage() {
 
         {/* Empty State */}
         {!isLoading && escrows.length === 0 && (
-          <div className="text-center py-20 border border-dashed border-border rounded-xl bg-card/40">
-            <Inbox className="w-12 h-12 mx-auto mb-4 opacity-10 text-primary" />
+          <div className="text-center py-20 border border-dashed border-border rounded-2xl bg-linear-to-b from-card/50 to-transparent animate-in fade-in zoom-in-95 duration-700">
+            <div className="relative inline-block mb-4">
+              <Inbox className="w-12 h-12 mx-auto opacity-10 text-primary" />
+              <div className="absolute inset-0 bg-primary/5 blur-2xl rounded-full" />
+            </div>
             <h3 className="text-sm font-semibold text-foreground">No active escrows</h3>
-            <p className="text-xs text-muted-foreground mt-1 max-w-60 mx-auto">
+            <p className="text-xs text-muted-foreground mt-2 max-w-50 mx-auto leading-relaxed">
               Securely hold funds for services or goods until both parties are satisfied.
             </p>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="sm"
-              className="mt-6 border-border hover:bg-background"
+              className="mt-8 border-border hover:bg-background hover:text-primary transition-colors cursor-pointer"
               onClick={() => setShowCreateDialog(true)}
             >
+              <Plus className="w-3.5 h-3.5 mr-2" />
               Initialize First Escrow
             </Button>
           </div>
