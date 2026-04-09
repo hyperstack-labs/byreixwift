@@ -435,7 +435,7 @@ export function EscrowPage() {
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="h-25 w-full rounded-xl border border-border bg-card/50 animate-pulse flex items-center px-4 justify-between"
+                className="h-25 w-full rounded-xl border border-border bg-card/50 animate-none flex items-center px-4 justify-between"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-3 h-3 rounded-full bg-muted" />

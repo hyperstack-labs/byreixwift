@@ -36,7 +36,6 @@ export const USE_MOCK = true;
 const STATE_STEPS: EscrowState[] = ["pending", "locked", "released"];
 
 // Visual configuration for the various stages of the escrow lifecycle.
-
 export const STATE_CONFIG: Record<
   EscrowState,
   {
