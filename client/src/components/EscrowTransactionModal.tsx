@@ -23,7 +23,7 @@ interface TransactionModalProps {
   escrow: EscrowRecord;
   events: EscrowEventRecord[];
   isMutating: boolean;
-  error?: string | null; 
+  error?: string | null;
   onLock: () => void;
   onRelease: () => void;
   onRefund: () => void;
@@ -32,12 +32,11 @@ interface TransactionModalProps {
 
 // Need to turn this off in production
 export const USE_MOCK = true;
-// State config 
+// State config
 const STATE_STEPS: EscrowState[] = ["pending", "locked", "released"];
 
-
 // Visual configuration for the various stages of the escrow lifecycle.
- 
+
 export const STATE_CONFIG: Record<
   EscrowState,
   {
@@ -60,7 +59,8 @@ export const STATE_CONFIG: Record<
     Icon: Lock,
     dotClass: "bg-amber-400",
     badgeClass: "bg-amber-500/10 text-amber-400 border border-amber-500/20",
-    description: "Funds are secured in the smart contract. Neither party can access them until release or refund.",
+    description:
+      "Funds are secured in the smart contract. Neither party can access them until release or refund.",
   },
   released: {
     label: "Released",
@@ -85,11 +85,13 @@ const TRUSTLESS_PILLS = [
   "On-chain finality",
 ];
 
-// Sub-components 
+// Sub-components
 export function EscrowStatusBadge({ state }: { state: EscrowState }) {
   const { label, Icon, badgeClass } = STATE_CONFIG[state];
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${badgeClass}`}>
+    <span
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${badgeClass}`}
+    >
       <Icon className="w-3 h-3" />
       {label}
     </span>
@@ -104,7 +106,9 @@ export function StateStepper({ state }: { state: EscrowState }) {
         <RotateCcw className="w-4 h-4 text-blue-400 shrink-0" />
         <div>
           <p className="text-sm font-medium text-blue-300">Refunded</p>
-          <p className="text-xs text-muted-foreground mt-0.5">Funds have been returned to the buyer wallet.</p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Funds have been returned to the buyer wallet.
+          </p>
         </div>
       </div>
     );
@@ -119,26 +123,40 @@ export function StateStepper({ state }: { state: EscrowState }) {
         const isDone = i < currentIdx;
         const isCurrent = i === currentIdx;
         const isLast = i === STATE_STEPS.length - 1;
-        
+
         return (
           <div key={step} className={`flex items-center min-w-0 ${isLast ? "" : "flex-1"}`}>
             <div className="flex flex-col items-center gap-1.5 shrink-0">
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center border transition-all ${
-                  isDone ? "bg-green-500/20 border-green-500/40" : isCurrent ? "bg-primary/20 border-primary" : "bg-card border-border"
+                  isDone
+                    ? "bg-green-500/20 border-green-500/40"
+                    : isCurrent
+                      ? "bg-primary/20 border-primary"
+                      : "bg-card border-border"
                 }`}
               >
                 {/* Success feedback */}
-                {isDone ? <Check className="w-4 h-4 text-green-400" /> : <Icon className={`w-4 h-4 ${isCurrent ? "text-primary" : "text-muted-foreground/40"}`} />}
+                {isDone ? (
+                  <Check className="w-4 h-4 text-green-400" />
+                ) : (
+                  <Icon
+                    className={`w-4 h-4 ${isCurrent ? "text-primary" : "text-muted-foreground/40"}`}
+                  />
+                )}
               </div>
-              <span className={`text-[10px] sm:text-xs font-medium ${isCurrent ? "text-foreground" : isDone ? "text-green-500/70" : "text-muted-foreground/40"}`}>
+              <span
+                className={`text-[10px] sm:text-xs font-medium ${isCurrent ? "text-foreground" : isDone ? "text-green-500/70" : "text-muted-foreground/40"}`}
+              >
                 {label}
               </span>
             </div>
             {!isLast && (
               <div className="flex-1 flex items-center pb-5 px-1">
                 <div className={`h-px w-full ${isDone ? "bg-green-500/40" : "bg-border"}`} />
-                <ArrowRight className={`w-3 h-3 shrink-0 ${isDone ? "text-green-500/60" : "text-border"}`} />
+                <ArrowRight
+                  className={`w-3 h-3 shrink-0 ${isDone ? "text-green-500/60" : "text-border"}`}
+                />
               </div>
             )}
           </div>
@@ -156,12 +174,15 @@ export function TrustlessIndicators() {
         <p className="text-sm font-medium">Trustless escrow</p>
       </div>
       <p className="text-xs text-muted-foreground leading-relaxed">
-        Funds are held exclusively by the smart contract. No party including the platform can
-        access or move funds outside the defined lifecycle rules.
+        Funds are held exclusively by the smart contract. No party including the platform can access
+        or move funds outside the defined lifecycle rules.
       </p>
       <div className="flex flex-wrap gap-1.5 pt-1">
         {TRUSTLESS_PILLS.map((pill) => (
-          <span key={pill} className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+          <span
+            key={pill}
+            className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20"
+          >
             {pill}
           </span>
         ))}
@@ -181,13 +202,12 @@ export function EscrowTransactionModal({
   onClose,
 }: TransactionModalProps) {
   const cfg = STATE_CONFIG[escrow.state];
-  const canAct = (escrow.state === "pending" || escrow.state === "locked");
+  const canAct = escrow.state === "pending" || escrow.state === "locked";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
       <div className="relative z-10 w-full max-w-lg bg-card border border-border rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
-        
         {/* Action Feedback */}
         {isMutating && (
           <div className="absolute inset-0 z-50 bg-background/40 backdrop-blur-[2px] flex items-center justify-center animate-in fade-in duration-200">
@@ -204,26 +224,36 @@ export function EscrowTransactionModal({
             <p className="font-bold truncate">{escrow.description}</p>
             <div className="flex items-center gap-2 flex-wrap">
               <EscrowStatusBadge state={escrow.state} />
-              <span className="text-xs text-muted-foreground">{new Date(escrow.createdAt).toLocaleDateString()}</span>
+              <span className="text-xs text-muted-foreground">
+                {new Date(escrow.createdAt).toLocaleDateString()}
+              </span>
               {USE_MOCK && (
-                <span className="text-xs px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20">mock</span>
+                <span className="text-xs px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20">
+                  mock
+                </span>
               )}
             </div>
           </div>
-          <Button onClick={onClose} variant="ghost" size="icon" className="shrink-0 -mr-2 cursor-pointer">
+          <Button
+            onClick={onClose}
+            variant="ghost"
+            size="icon"
+            className="shrink-0 -mr-2 cursor-pointer"
+          >
             <X className="w-4 h-4 text-muted-foreground " />
           </Button>
         </div>
 
         {/* SCROLLABLE BODY */}
         <div className="overflow-y-auto flex-1 p-5 space-y-6">
-          
           {/* ERROR STATE */}
           {error && (
             <div className="flex items-start gap-2.5 p-3 rounded-xl border border-red-500/20 bg-red-500/10 text-red-400 animate-in fade-in slide-in-from-top-2 duration-300">
               <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
               <div className="text-sm">
-                <p className="font-bold text-xs uppercase tracking-widest mb-0.5">Transaction Error</p>
+                <p className="font-bold text-xs uppercase tracking-widest mb-0.5">
+                  Transaction Error
+                </p>
                 <p>{error}</p>
               </div>
             </div>
@@ -235,17 +265,26 @@ export function EscrowTransactionModal({
           </div>
 
           <div className="py-2">
-            <p className="text-[10px] text-muted-foreground font-medium mb-4 uppercase tracking-wider">Transaction lifecycle</p>
+            <p className="text-[10px] text-muted-foreground font-medium mb-4 uppercase tracking-wider">
+              Transaction lifecycle
+            </p>
             <StateStepper state={escrow.state} />
           </div>
 
           {/* Transaction Details */}
           <div>
-            <p className="text-[10px] text-muted-foreground font-medium mb-3 uppercase tracking-wider">Transaction details</p>
+            <p className="text-[10px] text-muted-foreground font-medium mb-3 uppercase tracking-wider">
+              Transaction details
+            </p>
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-xl border border-border bg-background/40 p-3">
                 <p className="text-muted-foreground text-[10px] mb-1">Amount</p>
-                <p className="font-semibold">{escrow.amount} <span className="text-[10px] text-muted-foreground font-normal">{escrow.tokenSymbol}</span></p>
+                <p className="font-semibold">
+                  {escrow.amount}{" "}
+                  <span className="text-[10px] text-muted-foreground font-normal">
+                    {escrow.tokenSymbol}
+                  </span>
+                </p>
               </div>
               <div className="rounded-xl border border-border bg-background/40 p-3">
                 <p className="text-muted-foreground text-[10px] mb-1">Fixed Fee</p>
@@ -259,8 +298,12 @@ export function EscrowTransactionModal({
                 ].map(({ icon: Icon, label, val }) => (
                   <div key={label} className="flex items-center gap-3 group">
                     <Icon className="w-3.5 h-3.5 text-muted-foreground shrink-0 group-hover:text-primary transition-colors" />
-                    <span className="text-[10px] text-muted-foreground w-12 uppercase">{label}</span>
-                    <span className="text-xs font-mono ml-auto text-foreground bg-muted/30 px-2 py-0.5 rounded">{val.slice(0, 6)}...{val.slice(-4)}</span>
+                    <span className="text-[10px] text-muted-foreground w-12 uppercase">
+                      {label}
+                    </span>
+                    <span className="text-xs font-mono ml-auto text-foreground bg-muted/30 px-2 py-0.5 rounded">
+                      {val.slice(0, 6)}...{val.slice(-4)}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -270,23 +313,30 @@ export function EscrowTransactionModal({
           <TrustlessIndicators />
           {/* Event log, Clear Empty State logic */}
           <div className="pb-2">
-            <p className="text-[10px] text-muted-foreground font-medium mb-3 uppercase tracking-wider">Event log</p>
+            <p className="text-[10px] text-muted-foreground font-medium mb-3 uppercase tracking-wider">
+              Event log
+            </p>
             <div className="space-y-2">
               {events.length > 0 ? (
-               events.map((ev) => (
-                <div key={ev.id} className="flex items-start gap-3 rounded-xl border border-border bg-background/40 p-3 hover:bg-muted/20 transition-colors">
-                  <FileText className="w-3.5 h-3.5 text-muted-foreground mt-1 shrink-0" />
-                  <div className="min-w-0 flex-1">
-                    <div className="flex justify-between items-start">
-                      <p className="text-sm font-semibold">{ev.type}</p>
-                      <p className="text-[9px] text-muted-foreground opacity-60 uppercase">
-                        {new Date(ev.occurredAt).toLocaleTimeString()}
+                events.map((ev) => (
+                  <div
+                    key={ev.id}
+                    className="flex items-start gap-3 rounded-xl border border-border bg-background/40 p-3 hover:bg-muted/20 transition-colors"
+                  >
+                    <FileText className="w-3.5 h-3.5 text-muted-foreground mt-1 shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex justify-between items-start">
+                        <p className="text-sm font-semibold">{ev.type}</p>
+                        <p className="text-[9px] text-muted-foreground opacity-60 uppercase">
+                          {new Date(ev.occurredAt).toLocaleTimeString()}
+                        </p>
+                      </div>
+                      <p className="text-[10px] text-muted-foreground mt-0.5 capitalize">
+                        Final State: {ev.state}
                       </p>
                     </div>
-                    <p className="text-[10px] text-muted-foreground mt-0.5 capitalize">Final State: {ev.state}</p>
                   </div>
-                </div>
-              ))
+                ))
               ) : (
                 <div className="flex flex-col items-center justify-center p-8 border border-dashed border-border rounded-xl">
                   <Inbox className="w-6 h-6 text-muted-foreground/20 mb-2" /> {/* Empty state */}
@@ -307,7 +357,11 @@ export function EscrowTransactionModal({
                 onClick={onLock}
                 className="bg-amber-600 hover:bg-amber-700 text-white flex-1 transition-all cursor-pointer"
               >
-                {isMutating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Lock className="w-4 h-4 mr-2" />}
+                {isMutating ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <Lock className="w-4 h-4 mr-2" />
+                )}
                 Lock funds
               </Button>
             )}
@@ -319,7 +373,11 @@ export function EscrowTransactionModal({
                 onClick={onRelease}
                 className="bg-primary hover:bg-primary/90 text-primary-foreground flex-1 transition-all cursor-pointer"
               >
-                {isMutating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <CheckCircle2 className="w-4 h-4 mr-2" />}
+                {isMutating ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <CheckCircle2 className="w-4 h-4 mr-2" />
+                )}
                 Release funds
               </Button>
             )}
@@ -330,7 +388,11 @@ export function EscrowTransactionModal({
               onClick={onRefund}
               className="border-border hover:bg-secondary flex-1 transition-all cursor-pointer"
             >
-              {isMutating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RotateCcw className="w-4 h-4 mr-2" />}
+              {isMutating ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <RotateCcw className="w-4 h-4 mr-2" />
+              )}
               Refund
             </Button>
           </div>

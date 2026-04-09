@@ -32,7 +32,8 @@ import {
   USE_MOCK,
 } from "@/components/EscrowTransactionModal";
 
-let _mockStore: EscrowRecord[] = [ // Temporarily remove value to see empty state
+let _mockStore: EscrowRecord[] = [
+  // Temporarily remove value to see empty state
   {
     id: "esc-001-mock",
     buyer: "0x742d35Cc6634C0532925a3b844Bc454e7595f9aB8",
@@ -181,7 +182,7 @@ export function EscrowPage() {
   const events = USE_MOCK ? mockEvents.data : (escrowEvents.data ?? []);
   const isLoading = USE_MOCK ? false : escrowRecord.isLoading; // Set to true temporarily to see skeleton rendering
   const error = USE_MOCK ? null : escrowRecord.error; // const error = "Failed to synchronize with the smart contract. Please check your connection"; // replace with for temporary error feedback rendering
-  
+
   const selectedEscrow = selectedEscrowId
     ? (escrows.find((e) => e.id === selectedEscrowId) ?? null)
     : null;
