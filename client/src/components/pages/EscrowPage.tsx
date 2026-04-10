@@ -14,7 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui";
-import { Loader2, Plus, Inbox, Wallet, ArrowRight } from "lucide-react";
+import { Loader2, Plus, Inbox, Wallet, ArrowRight, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import {
   useCreateEscrow,
@@ -29,8 +29,10 @@ import {
   EscrowTransactionModal,
   EscrowStatusBadge,
   STATE_CONFIG,
-  USE_MOCK,
 } from "@/components/EscrowTransactionModal";
+
+// Feature flag: set to false to switch from mock data to real API/hooks
+const USE_MOCK = true;
 
 let _mockStore: EscrowRecord[] = [
   // Temporarily remove value to see empty state
@@ -63,7 +65,6 @@ const _mockEventStore: Record<string, EscrowEventRecord[]> = {
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 // Mock hooks
-
 function useMockEscrows() {
   const [escrows, setEscrows] = useState<EscrowRecord[]>(_mockStore);
   const refresh = useCallback(() => setEscrows([..._mockStore]), []);
@@ -90,7 +91,7 @@ function useMockCreateEscrow(refreshEscrows: () => void) {
         id: `esc-${Date.now()}-mock`,
         state: "pending",
         createdAt: new Date().toISOString(),
-      };
+      } as EscrowRecord;
       _mockStore = [newEscrow, ..._mockStore];
       _mockEventStore[newEscrow.id] = [
         {
@@ -155,6 +156,8 @@ const isValidAddress = (a: string) => /^0x[0-9a-fA-F]{40}$/.test(a);
 export function EscrowPage() {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [selectedEscrowId, setSelectedEscrowId] = useState<string | null>(null);
+  const [modalError, setModalError] = useState<string | null>(null);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
     buyer: DEFAULT_BUYER,
     seller: DEFAULT_SELLER,
@@ -180,8 +183,8 @@ export function EscrowPage() {
 
   const escrows = USE_MOCK ? mockEscrows.data : (escrowRecord.data ?? []);
   const events = USE_MOCK ? mockEvents.data : (escrowEvents.data ?? []);
-  const isLoading = USE_MOCK ? false : escrowRecord.isLoading; // Set to true temporarily to see skeleton rendering
-  const error = USE_MOCK ? null : escrowRecord.error; // const error = "Failed to synchronize with the smart contract. Please check your connection"; // replace with for temporary error feedback rendering
+  const isLoading = USE_MOCK ? false : escrowRecord.isLoading;
+  const error = USE_MOCK ? null : escrowRecord.error;
 
   const selectedEscrow = selectedEscrowId
     ? (escrows.find((e) => e.id === selectedEscrowId) ?? null)
@@ -198,7 +201,7 @@ export function EscrowPage() {
       releaseEscrow.isPending ||
       refundEscrow.isPending;
 
-  const resetForm = () =>
+  const resetForm = useCallback(() => {
     setFormData({
       buyer: DEFAULT_BUYER,
       seller: DEFAULT_SELLER,
@@ -207,15 +210,30 @@ export function EscrowPage() {
       description: "",
       fixedFee: "0",
     });
+    setFormErrors({});
+  }, []);
+  // Field validation
+  const validateForm = () => {
+    const errors: Record<string, string> = {};
+    if (!formData.buyer) errors.buyer = "Required";
+    else if (!isValidAddress(formData.buyer)) errors.buyer = "Invalid address";
+
+    if (!formData.seller) errors.seller = "Required";
+    else if (!isValidAddress(formData.seller)) errors.seller = "Invalid address";
+
+    if (!formData.amount || Number(formData.amount) <= 0) errors.amount = "Invalid";
+    if (!formData.description) errors.description = "Required";
+
+    if (!formData.token) errors.token = "Required";
+    if (formData.fixedFee === "" || Number(formData.fixedFee) < 0) errors.fixedFee = "Invalid";
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const handleCreateEscrow = async () => {
-    if (!formData.buyer || !formData.seller || !formData.amount || !formData.description) {
-      toast.error("Please fill in all required fields");
-      return;
-    }
-
-    if (!isValidAddress(formData.buyer) || !isValidAddress(formData.seller)) {
-      toast.error("Invalid wallet address (0x + 40 hex chars)");
+    if (!validateForm()) {
+      toast.error("Please fill in all required fields correctly");
       return;
     }
 
@@ -227,7 +245,6 @@ export function EscrowPage() {
       description: formData.description,
       fixedFee: Number(formData.fixedFee || "0"),
       state: "pending" as EscrowState,
-      createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
 
@@ -235,7 +252,7 @@ export function EscrowPage() {
       const result = USE_MOCK
         ? await mockCreate.mutateAsync(payload)
         : await createEscrow.mutateAsync(payload);
-      toast.success("Escrow created");
+      toast.success("Escrow created successfully");
       setSelectedEscrowId(result.escrow.id);
       setShowCreateDialog(false);
       resetForm();
@@ -249,8 +266,9 @@ export function EscrowPage() {
     id: string,
     actor: string
   ) => {
+    // Clear any prior error before attempting the transition
+    setModalError(null);
     try {
-      // throw new Error("User rejected the transaction request."); // For error testing purposes
       if (USE_MOCK) {
         await mockTransition.mutate(action, id);
       } else {
@@ -260,10 +278,16 @@ export function EscrowPage() {
       }
       // Action Feedback
       toast.success(
-        { lock: "Escrow locked", release: "Funds released", refund: "Escrow refunded" }[action]
+        {
+          lock: "Escrow locked successfully",
+          release: "Funds released successfully",
+          refund: "Escrow refunded successfully",
+        }[action]
       );
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to update escrow");
+      const message = err instanceof Error ? err.message : "Failed to update escrow";
+      toast.error(message);
+      setModalError(message);
     }
   };
 
@@ -299,7 +323,13 @@ export function EscrowPage() {
             </div>
           </div>
 
-          <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+          <Dialog
+            open={showCreateDialog}
+            onOpenChange={(open) => {
+              setShowCreateDialog(open);
+              if (!open) resetForm();
+            }}
+          >
             <DialogTrigger asChild>
               <Button
                 size="sm"
@@ -320,81 +350,137 @@ export function EscrowPage() {
 
               <div className="p-6 space-y-4 overflow-y-auto flex-1">
                 <div className="space-y-1.5">
-                  <Label htmlFor="buyer" className="text-sm">
-                    Buyer Wallet
-                  </Label>
+                  <div className="flex justify-between items-center">
+                    <Label htmlFor="buyer" className="text-sm">
+                      Buyer Wallet
+                    </Label>
+                    {formErrors.buyer && (
+                      <span className="text-[10px] text-red-500 flex items-center gap-1 animate-in fade-in slide-in-from-right-1">
+                        <AlertCircle className="w-3 h-3" /> {formErrors.buyer}
+                      </span>
+                    )}
+                  </div>
                   <Input
                     id="buyer"
                     placeholder="0x..."
                     value={formData.buyer}
                     onChange={(e) => setFormData({ ...formData, buyer: e.target.value })}
-                    className="bg-background border-border font-mono text-sm"
+                    className={`bg-background font-mono text-sm transition-colors ${
+                      formErrors.buyer ? "border-red-500 ring-1 ring-red-500/20" : "border-border"
+                    }`}
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="seller" className="text-sm">
-                    Seller Wallet
-                  </Label>
+                  <div className="flex justify-between items-center">
+                    <Label htmlFor="seller" className="text-sm">
+                      Seller Wallet
+                    </Label>
+                    {formErrors.seller && (
+                      <span className="text-[10px] text-red-500 flex items-center gap-1 animate-in fade-in slide-in-from-right-1">
+                        <AlertCircle className="w-3 h-3" /> {formErrors.seller}
+                      </span>
+                    )}
+                  </div>
                   <Input
                     id="seller"
                     placeholder="0x..."
                     value={formData.seller}
                     onChange={(e) => setFormData({ ...formData, seller: e.target.value })}
-                    className="bg-background border-border font-mono text-sm"
+                    className={`bg-background font-mono text-sm transition-colors ${
+                      formErrors.seller ? "border-red-500 ring-1 ring-red-500/20" : "border-border"
+                    }`}
                   />
                 </div>
 
                 <div className="grid grid-cols-3 gap-3">
                   <div className="space-y-1.5">
-                    <Label htmlFor="amount" className="text-sm">
-                      Amount
-                    </Label>
+                    <div className="flex justify-between items-center">
+                      <Label htmlFor="amount" className="text-sm">
+                        Amount
+                      </Label>
+                      {formErrors.amount && (
+                        <AlertCircle className="w-3 h-3 text-red-500 animate-pulse" />
+                      )}
+                    </div>
                     <Input
                       id="amount"
                       type="number"
                       placeholder="0.00"
                       value={formData.amount}
                       onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                      className="bg-background border-border"
+                      className={`bg-background transition-colors ${
+                        formErrors.amount
+                          ? "border-red-500 ring-1 ring-red-500/20"
+                          : "border-border"
+                      }`}
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="fixedFee" className="text-sm">
-                      Fee
-                    </Label>
+                    <div className="flex justify-between items-center">
+                      <Label htmlFor="fixedFee" className="text-sm">
+                        Fee
+                      </Label>
+                      {formErrors.fixedFee && (
+                        <AlertCircle className="w-3 h-3 text-red-500 animate-pulse" />
+                      )}
+                    </div>
                     <Input
                       id="fixedFee"
                       type="number"
                       placeholder="0.00"
                       value={formData.fixedFee}
                       onChange={(e) => setFormData({ ...formData, fixedFee: e.target.value })}
-                      className="bg-background border-border"
+                      className={`bg-background transition-colors ${
+                        formErrors.fixedFee
+                          ? "border-red-500 ring-1 ring-red-500/20"
+                          : "border-border"
+                      }`}
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="token" className="text-sm">
-                      Token
-                    </Label>
+                    <div className="flex justify-between items-center">
+                      <Label htmlFor="token" className="text-sm">
+                        Token
+                      </Label>
+                      {formErrors.token && (
+                        <AlertCircle className="w-3 h-3 text-red-500 animate-pulse" />
+                      )}
+                    </div>
                     <Input
                       id="token"
                       value={formData.token}
                       onChange={(e) => setFormData({ ...formData, token: e.target.value })}
-                      className="bg-background border-border text-muted-foreground"
+                      className={`bg-background transition-colors ${
+                        formErrors.token
+                          ? "border-red-500 ring-1 ring-red-500/20"
+                          : "border-border text-muted-foreground"
+                      }`}
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="description" className="text-sm">
-                    Description
-                  </Label>
+                  <div className="flex justify-between items-center">
+                    <Label htmlFor="description" className="text-sm">
+                      Description
+                    </Label>
+                    {formErrors.description && (
+                      <span className="text-[10px] text-red-500 flex items-center gap-1 animate-in fade-in slide-in-from-right-1">
+                        <AlertCircle className="w-3 h-3" /> {formErrors.description}
+                      </span>
+                    )}
+                  </div>
                   <Textarea
                     id="description"
                     placeholder="Purpose of transaction"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="bg-background border-border min-h-20"
+                    className={`bg-background min-h-20 transition-colors ${
+                      formErrors.description
+                        ? "border-red-500 ring-1 ring-red-500/20"
+                        : "border-border"
+                    }`}
                   />
                 </div>
               </div>
@@ -415,7 +501,13 @@ export function EscrowPage() {
                   disabled={isMutating}
                   className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground cursor-pointer"
                 >
-                  {isMutating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Create"}
+                  {isMutating ? (
+                    <span className="flex items-center justify-center gap-2 whitespace-nowrap animate-in fade-in duration-200">
+                      <Loader2 className="w-4 h-4 animate-spin" /> Initializing...
+                    </span>
+                  ) : (
+                    "Create"
+                  )}
                 </Button>
               </div>
             </DialogContent>
@@ -492,7 +584,7 @@ export function EscrowPage() {
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-2 shrink-0">
-                    <p className="font-bold text-sm tabular-nums text-right">
+                    <p className="font-bold text-xs tabular-nums text-right mr-2">
                       {escrow.amount}{" "}
                       <span className="text-[10px] text-muted-foreground/60 font-medium">
                         {escrow.tokenSymbol}
@@ -536,10 +628,16 @@ export function EscrowPage() {
           escrow={selectedEscrow}
           events={events}
           isMutating={isMutating}
+          error={modalError}
+          isMockMode={USE_MOCK}
           onLock={() => handleTransition("lock", selectedEscrow.id, selectedEscrow.buyer)}
           onRelease={() => handleTransition("release", selectedEscrow.id, selectedEscrow.buyer)}
           onRefund={() => handleTransition("refund", selectedEscrow.id, selectedEscrow.seller)}
-          onClose={() => setSelectedEscrowId(null)}
+          onClose={() => {
+            setSelectedEscrowId(null);
+            // Clear error when the modal is dismissed
+            setModalError(null);
+          }}
         />
       )}
     </div>

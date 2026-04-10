@@ -1,5 +1,6 @@
 "use client";
 
+import { type ElementType } from "react";
 import { Button } from "@/components/ui";
 import {
   Loader2,
@@ -24,28 +25,25 @@ interface TransactionModalProps {
   events: EscrowEventRecord[];
   isMutating: boolean;
   error?: string | null;
+  isMockMode?: boolean; // Passed from EscrowPage.tsx controls the "mock" badge visibility
   onLock: () => void;
   onRelease: () => void;
   onRefund: () => void;
   onClose: () => void;
 }
 
-// Need to turn this off in production
-export const USE_MOCK = true;
-// State config
 const STATE_STEPS: EscrowState[] = ["pending", "locked", "released"];
 
-// Visual configuration for the various stages of the escrow lifecycle.
-export const STATE_CONFIG: Record<
-  EscrowState,
-  {
-    label: string;
-    Icon: React.ElementType;
-    dotClass: string;
-    badgeClass: string;
-    description: string;
-  }
-> = {
+// Visual configuration for the various stages of the escrow lifecycle
+type StateConfigEntry = {
+  label: string;
+  Icon: ElementType;
+  dotClass: string;
+  badgeClass: string;
+  description: string;
+};
+
+export const STATE_CONFIG = {
   pending: {
     label: "Pending",
     Icon: Clock,
@@ -75,7 +73,7 @@ export const STATE_CONFIG: Record<
     badgeClass: "bg-blue-500/10 text-blue-400 border border-blue-500/20",
     description: "Funds have been returned to the buyer wallet.",
   },
-};
+} satisfies Record<EscrowState, StateConfigEntry>;
 
 const TRUSTLESS_PILLS = [
   "No intermediary",
@@ -195,6 +193,7 @@ export function EscrowTransactionModal({
   events,
   isMutating,
   error,
+  isMockMode,
   onLock,
   onRelease,
   onRefund,
@@ -226,7 +225,8 @@ export function EscrowTransactionModal({
               <span className="text-xs text-muted-foreground">
                 {new Date(escrow.createdAt).toLocaleDateString()}
               </span>
-              {USE_MOCK && (
+              {/* Mock badge driven by parent's USE_MOCK flag */}
+              {isMockMode && (
                 <span className="text-xs px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20">
                   mock
                 </span>
@@ -239,21 +239,23 @@ export function EscrowTransactionModal({
             size="icon"
             className="shrink-0 -mr-2 cursor-pointer"
           >
-            <X className="w-4 h-4 text-muted-foreground " />
+            <X className="w-4 h-4 text-muted-foreground" />
           </Button>
         </div>
 
-        {/* SCROLLABLE BODY */}
+        {/* Scrollable body */}
         <div className="overflow-y-auto flex-1 p-5 space-y-6">
           {/* ERROR STATE */}
-          {error && (
-            <div className="flex items-start gap-2.5 p-3 rounded-xl border border-red-500/20 bg-red-500/10 text-red-400 animate-in fade-in slide-in-from-top-2 duration-300">
-              <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
-              <div className="text-sm">
-                <p className="font-bold text-xs uppercase tracking-widest mb-0.5">
+          {error && !isMutating && (
+            <div className="group relative flex items-start gap-3 p-4 rounded-xl border border-red-500/20 bg-red-500/5 text-red-400 animate-in fade-in slide-in-from-top-2 duration-300">
+              <div className="bg-red-500/10 p-1.5 rounded-lg">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+              </div>
+              <div className="flex-1 text-sm">
+                <p className="font-bold text-[10px] uppercase tracking-widest text-red-500/70 mb-1">
                   Transaction Error
                 </p>
-                <p>{error}</p>
+                <p className="leading-relaxed">{error}</p>
               </div>
             </div>
           )}
@@ -310,7 +312,7 @@ export function EscrowTransactionModal({
           </div>
 
           <TrustlessIndicators />
-          {/* Event log, Clear Empty State logic */}
+          {/* Event log */}
           <div className="pb-2">
             <p className="text-[10px] text-muted-foreground font-medium mb-3 uppercase tracking-wider">
               Event log
@@ -338,7 +340,7 @@ export function EscrowTransactionModal({
                 ))
               ) : (
                 <div className="flex flex-col items-center justify-center p-8 border border-dashed border-border rounded-xl">
-                  <Inbox className="w-6 h-6 text-muted-foreground/20 mb-2" /> {/* Empty state */}
+                  <Inbox className="w-6 h-6 text-muted-foreground/20 mb-2" />
                   <p className="text-xs text-muted-foreground">No events recorded yet</p>
                 </div>
               )}
@@ -346,7 +348,7 @@ export function EscrowTransactionModal({
           </div>
         </div>
 
-        {/* Footer */}
+        {/* Footer actions */}
         {canAct && (
           <div className="border-t border-border p-5 flex flex-col sm:flex-row gap-3 shrink-0 bg-card">
             {escrow.state === "pending" && (
