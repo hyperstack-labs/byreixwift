@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useCallback } from "react";
-
 import {
   Card,
   Button,
@@ -15,11 +14,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui";
-
 import {
-  Loader2, Plus, ShieldCheck
+  Loader2,
+  Plus,
+  Inbox,
+  Wallet,
+  ArrowRight,
+  AlertCircle,
+  CheckCircle2,
+  ExternalLink,
 } from "lucide-react";
-
 import { toast } from "sonner";
 import {
   useCreateEscrow,
@@ -27,46 +31,49 @@ import {
   useEscrows,
   useLockEscrow,
   useRefundEscrow,
-  useReleaseEscrow
+  useReleaseEscrow,
 } from "@/hooks";
+import { EscrowState, EscrowRecord, EscrowEventRecord } from "@/types/escrow";
+import {
+  EscrowTransactionModal,
+  EscrowStatusBadge,
+  STATE_CONFIG,
+} from "@/components/EscrowTransactionModal";
 
-import { 
-  EscrowState, EscrowRecord, EscrowEventRecord
-} from "@/types/escrow";
-
-import { EscrowTransactionModal, EscrowStatusBadge, STATE_CONFIG, USE_MOCK } from "@/components/EscrowTransactionModal";
+// Feature flag: set to false to switch from mock data to real API/hooks
+const USE_MOCK = true;
 
 let _mockStore: EscrowRecord[] = [
+  // Temporarily remove value to see empty state
   {
     id: "esc-001-mock",
     buyer: "0x742d35Cc6634C0532925a3b844Bc454e7595f9aB8",
     seller: "0x9f3aD15A12e1F3514d8B8E9c6F16C2E8922A7cD2",
-    amount: 250, tokenSymbol: "SDA", fixedFee: 5,
+    amount: 250,
+    tokenSymbol: "SDA",
+    fixedFee: 5,
     description: "Website redesign milestone #1",
     state: "pending",
     createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-    updatedAt: new Date(Date.now() - 1000 * 60 * 30).toISOString()
-
+    updatedAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
   },
 ];
 
 const _mockEventStore: Record<string, EscrowEventRecord[]> = {
   "esc-001-mock": [
-    { 
-      id: "e1", 
-      escrowId: "esc-001-mock", 
-      type: "EscrowCreated", 
-      state: "pending", 
-      occurredAt: new Date(Date.now() - 1000 * 60 * 30).toISOString() 
+    {
+      id: "e1",
+      escrowId: "esc-001-mock",
+      type: "EscrowCreated",
+      state: "pending",
+      occurredAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
     },
-  ]
+  ],
 };
-
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-// Mock hooks 
-
+// Mock hooks
 function useMockEscrows() {
   const [escrows, setEscrows] = useState<EscrowRecord[]>(_mockStore);
   const refresh = useCallback(() => setEscrows([..._mockStore]), []);
@@ -75,57 +82,99 @@ function useMockEscrows() {
 
 function useMockEscrowEvents(id: string | null) {
   const [events, setEvents] = useState<EscrowEventRecord[]>(id ? (_mockEventStore[id] ?? []) : []);
-  const refresh = useCallback((newId: string | null) =>
-    setEvents(newId ? (_mockEventStore[newId] ?? []) : []), []);
+  const refresh = useCallback(
+    (newId: string | null) => setEvents(newId ? (_mockEventStore[newId] ?? []) : []),
+    []
+  );
   return { data: events, refresh };
 }
 
 function useMockCreateEscrow(refreshEscrows: () => void) {
   const [isPending, setIsPending] = useState(false);
-  const mutateAsync = useCallback(async (payload: Omit<EscrowRecord, "id" | "state" | "createdAt">) => {
-    setIsPending(true);
-    await sleep(600);
-    const newEscrow: EscrowRecord = { ...payload, id: `esc-${Date.now()}-mock`, state: "pending", createdAt: new Date().toISOString() };
-    _mockStore = [newEscrow, ..._mockStore];
-    _mockEventStore[newEscrow.id] = [{ id: `e-${Date.now()}`, escrowId: `esc-${Date.now()}-mock`, type: "EscrowCreated", state: "pending", occurredAt: new Date().toISOString() }];
-    setIsPending(false);
-    refreshEscrows();
-    return { escrow: newEscrow };
-  }, [refreshEscrows]);
-
+  const mutateAsync = useCallback(
+    async (payload: Omit<EscrowRecord, "id" | "state" | "createdAt">) => {
+      setIsPending(true);
+      await sleep(600);
+      const newEscrow: EscrowRecord = {
+        ...payload,
+        id: `esc-${Date.now()}-mock`,
+        state: "pending",
+        createdAt: new Date().toISOString(),
+      } as EscrowRecord;
+      _mockStore = [newEscrow, ..._mockStore];
+      _mockEventStore[newEscrow.id] = [
+        {
+          id: `e-${Date.now()}`,
+          escrowId: newEscrow.id,
+          type: "EscrowCreated",
+          state: "pending",
+          occurredAt: new Date().toISOString(),
+        },
+      ];
+      setIsPending(false);
+      refreshEscrows();
+      return { escrow: newEscrow };
+    },
+    [refreshEscrows]
+  );
   return { isPending, mutateAsync };
-
 }
+
 function useMockTransition(refreshEscrows: () => void, refreshEvents: (id: string | null) => void) {
   const [isPending, setIsPending] = useState(false);
-  const mutate = useCallback(async (action: "lock" | "release" | "refund", id: string) => {
-    setIsPending(true);
-    await sleep(600);
-    const nextState: Record<string, EscrowState> = { lock: "locked", release: "released", refund: "refunded" };
-    const evtType: Record<string, EscrowEventRecord["type"]> = {created: "EscrowCreated", lock: "TransactionLocked", release: "FundsReleased", refund: "FundsRefunded" };
-    _mockStore = _mockStore.map((e) => e.id === id ? { ...e, state: nextState[action] } : e);
-    _mockEventStore[id] = [...(_mockEventStore[id] ?? []), { id: `e-${Date.now()}`, escrowId: `esc-${Date.now()}-mock`, type: evtType[action], state: nextState[action], occurredAt: new Date().toISOString() }];
-    setIsPending(false);
-    refreshEscrows();
-    refreshEvents(id);
-  }, [refreshEscrows, refreshEvents]);
-
+  const mutate = useCallback(
+    async (action: "lock" | "release" | "refund", id: string) => {
+      setIsPending(true);
+      await sleep(600);
+      const nextState: Record<string, EscrowState> = {
+        lock: "locked",
+        release: "released",
+        refund: "refunded",
+      };
+      const evtType: Record<string, EscrowEventRecord["type"]> = {
+        created: "EscrowCreated",
+        lock: "TransactionLocked",
+        release: "FundsReleased",
+        refund: "FundsRefunded",
+      };
+      _mockStore = _mockStore.map((e) => (e.id === id ? { ...e, state: nextState[action] } : e));
+      _mockEventStore[id] = [
+        ...(_mockEventStore[id] ?? []),
+        {
+          id: `e-${Date.now()}`,
+          escrowId: id,
+          type: evtType[action],
+          state: nextState[action],
+          occurredAt: new Date().toISOString(),
+        },
+      ];
+      setIsPending(false);
+      refreshEscrows();
+      refreshEvents(id);
+    },
+    [refreshEscrows, refreshEvents]
+  );
   return { isPending, mutate };
 }
 
-
-//  EscrowPage
+// EscrowPage
 const DEFAULT_BUYER = "0x742d35Cc6634C0532925a3b844Bc454e7595f9aB";
 const DEFAULT_SELLER = "0x9f3aD15A12e1F3514d8B8E9c6F16C2E8922A7cD2";
-
 const isValidAddress = (a: string) => /^0x[0-9a-fA-F]{40}$/.test(a);
 
 export function EscrowPage() {
-
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [creationSuccessData, setCreationSuccessData] = useState<EscrowRecord | null>(null);
   const [selectedEscrowId, setSelectedEscrowId] = useState<string | null>(null);
+  const [modalError, setModalError] = useState<string | null>(null);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
-    buyer: DEFAULT_BUYER, seller: DEFAULT_SELLER, amount: "", token: "SDA", description: "", fixedFee: "0",
+    buyer: DEFAULT_BUYER,
+    seller: DEFAULT_SELLER,
+    amount: "",
+    token: "SDA",
+    description: "",
+    fixedFee: "0",
   });
 
   // Mock hooks (always constructed — hooks can't be conditional)
@@ -147,51 +196,89 @@ export function EscrowPage() {
   const isLoading = USE_MOCK ? false : escrowRecord.isLoading;
   const error = USE_MOCK ? null : escrowRecord.error;
 
+  const selectedEscrow = selectedEscrowId
+    ? (escrows.find((e) => e.id === selectedEscrowId) ?? null)
+    : null;
 
-  const selectedEscrow = selectedEscrowId ? escrows.find((e) => e.id === selectedEscrowId) ?? null : null;
-  const totalLocked = escrows.filter((e) => e.state === "pending" || e.state === "locked").reduce((s, e) => s + e.amount, 0);
+  const totalLocked = escrows
+    .filter((e) => e.state === "pending" || e.state === "locked")
+    .reduce((s, e) => s + e.amount, 0);
+
   const isMutating = USE_MOCK
     ? mockCreate.isPending || mockTransition.isPending
-    : createEscrow.isPending || lockEscrow.isPending || releaseEscrow.isPending || refundEscrow.isPending;
+    : createEscrow.isPending ||
+      lockEscrow.isPending ||
+      releaseEscrow.isPending ||
+      refundEscrow.isPending;
 
-  const resetForm = () => setFormData({ buyer: DEFAULT_BUYER, seller: DEFAULT_SELLER, amount: "", token: "SDA", description: "", fixedFee: "0" });
+  const resetForm = useCallback(() => {
+    setFormData({
+      buyer: DEFAULT_BUYER,
+      seller: DEFAULT_SELLER,
+      amount: "",
+      token: "SDA",
+      description: "",
+      fixedFee: "0",
+    });
+    setFormErrors({});
+    setCreationSuccessData(null);
+  }, []);
 
+  // Field validation
+  const validateForm = () => {
+    const errors: Record<string, string> = {};
+    if (!formData.buyer) errors.buyer = "Required";
+    else if (!isValidAddress(formData.buyer)) errors.buyer = "Invalid address";
 
+    if (!formData.seller) errors.seller = "Required";
+    else if (!isValidAddress(formData.seller)) errors.seller = "Invalid address";
+
+    if (!formData.amount || Number(formData.amount) <= 0) errors.amount = "Invalid";
+    if (!formData.description) errors.description = "Required";
+
+    if (!formData.token) errors.token = "Required";
+    if (formData.fixedFee === "" || Number(formData.fixedFee) < 0) errors.fixedFee = "Invalid";
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const handleCreateEscrow = async () => {
-    if (!formData.buyer || !formData.seller || !formData.amount || !formData.description) {
-      toast.error("Please fill in all required fields"); return;
+    if (!validateForm()) {
+      toast.error("Please fill in all required fields correctly");
+      return;
     }
 
-    if (!isValidAddress(formData.buyer)) { toast.error("Buyer wallet address is invalid (0x + 40 hex chars)"); return; }
-
-    if (!isValidAddress(formData.seller)) { toast.error("Seller wallet address is invalid (0x + 40 hex chars)"); return; }
-
-    const payload = { buyer: formData.buyer, 
-      seller: formData.seller, 
-      amount: Number(formData.amount), 
-      tokenSymbol: formData.token, 
-      description: formData.description, 
-      fixedFee: Number(formData.fixedFee || "0"), 
-      state: "pending", createdAt: new Date().toISOString(), 
-      updatedAt: new Date().toISOString() };
+    const payload = {
+      buyer: formData.buyer,
+      seller: formData.seller,
+      amount: Number(formData.amount),
+      tokenSymbol: formData.token,
+      description: formData.description,
+      fixedFee: Number(formData.fixedFee || "0"),
+      state: "pending" as EscrowState,
+      updatedAt: new Date().toISOString(),
+    };
 
     try {
+      const result = USE_MOCK
+        ? await mockCreate.mutateAsync(payload)
+        : await createEscrow.mutateAsync(payload);
 
-      const result = USE_MOCK ? await mockCreate.mutateAsync(payload) : await createEscrow.mutateAsync(payload);
-      toast.success("Escrow created");
-      setSelectedEscrowId(result.escrow.id);
-      setShowCreateDialog(false);
-      resetForm();
-
+      toast.success("Escrow created successfully");
+      setCreationSuccessData(result.escrow);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to create escrow");
     }
-
   };
 
-  const handleTransition = async (action: "lock" | "release" | "refund", id: string, actor: string) => {
-
+  const handleTransition = async (
+    action: "lock" | "release" | "refund",
+    id: string,
+    actor: string
+  ) => {
+    // Clear any prior error before attempting the transition
+    setModalError(null);
     try {
       if (USE_MOCK) {
         await mockTransition.mutate(action, id);
@@ -200,121 +287,385 @@ export function EscrowPage() {
         if (action === "release") await releaseEscrow.mutateAsync({ id, payload: { actor } });
         if (action === "refund") await refundEscrow.mutateAsync({ id, payload: { actor } });
       }
-      toast.success({ lock: "Escrow locked", release: "Funds released", refund: "Escrow refunded" }[action]);
+      // Action Feedback
+      toast.success(
+        {
+          lock: "Escrow locked successfully",
+          release: "Funds released successfully",
+          refund: "Escrow refunded successfully",
+        }[action]
+      );
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to update escrow");
+      const message = err instanceof Error ? err.message : "Failed to update escrow";
+      toast.error(message);
+      setModalError(message);
     }
   };
 
   return (
     <div className="min-h-screen pt-24 pb-32 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
-
+        {/* Header */}
         <div className="flex items-center justify-between mb-8 gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-semibold">Escrow</h1>
-              {USE_MOCK && <span className="text-xs px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20">Demo Mode</span>}
+              <h1 className="text-2xl font-semibold text-foreground">Escrow</h1>
+              {USE_MOCK && (
+                <span className="text-xs px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20">
+                  Demo Mode
+                </span>
+              )}
             </div>
-            <p className="text-sm text-muted-foreground mt-1">
-              {escrows.length} records — {totalLocked.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} units currently locked
-            </p>
+            <div className="min-h-10">
+              {!isLoading ? (
+                <p className="text-sm text-muted-foreground mt-1 animate-in fade-in duration-500">
+                  {escrows.length} records —{" "}
+                  <span className="font-medium text-foreground">
+                    {totalLocked.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </span>{" "}
+                  units locked
+                </p>
+              ) : (
+                <div className="h-4 w-48 bg-muted/20 animate-pulse rounded mt-2" />
+              )}
+            </div>
           </div>
 
-          <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+          <Dialog
+            open={showCreateDialog}
+            onOpenChange={(open) => {
+              setShowCreateDialog(open);
+              if (!open) {
+                setTimeout(resetForm, 300);
+              }
+            }}
+          >
             <DialogTrigger asChild>
-              <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground">
-                <Plus className="w-4 h-4 mr-1" />New
+              <Button
+                size="sm"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground cursor-pointer"
+              >
+                <Plus className="w-4 h-4 mr-1" />
+                New
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-card border-border">
-              <DialogHeader>
-                <DialogTitle>New Escrow</DialogTitle>
-                <DialogDescription>Funds will be held by the smart contract until all parties act.</DialogDescription>
-              </DialogHeader>
 
-              <div className="space-y-4 mt-4">
+            <DialogContent className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] max-w-md bg-card border-border p-0 overflow-hidden flex flex-col max-h-[90vh]">
+              {!creationSuccessData ? (
+                <>
+                  <DialogHeader className="p-6 border-b border-border shrink-0">
+                    <DialogTitle>New Escrow</DialogTitle>
+                    <DialogDescription>
+                      Funds will be held by the smart contract until all parties act.
+                    </DialogDescription>
+                  </DialogHeader>
 
-                <div>
-                  <Label htmlFor="buyer" className="text-sm">Buyer Wallet</Label>
-                  <Input id="buyer" placeholder="0x..." value={formData.buyer} onChange={(e) => setFormData({ ...formData, buyer: e.target.value })} className="mt-1 bg-background border-border font-mono text-sm" />
-                </div>
+                  <div className="p-6 space-y-4 overflow-y-auto flex-1">
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between items-center">
+                        <Label htmlFor="buyer" className="text-sm">
+                          Buyer Wallet
+                        </Label>
+                        {formErrors.buyer && (
+                          <span className="text-[10px] text-red-500 flex items-center gap-1 animate-in fade-in slide-in-from-right-1">
+                            <AlertCircle className="w-3 h-3" /> {formErrors.buyer}
+                          </span>
+                        )}
+                      </div>
+                      <Input
+                        id="buyer"
+                        placeholder="0x..."
+                        value={formData.buyer}
+                        onChange={(e) => setFormData({ ...formData, buyer: e.target.value })}
+                        className={`bg-background font-mono text-sm transition-colors ${
+                          formErrors.buyer
+                            ? "border-red-500 ring-1 ring-red-500/20"
+                            : "border-border"
+                        }`}
+                      />
+                    </div>
 
-                <div>
-                  <Label htmlFor="seller" className="text-sm">Seller Wallet</Label>
-                  <Input id="seller" placeholder="0x..." value={formData.seller} onChange={(e) => setFormData({ ...formData, seller: e.target.value })} className="mt-1 bg-background border-border font-mono text-sm" />
-                </div>
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between items-center">
+                        <Label htmlFor="seller" className="text-sm">
+                          Seller Wallet
+                        </Label>
+                        {formErrors.seller && (
+                          <span className="text-[10px] text-red-500 flex items-center gap-1 animate-in fade-in slide-in-from-right-1">
+                            <AlertCircle className="w-3 h-3" /> {formErrors.seller}
+                          </span>
+                        )}
+                      </div>
+                      <Input
+                        id="seller"
+                        placeholder="0x..."
+                        value={formData.seller}
+                        onChange={(e) => setFormData({ ...formData, seller: e.target.value })}
+                        className={`bg-background font-mono text-sm transition-colors ${
+                          formErrors.seller
+                            ? "border-red-500 ring-1 ring-red-500/20"
+                            : "border-border"
+                        }`}
+                      />
+                    </div>
 
-                <div className="grid grid-cols-3 gap-3">
-                  <div>
-                    <Label htmlFor="amount" className="text-sm">Amount</Label>
-                    <Input id="amount" type="number" placeholder="0.00" value={formData.amount} onChange={(e) => setFormData({ ...formData, amount: e.target.value })} className="mt-1 bg-background border-border" />
+                    <div className="grid grid-cols-3 gap-3">
+                      <div className="space-y-1.5">
+                        <div className="flex justify-between items-center">
+                          <Label htmlFor="amount" className="text-sm">
+                            Amount
+                          </Label>
+                          {formErrors.amount && (
+                            <AlertCircle className="w-3 h-3 text-red-500 animate-pulse" />
+                          )}
+                        </div>
+                        <Input
+                          id="amount"
+                          type="number"
+                          placeholder="0.00"
+                          value={formData.amount}
+                          onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                          className={`bg-background transition-colors ${
+                            formErrors.amount
+                              ? "border-red-500 ring-1 ring-red-500/20"
+                              : "border-border"
+                          }`}
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <div className="flex justify-between items-center">
+                          <Label htmlFor="fixedFee" className="text-sm">
+                            Fee
+                          </Label>
+                          {formErrors.fixedFee && (
+                            <AlertCircle className="w-3 h-3 text-red-500 animate-pulse" />
+                          )}
+                        </div>
+                        <Input
+                          id="fixedFee"
+                          type="number"
+                          placeholder="0.00"
+                          value={formData.fixedFee}
+                          onChange={(e) => setFormData({ ...formData, fixedFee: e.target.value })}
+                          className={`bg-background transition-colors ${
+                            formErrors.fixedFee
+                              ? "border-red-500 ring-1 ring-red-500/20"
+                              : "border-border"
+                          }`}
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <div className="flex justify-between items-center">
+                          <Label htmlFor="token" className="text-sm">
+                            Token
+                          </Label>
+                          {formErrors.token && (
+                            <AlertCircle className="w-3 h-3 text-red-500 animate-pulse" />
+                          )}
+                        </div>
+                        <Input
+                          id="token"
+                          value={formData.token}
+                          onChange={(e) => setFormData({ ...formData, token: e.target.value })}
+                          className={`bg-background transition-colors ${
+                            formErrors.token
+                              ? "border-red-500 ring-1 ring-red-500/20"
+                              : "border-border text-muted-foreground"
+                          }`}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between items-center">
+                        <Label htmlFor="description" className="text-sm">
+                          Description
+                        </Label>
+                        {formErrors.description && (
+                          <span className="text-[10px] text-red-500 flex items-center gap-1 animate-in fade-in slide-in-from-right-1">
+                            <AlertCircle className="w-3 h-3" /> {formErrors.description}
+                          </span>
+                        )}
+                      </div>
+                      <Textarea
+                        id="description"
+                        placeholder="Purpose of transaction"
+                        value={formData.description}
+                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                        className={`bg-background min-h-20 transition-colors ${
+                          formErrors.description
+                            ? "border-red-500 ring-1 ring-red-500/20"
+                            : "border-border"
+                        }`}
+                      />
+                    </div>
                   </div>
 
-                  <div>
-                    <Label htmlFor="fixedFee" className="text-sm">Fixed Fee</Label>
-                    <Input id="fixedFee" type="number" placeholder="0.00" value={formData.fixedFee} onChange={(e) => setFormData({ ...formData, fixedFee: e.target.value })} className="mt-1 bg-background border-border" />
+                  <div className="p-6 border-t border-border bg-card flex gap-2 shrink-0">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setShowCreateDialog(false);
+                        setTimeout(resetForm, 300);
+                      }}
+                      className="flex-1 border-border cursor-pointer"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handleCreateEscrow}
+                      disabled={isMutating}
+                      className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground cursor-pointer"
+                    >
+                      {isMutating ? (
+                        <span className="flex items-center justify-center gap-2 whitespace-nowrap animate-in fade-in duration-200">
+                          <Loader2 className="w-4 h-4 animate-spin" /> Initializing...
+                        </span>
+                      ) : (
+                        "Create"
+                      )}
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <div className="p-8 flex flex-col items-center text-center animate-in zoom-in-95 duration-300">
+                  <div className="w-16 h-16 rounded-full bg-green-500/10 text-green-500 flex items-center justify-center mb-6">
+                    <CheckCircle2 className="w-10 h-10" />
+                  </div>
+                  <DialogTitle className="text-xl">Escrow Initialized</DialogTitle>
+                  <DialogDescription className="mt-2 text-balance">
+                    Escrow{" "}
+                    <span className="font-mono text-foreground">{creationSuccessData.id}</span> has
+                    been successfully created.
+                  </DialogDescription>
+
+                  <div className="w-full mt-8 p-4 rounded-xl border border-border bg-muted/30 space-y-3 text-left">
+                    <div className="flex justify-between text-xs">
+                      <span className="text-muted-foreground">Amount:</span>
+                      <span className="font-bold">
+                        {creationSuccessData.amount} {creationSuccessData.tokenSymbol}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-xs">
+                      <span className="text-muted-foreground">Seller:</span>
+                      <span className="font-mono">
+                        {creationSuccessData.seller.slice(0, 10)}...
+                      </span>
+                    </div>
                   </div>
 
-                  <div>
-                    <Label htmlFor="token" className="text-sm">Token</Label>
-                    <Input id="token" value={formData.token} readOnly className="mt-1 bg-background border-border" />
+                  <div className="w-full mt-8 flex flex-col gap-2">
+                    <Button
+                      className="w-full bg-primary text-primary-foreground cursor-pointer"
+                      onClick={() => {
+                        const id = creationSuccessData.id;
+                        setShowCreateDialog(false);
+                        // Reset everything immediately after getting the ID
+                        setTimeout(() => {
+                          setSelectedEscrowId(id);
+                          resetForm();
+                        }, 100);
+                      }}
+                    >
+                      View Details
+                      <ExternalLink className="w-4 h-4 ml-2" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className="w-full text-muted-foreground hover:text-foreground cursor-pointer"
+                      onClick={() => {
+                        setShowCreateDialog(false);
+                        setTimeout(resetForm, 300);
+                      }}
+                    >
+                      Close
+                    </Button>
                   </div>
                 </div>
-
-                <div>
-                  <Label htmlFor="description" className="text-sm">Transaction Description</Label>
-                  <Textarea id="description" placeholder="Brief description..." value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="mt-1 bg-background border-border min-h-20" />
-                </div>
-
-              </div>
-
-              <div className="flex gap-2 mt-4">
-                <Button variant="outline" onClick={() => { setShowCreateDialog(false); resetForm(); }} className="flex-1 border-border">Cancel</Button>
-                <Button onClick={handleCreateEscrow} disabled={isMutating} className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground">
-                  {isMutating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Create"}
-                </Button>
-              </div>
-
+              )}
             </DialogContent>
           </Dialog>
         </div>
 
+        {/* Error State */}
         {error && (
           <Card className="p-4 mb-4 border-red-500/40 bg-red-500/10 text-red-200">
             {error instanceof Error ? error.message : "Failed to load escrow records"}
           </Card>
         )}
 
+        {/* Loading State */}
         {isLoading && (
-
-          <Card className="p-6 bg-card border-border">
-            <div className="flex items-center gap-3 text-muted-foreground">
-              <Loader2 className="w-4 h-4 animate-spin" />Loading escrow records…
-            </div>
-          </Card>
-
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="h-25 w-full rounded-xl border border-border bg-card/50 animate-none flex items-center px-4 justify-between"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-3 h-3 rounded-full bg-muted" />
+                  <div className="space-y-2">
+                    <div className="h-4 w-40 bg-muted rounded" />
+                    <div className="h-3 w-24 bg-muted/50 rounded" />
+                  </div>
+                </div>
+                <div className="space-y-2 flex flex-col items-end">
+                  <div className="h-4 w-16 bg-muted rounded" />
+                  <div className="h-5 w-20 bg-muted/50 rounded-full" />
+                </div>
+              </div>
+            ))}
+          </div>
         )}
 
+        {/* List View */}
         <div className="space-y-3">
           {escrows.map((escrow) => {
             const cfg = STATE_CONFIG[escrow.state as keyof typeof STATE_CONFIG];
             return (
-              <Card key={escrow.id} onClick={() => setSelectedEscrowId(escrow.id)}
-                className="p-4 bg-card border-border hover:border-primary/30 transition-colors cursor-pointer">
+              <Card
+                key={escrow.id}
+                onClick={() => setSelectedEscrowId(escrow.id)}
+                className="p-4 bg-card border-border hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all cursor-pointer group active:scale-[0.98] duration-200"
+              >
                 <div className="flex items-start justify-between gap-4">
-                  <div className="flex items-start gap-3 min-w-0">
-                    <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${cfg.dotClass}`} />
-
+                  <div className="flex items-start gap-3 min-w-0 text-left">
+                    <div
+                      className={`w-2.5 h-2.5 rounded-full mt-1.5 shrink-0 shadow-[0_0_8px_rgba(0,0,0,0.1)] ${cfg.dotClass}`}
+                    />
                     <div className="min-w-0">
-                      <p className="font-medium truncate">{escrow.description}</p>
-                      <p className="text-xs text-muted-foreground font-mono mt-0.5">{escrow.buyer.slice(0, 8)}… → {escrow.seller.slice(0, 8)}…</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">{new Date(escrow.createdAt).toLocaleString()}</p>
+                      <p className="font-semibold truncate group-hover:text-primary transition-all duration-200 group-hover:translate-x-0.5">
+                        {escrow.description}
+                      </p>
+                      <div className="flex items-center gap-1.5 mt-1 text-xs text-muted-foreground/70 font-mono">
+                        <Wallet className="w-3 h-3 shrink-0 opacity-60" />
+                        <span>{escrow.buyer.slice(0, 6)}...</span>
+                        <ArrowRight className="w-2.5 h-2.5 opacity-30 shrink-0" />
+                        <span>{escrow.seller.slice(0, 6)}...</span>
+                      </div>
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground/40 mt-2 font-bold">
+                        {new Date(escrow.createdAt).toLocaleDateString(undefined, {
+                          month: "short",
+                          day: "numeric",
+                        })}{" "}
+                        •{" "}
+                        {new Date(escrow.createdAt).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </p>
                     </div>
                   </div>
-
                   <div className="flex flex-col items-end gap-2 shrink-0">
-                    <p className="font-semibold text-sm">{escrow.amount} <span className="text-xs text-muted-foreground font-normal">{escrow.tokenSymbol}</span></p>
+                    <p className="font-bold text-xs tabular-nums text-right mr-2">
+                      {escrow.amount}{" "}
+                      <span className="text-[10px] text-muted-foreground/60 font-medium">
+                        {escrow.tokenSymbol}
+                      </span>
+                    </p>
                     <EscrowStatusBadge state={escrow.state} />
                   </div>
                 </div>
@@ -323,27 +674,48 @@ export function EscrowPage() {
           })}
         </div>
 
+        {/* Empty State */}
         {!isLoading && escrows.length === 0 && (
-          <div className="text-center py-12 text-muted-foreground">
-            <ShieldCheck className="w-10 h-10 mx-auto mb-3 opacity-20" />
-            <p>No escrow records yet</p>
-            <p className="text-sm mt-1">Create a new escrow to start a trustless transaction.</p>
+          <div className="text-center py-20 border border-dashed border-border rounded-2xl bg-linear-to-b from-card/50 to-transparent animate-in fade-in zoom-in-95 duration-700">
+            <div className="relative inline-block mb-4">
+              <Inbox className="w-12 h-12 mx-auto opacity-10 text-primary" />
+              <div className="absolute inset-0 bg-primary/5 blur-2xl rounded-full" />
+            </div>
+            <h3 className="text-sm font-semibold text-foreground">No active escrows</h3>
+            <p className="text-xs text-muted-foreground mt-2 max-w-50 mx-auto leading-relaxed">
+              Securely hold funds for services or goods until both parties are satisfied.
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-8 border-border hover:bg-background hover:text-primary transition-colors cursor-pointer"
+              onClick={() => setShowCreateDialog(true)}
+            >
+              <Plus className="w-3.5 h-3.5 mr-2" />
+              Initialize First Escrow
+            </Button>
           </div>
         )}
       </div>
 
-      {/* Transaction modal */}
+      {/* Transaction Modal */}
       {selectedEscrow && (
         <EscrowTransactionModal
-          escrow={selectedEscrow} events={events} isMutating={isMutating}
+          escrow={selectedEscrow}
+          events={events}
+          isMutating={isMutating}
+          error={modalError}
+          isMockMode={USE_MOCK}
           onLock={() => handleTransition("lock", selectedEscrow.id, selectedEscrow.buyer)}
           onRelease={() => handleTransition("release", selectedEscrow.id, selectedEscrow.buyer)}
           onRefund={() => handleTransition("refund", selectedEscrow.id, selectedEscrow.seller)}
-          onClose={() => setSelectedEscrowId(null)}
+          onClose={() => {
+            setSelectedEscrowId(null);
+            // Clear error when the modal is dismissed
+            setModalError(null);
+          }}
         />
       )}
     </div>
-
   );
-
 }
