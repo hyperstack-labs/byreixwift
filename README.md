@@ -26,22 +26,6 @@ For detailed information on project operations and technical specifications, ref
 - Node.js (Latest LTS)
 - pnpm
 
-### Install Dependencies
-
-Install all project dependencies:
-
-```bash
-pnpm install
-
-# client
-cd client && pnpm install
-
-# server 
-cd server && pnpm install
-
-# contracts
-cd contracts && pnpm install
-
 
 ### Quick Start
 ```bash
