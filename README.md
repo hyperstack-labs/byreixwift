@@ -36,6 +36,9 @@ pnpm install
 # client
 cd client && pnpm install
 
+# server 
+cd server && pnpm install
+
 # contracts
 cd contracts && pnpm install
 
@@ -54,7 +57,7 @@ cd ..\contracts && pnpm install
 cd contracts
 pnpm hardhat compile
 pnpm hardhat test
-
+```
 
 
 ### Run The App
