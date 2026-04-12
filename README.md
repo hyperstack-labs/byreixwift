@@ -26,6 +26,20 @@ For detailed information on project operations and technical specifications, ref
 - Node.js (Latest LTS)
 - pnpm
 
+### Install Dependencies
+
+Install all project dependencies:
+
+```bash
+pnpm install
+
+# client
+cd client && pnpm install
+
+# contracts
+cd contracts && pnpm install
+
+
 ### Quick Start
 ```bash
 git clone <repository-url>
@@ -35,7 +49,16 @@ cd ..\client && pnpm install
 cd ..\contracts && pnpm install
 ```
 
+## Smart Contract Setup
+```bash
+cd contracts
+pnpm hardhat compile
+pnpm hardhat test
+
+
+
 ### Run The App
+
 ```bash
 cd server
 pnpm dev
@@ -47,3 +70,6 @@ pnpm dev
 ```
 
 The client runs at `http://localhost:3000` and the API runs at `http://localhost:3001/api`.
+
+
+
