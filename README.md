@@ -67,7 +67,7 @@ pnpm install
 pnpm hardhat clean
 pnpm hardhat compile
 pnpm hardhat test
-
+```
 
 ### Run The App
 
