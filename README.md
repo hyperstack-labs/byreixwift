@@ -36,12 +36,37 @@ cd ..\client && pnpm install
 cd ..\contracts && pnpm install
 ```
 
+
+## Node.js & Hardhat Setup
+
+### Supported Versions
+
+- **Node.js**: LTS version (recommended)
+- **Hardhat**: Latest version defined in `package.json`
+- **Package Manager**: pnpm
+
 ## Smart Contract Setup
 ```bash
 cd contracts
+pnpm install
 pnpm hardhat compile
 pnpm hardhat test
 ```
+
+## Test Consistency
+
+Contract tests are expected to:
+
+- Run successfully after installation
+- Pass consistently across different machines
+- Not depend on local machine configuration
+
+If tests fail, ensure:
+```bash
+pnpm install
+pnpm hardhat clean
+pnpm hardhat compile
+pnpm hardhat test
 
 
 ### Run The App
