@@ -100,7 +100,7 @@ export function Navbar({
     navLinks.length > 0 || publicHomeLinks.length > 0 || publicPageLinks.length > 0;
   const useSolidChrome = scrolled || mobileMenuOpen || Boolean(isConnected);
   const useQuietPublicCta = isPublicRoute && !useSolidChrome && !isConnected;
-  const desktopBarHeight = useSolidChrome ? 58 : 68;
+  const desktopBarHeight = scrolled || mobileMenuOpen || Boolean(isConnected) ? 58 : 56;
 
   const handleNavClick = (link: { label: string; value: string; isGated: boolean }) => {
     if (link.isGated && !isConnected) {
@@ -111,7 +111,11 @@ export function Navbar({
   };
 
   return (
-    <nav className="fixed inset-x-0 top-0 z-50 px-3 pt-2.5 sm:px-6 lg:px-8">
+    <nav
+      className={`fixed left-0 right-0 top-0 z-50 transition-[padding] duration-300 ${
+        useSolidChrome ? "px-0 pt-0" : "px-4 pt-4 sm:px-6 sm:pt-5 lg:px-8"
+      }`}
+    >
       <motion.div
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -119,22 +123,18 @@ export function Navbar({
           duration: 0.8,
           ease: [0.23, 1, 0.32, 1],
         }}
-        className="pointer-events-none mx-auto max-w-6xl"
+        className="pointer-events-none block w-full"
       >
         <motion.div
           layout
-          animate={{
-            y: useSolidChrome ? -2 : 0,
-            scale: useSolidChrome ? 0.992 : 1,
-          }}
           transition={{
             duration: 0.35,
             ease: [0.22, 1, 0.36, 1],
           }}
-          className={`pointer-events-auto overflow-hidden rounded-[1.35rem] border transition-[background-color,border-color,box-shadow] duration-300 sm:rounded-[1.5rem] ${
+          className={`pointer-events-auto overflow-hidden border transition-[background-color,border-color,box-shadow] duration-300 ${
             useSolidChrome
-              ? "border-[rgba(214,196,133,0.16)] bg-[rgba(5,18,12,0.82)] backdrop-blur-xl shadow-[0_14px_34px_rgba(3,13,8,0.3)]"
-              : "border-transparent bg-transparent shadow-none"
+              ? "w-full min-w-full rounded-none border-x-0 border-t-0 border-b-[rgba(214,196,133,0.12)] bg-[linear-gradient(180deg,rgba(5,18,12,0.9)_0%,rgba(5,18,12,0.78)_100%)] backdrop-blur-xl shadow-none"
+              : "w-full min-w-full rounded-none border-transparent bg-transparent shadow-none"
           }`}
         >
           <motion.div
@@ -144,7 +144,9 @@ export function Navbar({
               duration: 0.35,
               ease: [0.22, 1, 0.36, 1],
             }}
-            className="grid grid-cols-[auto_1fr_auto] items-center gap-3 px-3.5 sm:px-5 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:gap-5 lg:px-6"
+            className={`grid grid-cols-[auto_1fr_auto] items-center gap-3 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:gap-5 ${
+              useSolidChrome ? "px-5 sm:px-6 lg:px-8" : "px-6 sm:px-8 lg:px-12"
+            }`}
           >
             {/* Brand/Logo */}
             <div className="flex items-center justify-start">
@@ -160,7 +162,7 @@ export function Navbar({
                   }
                   onNavigate?.("home");
                 }}
-                className="relative z-10 shrink-0 scale-[0.94] cursor-pointer rounded-lg outline-none transition-all duration-500 hover:scale-[0.985] active:scale-95 sm:scale-100 sm:hover:scale-105"
+                className="relative z-10 shrink-0 cursor-pointer rounded-lg outline-none transition-all duration-300 hover:opacity-90 active:scale-95"
                 title="home"
               >
                 <ByreixLogo variant="compact" />
@@ -173,7 +175,7 @@ export function Navbar({
                 <motion.div
                   layout
                   transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                  className="flex items-center gap-6 lg:gap-8"
+                  className={`flex items-center ${useSolidChrome ? "gap-4 lg:gap-6" : "gap-5 lg:gap-7"}`}
                 >
                   {navLinks.map((link) => {
                     const isActive = currentPage === link.value;
@@ -181,15 +183,17 @@ export function Navbar({
                       <button
                         key={link.value}
                         onClick={() => handleNavClick(link)}
-                        className={`relative px-1 py-2 text-sm font-semibold tracking-[-0.01em] transition-colors duration-300 cursor-pointer whitespace-nowrap outline-none ${
+                        className={`relative cursor-pointer whitespace-nowrap rounded-full px-3 py-2 text-[0.95rem] font-medium tracking-[-0.01em] outline-none transition-[color,background-color,transform] duration-300 ${
                           isActive
-                            ? "text-foreground"
-                            : "text-muted-foreground hover:text-foreground/85"
+                            ? "bg-white/5 text-foreground"
+                            : useSolidChrome
+                              ? "text-muted-foreground hover:bg-white/4 hover:text-foreground/88"
+                              : "text-foreground/72 hover:text-foreground"
                         }`}
                       >
                         <span>{link.label}</span>
                         <span
-                          className={`absolute left-1/2 -bottom-0.5 h-px w-[72%] -translate-x-1/2 origin-center bg-primary/90 transition-transform duration-300 ${
+                          className={`absolute left-1/2 bottom-1 h-px w-[60%] -translate-x-1/2 origin-center bg-primary/90 transition-transform duration-300 ${
                             isActive ? "scale-x-100" : "scale-x-0"
                           }`}
                         />
@@ -200,7 +204,11 @@ export function Navbar({
                     <button
                       key={link.id}
                       onClick={() => onSectionNavigate?.(link.id)}
-                      className="relative px-1 py-2 text-sm font-semibold tracking-[-0.01em] text-muted-foreground transition-colors duration-300 whitespace-nowrap outline-none hover:text-foreground/85"
+                      className={`relative whitespace-nowrap rounded-full px-3 py-2 text-[0.95rem] font-medium tracking-[-0.01em] outline-none transition-[color,background-color,transform] duration-300 ${
+                        useSolidChrome
+                          ? "text-muted-foreground hover:bg-white/4 hover:text-foreground/88"
+                          : "text-foreground/72 hover:text-foreground"
+                      }`}
                     >
                       <span>{link.label}</span>
                     </button>
@@ -212,15 +220,17 @@ export function Navbar({
                       <Link
                         key={link.value}
                         href={link.href}
-                        className={`relative px-1 py-2 text-sm font-semibold tracking-[-0.01em] transition-colors duration-300 whitespace-nowrap outline-none ${
+                        className={`relative whitespace-nowrap rounded-full px-3 py-2 text-[0.95rem] font-medium tracking-[-0.01em] outline-none transition-[color,background-color,transform] duration-300 ${
                           isActive
-                            ? "text-foreground"
-                            : "text-muted-foreground hover:text-foreground/85"
+                            ? "bg-white/5 text-foreground"
+                            : useSolidChrome
+                              ? "text-muted-foreground hover:bg-white/4 hover:text-foreground/88"
+                              : "text-foreground/72 hover:text-foreground"
                         }`}
                       >
                         <span>{link.label}</span>
                         <span
-                          className={`absolute left-1/2 -bottom-0.5 h-px w-[72%] -translate-x-1/2 origin-center bg-primary/90 transition-transform duration-300 ${
+                          className={`absolute left-1/2 bottom-1 h-px w-[60%] -translate-x-1/2 origin-center bg-primary/90 transition-transform duration-300 ${
                             isActive ? "scale-x-100" : "scale-x-0"
                           }`}
                         />
@@ -233,14 +243,16 @@ export function Navbar({
 
             {/* Action Area - Unified Auth Group */}
             <div className="flex items-center justify-end">
-              <div className="hidden items-center gap-4 lg:gap-6 md:flex">
+              <div className={`hidden items-center md:flex ${useSolidChrome ? "gap-3 lg:gap-4" : "gap-4 lg:gap-5"}`}>
                 {!isConnected && currentPage !== "login" && (
                   <button
                     onClick={() => onNavigate?.("login")}
-                    className={`text-sm font-semibold tracking-[-0.01em] transition-colors duration-300 cursor-pointer whitespace-nowrap outline-none ${
+                    className={`cursor-pointer whitespace-nowrap rounded-full px-3 py-2 text-[0.95rem] font-medium tracking-[-0.01em] outline-none transition-[color,background-color,transform] duration-300 ${
                       useQuietPublicCta
-                        ? "text-foreground/62 hover:text-foreground/86"
-                        : "text-muted-foreground hover:text-foreground"
+                        ? "text-foreground/72 hover:text-foreground"
+                        : useSolidChrome
+                          ? "text-muted-foreground hover:bg-white/4 hover:text-foreground"
+                          : "text-foreground/72 hover:text-foreground"
                     }`}
                   >
                     Sign In
@@ -320,10 +332,10 @@ export function Navbar({
                 ) : (
                   <Button
                     onClick={onConnect}
-                    className={`group relative h-9 rounded-lg px-4 text-[0.92rem] font-semibold transition-all duration-300 active:scale-95 sm:h-10 sm:rounded-xl sm:px-[1.125rem] sm:text-sm ${
+                    className={`group relative h-9 rounded-lg px-4 text-[0.92rem] font-semibold transition-all duration-300 active:scale-95 sm:h-10 sm:rounded-lg sm:px-4.5 sm:text-[0.95rem] ${
                       useQuietPublicCta
-                        ? "border border-white/10 bg-white/[0.03] text-foreground shadow-none hover:border-white/18 hover:bg-white/[0.05]"
-                        : "border border-primary/25 bg-primary/92 text-primary-foreground hover:bg-primary hover:shadow-[0_10px_24px_rgba(37,201,133,0.18)]"
+                        ? "border border-white/0 bg-transparent text-foreground shadow-none hover:bg-white/[0.04]"
+                        : "border border-primary/25 bg-primary/92 text-primary-foreground hover:bg-primary hover:shadow-[0_8px_18px_rgba(37,201,133,0.16)]"
                     }`}
                   >
                     <span className="relative flex items-center gap-2.5">

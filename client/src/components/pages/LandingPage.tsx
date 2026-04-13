@@ -1,8 +1,8 @@
 "use client";
-import { useSyncExternalStore } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { motion, useReducedMotion } from "motion/react";
+import { motion, useAnimationControls, useInView, useReducedMotion } from "motion/react";
 import {
   ArrowRight,
   CheckCircle2,
@@ -171,16 +171,6 @@ const visibilityRows: DetailRow[] = [
   { label: "Escrow state", value: "Pending, locked, released, or refunded" },
 ];
 
-const heroAtmosphereDots = [
-  { top: "15%", left: "18%", size: "h-1 w-1", tone: "bg-white/18" },
-  { top: "22%", left: "76%", size: "h-1.5 w-1.5", tone: "bg-primary/18" },
-  { top: "33%", left: "67%", size: "h-1 w-1", tone: "bg-white/12" },
-  { top: "41%", left: "24%", size: "h-1.5 w-1.5", tone: "bg-[rgba(223,194,141,0.18)]" },
-  { top: "58%", left: "79%", size: "h-1 w-1", tone: "bg-white/12" },
-  { top: "64%", left: "13%", size: "h-1.5 w-1.5", tone: "bg-primary/16" },
-  { top: "72%", left: "61%", size: "h-1 w-1", tone: "bg-white/10" },
-] as const;
-
 const sectionReveal = (reducedMotion: boolean, delay = 0) => ({
   initial: { opacity: 0, y: reducedMotion ? 8 : 26 },
   whileInView: { opacity: 1, y: 0 },
@@ -193,9 +183,15 @@ const sectionReveal = (reducedMotion: boolean, delay = 0) => ({
 });
 
 const previewShell = (reducedMotion: boolean) => ({
-  hidden: { opacity: 0 },
+  hidden: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+  },
   visible: {
     opacity: 1,
+    y: 0,
+    scale: 1,
     transition: {
       duration: reducedMotion ? 0.18 : 0.42,
       ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
@@ -206,31 +202,57 @@ const previewShell = (reducedMotion: boolean) => ({
   },
 });
 
-const previewCover = (reducedMotion: boolean) => ({
-  hidden: { opacity: 1, y: 0 },
+const previewContent = (reducedMotion: boolean) => ({
+  hidden: {
+    opacity: 1,
+    y: reducedMotion ? 8 : 20,
+    clipPath: reducedMotion ? "inset(0% 0% 0% 0%)" : "inset(100% 0% 0% 0%)",
+    WebkitClipPath: reducedMotion ? "inset(0% 0% 0% 0%)" : "inset(100% 0% 0% 0%)",
+  },
   visible: {
-    opacity: reducedMotion ? 0 : 0.18,
-    y: "108%",
+    opacity: 1,
+    y: 0,
+    clipPath: "inset(0% 0% 0% 0%)",
+    WebkitClipPath: "inset(0% 0% 0% 0%)",
     transition: {
-      duration: reducedMotion ? 0.2 : 0.82,
-      delay: reducedMotion ? 0 : 0.06,
+      duration: reducedMotion ? 0.16 : 0.62,
       ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+      when: "beforeChildren" as const,
+      delayChildren: reducedMotion ? 0.01 : 0.05,
+      staggerChildren: reducedMotion ? 0.02 : 0.06,
+    },
+  },
+});
+
+const previewGroup = (reducedMotion: boolean) => ({
+  hidden: {
+    opacity: 1,
+    y: reducedMotion ? 6 : 18,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: reducedMotion ? 0.2 : 0.62,
+      ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+      when: "beforeChildren" as const,
+      staggerChildren: reducedMotion ? 0.02 : 0.04,
     },
   },
 });
 
 const previewItem = (reducedMotion: boolean) => ({
   hidden: {
-    opacity: 0,
-    y: reducedMotion ? 6 : 18,
-    filter: reducedMotion ? "blur(0px)" : "blur(10px)",
+    opacity: 1,
+    y: reducedMotion ? 3 : 8,
+    filter: "blur(0px)",
   },
   visible: {
     opacity: 1,
     y: 0,
     filter: "blur(0px)",
     transition: {
-      duration: reducedMotion ? 0.2 : 0.46,
+      duration: reducedMotion ? 0.18 : 0.56,
       ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
     },
   },
@@ -284,12 +306,30 @@ function PreviewShell({
   children: React.ReactNode;
   reducedMotion: boolean;
 }) {
+  const shellRef = useRef<HTMLDivElement | null>(null);
+  const controls = useAnimationControls();
+  const hasStartedRef = useRef(false);
+  const isInView = useInView(shellRef, {
+    amount: 0.82,
+    once: true,
+    margin: "0px 0px -12% 0px",
+  });
+
+  useEffect(() => {
+    if (!isInView || hasStartedRef.current === true) {
+      return;
+    }
+    
+    hasStartedRef.current = true;
+    void controls.start("visible");
+  }, [controls, isInView]);
+
   return (
     <motion.div
+      ref={shellRef}
       variants={previewShell(reducedMotion)}
       initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount: 0.34 }}
+      animate={controls}
       className="relative"
     >
       <div className="absolute inset-0 rounded-4xl bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.04),transparent_58%),radial-gradient(circle_at_bottom,rgba(37,201,133,0.08),transparent_46%)] blur-2xl sm:rounded-[2.4rem]" />
@@ -299,15 +339,12 @@ function PreviewShell({
           className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/16 to-transparent"
         />
         <motion.div
-          variants={previewCover(reducedMotion)}
-          className="pointer-events-none absolute inset-px z-20 rounded-[calc(2rem-1px)] bg-[linear-gradient(180deg,rgba(9,12,10,0.98)_0%,rgba(9,12,10,0.98)_74%,rgba(9,12,10,0.72)_100%)] sm:rounded-[calc(2.4rem-1px)]"
-        />
-        <div
-          className="relative overflow-hidden rounded-3xl sm:rounded-[1.85rem]"
+          variants={previewContent(reducedMotion)}
+          className="relative overflow-hidden rounded-3xl will-change-transform sm:rounded-[1.85rem]"
           style={previewMaskStyle}
         >
           {children}
-        </div>
+        </motion.div>
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-[#060907] via-[#060907]/96 to-transparent sm:h-28" />
       </div>
     </motion.div>
@@ -325,7 +362,7 @@ function PaymentPreview({ reducedMotion }: { reducedMotion: boolean }) {
     <PreviewShell reducedMotion={reducedMotion}>
       <div className="min-h-84 bg-[radial-gradient(circle_at_top,rgba(37,201,133,0.08),transparent_52%)] p-1 sm:min-h-98 lg:min-h-104">
         <motion.div
-          variants={previewItem(reducedMotion)}
+          variants={previewGroup(reducedMotion)}
           className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-white/8 bg-white/3 px-3 py-1.5"
         >
           <div className="flex items-center gap-2">
@@ -343,7 +380,7 @@ function PaymentPreview({ reducedMotion }: { reducedMotion: boolean }) {
         </motion.div>
 
         <motion.div
-          variants={previewItem(reducedMotion)}
+          variants={previewGroup(reducedMotion)}
           className="mt-3.5 rounded-[1.4rem] border border-white/8 bg-white/3 p-3.5"
         >
           <div className="flex flex-wrap items-start justify-between gap-3 border-b border-white/8 pb-3.5">
@@ -394,7 +431,10 @@ function PaymentPreview({ reducedMotion }: { reducedMotion: boolean }) {
           </motion.div>
         </motion.div>
 
-        <div className="mt-3.5 grid gap-2.5 sm:grid-cols-3">
+        <motion.div
+          variants={previewGroup(reducedMotion)}
+          className="mt-3.5 grid gap-2.5 sm:grid-cols-3"
+        >
           {signals.map((item) => (
             <motion.div
               key={item.label}
@@ -409,7 +449,7 @@ function PaymentPreview({ reducedMotion }: { reducedMotion: boolean }) {
               </p>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </PreviewShell>
   );
@@ -426,7 +466,7 @@ function TransferPreview({ reducedMotion }: { reducedMotion: boolean }) {
     <PreviewShell reducedMotion={reducedMotion}>
       <div className="min-h-90 bg-[radial-gradient(circle_at_top,rgba(223,194,141,0.06),transparent_46%)] p-1 sm:min-h-108 lg:min-h-116">
         <motion.div
-          variants={previewItem(reducedMotion)}
+          variants={previewGroup(reducedMotion)}
           className="flex flex-wrap gap-2 rounded-[1.1rem] border border-white/8 bg-white/3 px-3 py-2"
         >
           {["Family support", "Merchant payout", "Invoice settlement"].map((tag) => (
@@ -440,7 +480,7 @@ function TransferPreview({ reducedMotion }: { reducedMotion: boolean }) {
         </motion.div>
 
         <motion.div
-          variants={previewItem(reducedMotion)}
+          variants={previewGroup(reducedMotion)}
           className="mt-4 rounded-[1.55rem] border border-white/8 bg-white/3 p-4"
         >
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/8 pb-4">
@@ -475,7 +515,10 @@ function TransferPreview({ reducedMotion }: { reducedMotion: boolean }) {
           </div>
         </motion.div>
 
-        <div className="mt-4 grid gap-2.5 sm:grid-cols-3">
+        <motion.div
+          variants={previewGroup(reducedMotion)}
+          className="mt-4 grid gap-2.5 sm:grid-cols-3"
+        >
           {[
             { label: "Status", value: "Visible to both sides" },
             { label: "Review step", value: "Before send" },
@@ -492,7 +535,7 @@ function TransferPreview({ reducedMotion }: { reducedMotion: boolean }) {
               <p className="mt-2 text-sm font-semibold text-foreground/86">{item.value}</p>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </PreviewShell>
   );
@@ -503,7 +546,7 @@ function ApprovalPreview({ reducedMotion }: { reducedMotion: boolean }) {
     <PreviewShell reducedMotion={reducedMotion}>
       <div className="min-h-90 bg-[radial-gradient(circle_at_top,rgba(37,201,133,0.07),transparent_50%)] p-1 sm:min-h-108 lg:min-h-116">
         <motion.div
-          variants={previewItem(reducedMotion)}
+          variants={previewGroup(reducedMotion)}
           className="flex flex-wrap items-center justify-between gap-3 rounded-[1.1rem] border border-white/8 bg-white/3 px-3 py-2"
         >
           <div>
@@ -517,7 +560,7 @@ function ApprovalPreview({ reducedMotion }: { reducedMotion: boolean }) {
           </div>
         </motion.div>
 
-        <div className="mt-4 space-y-3">
+        <motion.div variants={previewGroup(reducedMotion)} className="mt-4 space-y-3">
           {workflowSteps.map((item) => (
             <motion.div
               key={item.step}
@@ -533,11 +576,11 @@ function ApprovalPreview({ reducedMotion }: { reducedMotion: boolean }) {
                   <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{item.copy}</p>
                 </div>
               </div>
-            </motion.div>
+              </motion.div>
           ))}
-        </div>
+        </motion.div>
 
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <motion.div variants={previewGroup(reducedMotion)} className="mt-4 grid gap-3 sm:grid-cols-2">
           {visibilityRows.slice(0, 4).map((row) => (
             <motion.div
               key={row.label}
@@ -550,7 +593,7 @@ function ApprovalPreview({ reducedMotion }: { reducedMotion: boolean }) {
               <p className="mt-2 text-sm font-semibold text-foreground/86">{row.value}</p>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </PreviewShell>
   );
@@ -574,51 +617,23 @@ export function LandingPage({ onConnect }: LandingPageProps) {
     <div className="min-h-screen bg-background selection:bg-primary/30 selection:text-foreground">
       <section
         id={HOME_SECTION_IDS.hero}
-        className="relative overflow-hidden px-4 sm:px-6 lg:px-8 noise-overlay"
+        className="relative min-h-svh overflow-hidden px-4 sm:px-6 lg:px-8 noise-overlay"
       >
         <div className="absolute inset-0 z-0 pointer-events-none">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(37,201,133,0.1),transparent_32%),radial-gradient(circle_at_82%_18%,rgba(223,194,141,0.06),transparent_24%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.05)_0.7px,transparent_0.7px)] bg-position-[0_0] bg-size-[22px_22px] opacity-30" />
-          <div className="absolute left-[-10%] top-[6%] h-88 w-88 rounded-full bg-primary/8 blur-[120px]" />
-          <div className="absolute right-[-6%] top-[12%] h-72 w-72 rounded-full bg-[rgba(223,194,141,0.06)] blur-[130px]" />
-          {heroAtmosphereDots.map((dot, index) => (
-            <motion.span
-              key={`${dot.top}-${dot.left}`}
-              className={`absolute rounded-full ${dot.size} ${dot.tone} blur-[1px]`}
-              style={{ top: dot.top, left: dot.left }}
-              animate={
-                reducedMotion
-                  ? undefined
-                  : {
-                      opacity: [0.22, 0.52, 0.22],
-                      scale: [1, 1.08, 1],
-                      x: [0, index % 2 === 0 ? 2 : -2, 0],
-                      y: [0, index % 3 === 0 ? -2 : 2, 0],
-                    }
-              }
-              transition={
-                reducedMotion
-                  ? undefined
-                  : {
-                      duration: 7.5 + index * 0.8,
-                      delay: index * 0.22,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }
-              }
-            />
-          ))}
-          <div className="absolute inset-x-0 bottom-0 h-[42%] bg-linear-to-t from-background via-background/88 to-transparent" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,20,13,0.62)_0%,rgba(4,16,11,0.3)_38%,rgba(4,12,9,0.16)_100%)]" />
+          <div className="absolute inset-x-0 top-0 h-[24rem] bg-[radial-gradient(ellipse_at_top,rgba(19,91,60,0.18),transparent_62%)]" />
+          <div className="absolute inset-x-0 bottom-[10%] h-[30rem] bg-[radial-gradient(ellipse_at_bottom,rgba(22,118,78,0.2),transparent_70%)]" />
+          <div className="absolute inset-x-0 bottom-0 h-[26%] bg-linear-to-t from-[rgba(5,20,13,0.92)] via-[rgba(5,20,13,0.7)] to-transparent" />
         </div>
 
-        <div className="relative z-10 mx-auto flex min-h-svh w-full max-w-4xl items-center justify-center pb-10 pt-20 sm:pb-12 sm:pt-24 lg:pt-28">
+        <div className="relative z-10 mx-auto flex min-h-svh w-full max-w-4xl items-center justify-center pt-20 sm:pt-24 lg:pt-28">
           <motion.div
-            initial={{ opacity: 0, scale: 1.03 }}
-            animate={{ opacity: 0.28, scale: 1 }}
-            transition={{ duration: 2.2, ease: [0.22, 1, 0.36, 1], delay: 0.12 }}
-            className="pointer-events-none absolute left-1/2 top-[50svh] h-[50svh] w-[220vw] max-w-none -translate-x-1/2 sm:w-[176vw] lg:w-[132vw]"
+            initial={{ opacity: 0, scale: 1.02 }}
+            animate={{ opacity: 0.2, scale: 1 }}
+            transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1], delay: 0.08 }}
+            className="pointer-events-none absolute left-1/2 top-[56svh] h-[46svh] w-[210vw] max-w-none -translate-x-1/2 sm:top-[58svh] sm:h-[48svh] sm:w-[168vw] lg:w-[126vw]"
           >
-            <Image src="/horizon_glow.png" alt="" fill className="object-cover mix-blend-screen" />
+            <Image src="/horizon_glow.png" alt="" fill className="object-cover mix-blend-screen opacity-80" />
           </motion.div>
 
           <motion.div
@@ -636,34 +651,34 @@ export function LandingPage({ onConnect }: LandingPageProps) {
               </span>
             </div>
 
-            <h1 className="mt-6 text-[clamp(2.35rem,14vw,3.75rem)] font-extrabold leading-[0.92] tracking-[-0.05em] text-foreground sm:mt-7 sm:text-[clamp(2.8rem,6vw,4.45rem)] sm:leading-[0.96]">
+            <h1 className="mt-5 max-w-[12ch] text-[clamp(2.35rem,14vw,3.75rem)] font-extrabold leading-[0.92] tracking-[-0.05em] text-foreground sm:mt-6 sm:text-[clamp(2.8rem,6vw,4.3rem)] sm:leading-[0.96]">
               Review payment
               <span className="mt-2 block text-(--byreix-gold-soft)">before approval.</span>
             </h1>
 
-            <p className="mt-5 max-w-136 text-[0.98rem] leading-[1.72] text-muted-foreground sm:text-[1.04rem] lg:text-[1.1rem]">
-              See the merchant, amount, fees, and settlement mode before you confirm. Use escrow
-              only when the transaction needs a visible release step.
+            <p className="mt-4 max-w-120 text-[0.98rem] leading-[1.72] text-muted-foreground sm:mt-5 sm:text-[1.03rem] lg:text-[1.08rem]">
+              See the merchant, amount, fees, and settlement path before you approve. Use escrow
+              only when the handoff needs a visible release step.
             </p>
 
-            <div className="mt-7 flex w-full max-w-lg flex-col gap-3 sm:w-auto sm:max-w-none sm:flex-row sm:justify-center">
+            <div className="mt-6 flex w-full max-w-lg flex-col gap-3 sm:mt-7 sm:w-auto sm:max-w-none sm:flex-row sm:justify-center">
               <Button
                 onClick={() => scrollToSection(HOME_SECTION_IDS.payments)}
-                className="h-12 w-full justify-center rounded-xl border border-white/10 bg-primary px-7 text-base font-semibold text-primary-foreground shadow-[0_14px_34px_rgba(3,13,8,0.34)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary/92 sm:w-auto"
+                className="h-12 w-full justify-center rounded-xl border border-white/10 bg-primary px-7 text-base font-semibold text-primary-foreground shadow-[0_16px_36px_rgba(3,13,8,0.34)] sm:w-auto"
               >
-                Learn More
+                See the Flow
                 <ArrowRight className="h-4 w-4" />
               </Button>
               <Button
                 onClick={onConnect}
                 variant="outline"
-                className="h-12 w-full justify-center rounded-xl border-white/10 bg-white/2 px-7 text-base font-semibold text-foreground/84 transition-all duration-300 hover:border-white/22 hover:bg-white/5 hover:text-foreground sm:w-auto"
+                className="h-12 w-full justify-center rounded-xl border-[rgba(223,194,141,0.18)] bg-[rgba(223,194,141,0.06)] px-7 text-base font-semibold text-foreground/90 hover:border-[rgba(223,194,141,0.34)] hover:bg-[rgba(223,194,141,0.1)] sm:w-auto"
               >
                 Launch App
               </Button>
             </div>
 
-            <div className="mt-6 grid w-full max-w-2xl gap-1.5 text-center sm:grid-cols-3 sm:gap-2">
+            <div className="mt-5 grid w-full max-w-2xl gap-1.5 text-center sm:mt-6 sm:grid-cols-3 sm:gap-2">
               {heroProofPoints.map((point, index) => (
                 <motion.div
                   key={point.label}
@@ -695,26 +710,26 @@ export function LandingPage({ onConnect }: LandingPageProps) {
 
       <section
         id={HOME_SECTION_IDS.why}
-        className="relative z-10 px-4 pb-14 pt-10 sm:px-6 sm:pb-16 sm:pt-12 lg:px-8 lg:pb-20 lg:pt-16"
+        className="relative z-10 px-4 pb-12 pt-9 sm:px-6 sm:pb-16 sm:pt-12 lg:px-8 lg:pb-20 lg:pt-16"
       >
         <div className="mx-auto grid max-w-6xl gap-6 sm:gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:gap-12">
           <motion.div {...sectionReveal(reducedMotion)} className="max-w-xl">
             <SectionLabel>Why ByReiXwift Exists</SectionLabel>
-            <h2 className="mt-5 text-[1.95rem] font-bold leading-[1.02] tracking-tight text-foreground sm:mt-6 sm:text-[2.55rem] lg:text-[3.25rem]">
+            <h2 className="mt-4 text-[1.82rem] font-bold leading-[1.04] tracking-tight text-foreground sm:mt-6 sm:text-[2.55rem] lg:text-[3.25rem]">
               Digital payments are easy to start and hard to verify.
             </h2>
-            <p className="mt-5 text-[1rem] leading-[1.72] text-muted-foreground sm:mt-6 sm:text-lg">
+            <p className="mt-4 max-w-[34rem] text-[0.98rem] leading-[1.68] text-muted-foreground sm:mt-6 sm:text-lg">
               Fees, settlement terms, and trust gaps still show up too late. ByReiXwift is being
               built so you can review the deal before money moves.
             </p>
           </motion.div>
 
-          <motion.div {...sectionReveal(reducedMotion, 0.08)} className="grid gap-4 sm:grid-cols-2">
-            <div className={`${contentCardClass} p-5 sm:p-6`}>
+          <motion.div {...sectionReveal(reducedMotion, 0.08)} className="grid gap-3 sm:gap-4 sm:grid-cols-2">
+            <div className={`${contentCardClass} p-4.5 sm:p-6`}>
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/85">
                 What users still face
               </p>
-              <div className="mt-5 space-y-4">
+              <div className="mt-4 space-y-3.5 sm:mt-5 sm:space-y-4">
                 {problemPoints.map((point) => (
                   <div key={point} className="flex gap-3">
                     <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
@@ -723,11 +738,11 @@ export function LandingPage({ onConnect }: LandingPageProps) {
                 ))}
               </div>
             </div>
-            <div className={`${contentCardClass} p-5 sm:p-6`}>
+            <div className={`${contentCardClass} p-4.5 sm:p-6`}>
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-(--byreix-gold-soft)">
                 What ByReiXwift changes
               </p>
-              <div className="mt-5 space-y-4">
+              <div className="mt-4 space-y-3.5 sm:mt-5 sm:space-y-4">
                 {responsePoints.map((point) => (
                   <div key={point} className="flex gap-3">
                     <Scale className="mt-0.5 h-4 w-4 shrink-0 text-(--byreix-gold-soft)" />
@@ -741,10 +756,10 @@ export function LandingPage({ onConnect }: LandingPageProps) {
       </section>
       <section
         id={HOME_SECTION_IDS.overview}
-        className="px-4 py-14 sm:px-6 sm:py-16 lg:px-8 lg:py-20"
+        className="px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20"
       >
         <div
-          className={`mx-auto max-w-6xl ${sectionWrapClass} px-5 py-8 sm:px-8 sm:py-10 lg:px-10`}
+          className={`mx-auto max-w-6xl ${sectionWrapClass} px-4.5 py-7 sm:px-8 sm:py-10 lg:px-10`}
         >
           <motion.div
             {...sectionReveal(reducedMotion)}
@@ -753,31 +768,33 @@ export function LandingPage({ onConnect }: LandingPageProps) {
             <p className="text-[0.78rem] font-bold uppercase tracking-[0.24em] text-primary/92 sm:text-[0.82rem]">
               What ByReiXwift Is
             </p>
-            <h2 className="mt-4 text-[1.95rem] font-bold leading-[1.02] tracking-tight text-foreground sm:mt-5 sm:text-[2.5rem] lg:text-[3.2rem]">
+            <h2 className="mt-4 text-[1.82rem] font-bold leading-[1.04] tracking-tight text-foreground sm:mt-5 sm:text-[2.5rem] lg:text-[3.2rem]">
               One product, three clear flows.
             </h2>
-            <p className="mt-5 text-[1rem] leading-[1.72] text-muted-foreground sm:text-lg">
+            <p className="mt-4 max-w-[34rem] text-[0.98rem] leading-[1.68] text-muted-foreground sm:mt-5 sm:text-lg">
               Pay, send, or protect a transaction without guessing what happens next.
             </p>
           </motion.div>
 
-          <div className="mt-10 grid gap-4 sm:mt-12 lg:grid-cols-3 lg:gap-5">
+          <div className="mt-8 grid gap-3.5 sm:mt-12 sm:gap-4 lg:grid-cols-3 lg:gap-5">
             {platformPillars.map((pillar, index) => {
               const Icon = pillar.icon;
               return (
                 <motion.article
                   key={pillar.title}
                   {...sectionReveal(reducedMotion, 0.04 * index)}
-                  className={`${contentCardClass} p-5 sm:p-6`}
+                  className={`${contentCardClass} p-4.5 transition-[transform,border-color,background-color,box-shadow] duration-300 hover:-translate-y-1 hover:border-[rgba(223,194,141,0.2)] hover:shadow-[0_18px_42px_rgba(0,0,0,0.18)] sm:p-6`}
                 >
                   <div className="flex items-center gap-3">
                     <Icon className="h-[1.05rem] w-[1.05rem] shrink-0 text-primary/88" />
-                    <h3 className="text-2xl font-semibold text-foreground">{pillar.title}</h3>
+                    <h3 className="text-[1.35rem] font-semibold text-foreground sm:text-2xl">
+                      {pillar.title}
+                    </h3>
                   </div>
-                  <p className="mt-3 text-[0.98rem] leading-[1.68] text-muted-foreground sm:text-base">
+                  <p className="mt-2.5 text-[0.95rem] leading-[1.64] text-muted-foreground sm:mt-3 sm:text-base">
                     {pillar.description}
                   </p>
-                  <p className="mt-5 border-t border-border pt-5 text-sm leading-relaxed text-foreground/82">
+                  <p className="mt-4 border-t border-border pt-4 text-sm leading-relaxed text-foreground/82 sm:mt-5 sm:pt-5">
                     {pillar.reason}
                   </p>
                 </motion.article>
@@ -800,18 +817,18 @@ export function LandingPage({ onConnect }: LandingPageProps) {
 
       <section
         id={HOME_SECTION_IDS.payments}
-        className="px-4 py-14 sm:px-6 sm:py-16 lg:px-8 lg:py-20"
+        className="px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20"
       >
-        <div className="mx-auto grid max-w-6xl items-center gap-8 sm:gap-10 lg:grid-cols-[0.96fr_0.9fr] lg:gap-16">
+        <div className="mx-auto grid max-w-6xl items-center gap-7 sm:gap-10 lg:grid-cols-[0.96fr_0.9fr] lg:gap-16">
           <motion.div {...sectionReveal(reducedMotion)} className="max-w-xl">
             <SectionLabel>Payment Transparency</SectionLabel>
-            <h2 className="mt-5 text-[2.05rem] font-bold leading-[1.02] tracking-tight text-foreground sm:mt-6 sm:text-[2.65rem] lg:text-[3.55rem]">
+            <h2 className="mt-4 text-[1.88rem] font-bold leading-[1.04] tracking-tight text-foreground sm:mt-6 sm:text-[2.65rem] lg:text-[3.55rem]">
               See the payment before you approve it.
             </h2>
-            <p className="mt-5 text-[1rem] leading-[1.72] text-muted-foreground sm:mt-6 sm:text-lg">
+            <p className="mt-4 max-w-[34rem] text-[0.98rem] leading-[1.68] text-muted-foreground sm:mt-6 sm:text-lg">
               Check the amount, fee, destination, and settlement mode before money moves.
             </p>
-            <div className="mt-8 space-y-4">
+            <div className="mt-7 space-y-3.5 sm:mt-8 sm:space-y-4">
               {[
                 "See the amount, fees, and destination in one review step.",
                 "See the settlement mode before approval.",
@@ -832,24 +849,24 @@ export function LandingPage({ onConnect }: LandingPageProps) {
       </section>
       <section
         id={HOME_SECTION_IDS.transfers}
-        className="px-4 py-14 sm:px-6 sm:py-16 lg:px-8 lg:py-20"
+        className="px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20"
       >
-        <div className="mx-auto grid max-w-6xl items-center gap-8 sm:gap-10 lg:grid-cols-[1.02fr_0.98fr] lg:gap-14">
+        <div className="mx-auto grid max-w-6xl items-center gap-7 sm:gap-10 lg:grid-cols-[1.02fr_0.98fr] lg:gap-14">
           <div className="order-2 lg:order-1">
             <TransferPreview reducedMotion={reducedMotion} />
           </div>
 
           <motion.div {...sectionReveal(reducedMotion)} className="order-1 max-w-xl lg:order-2">
             <SectionLabel>Transfers</SectionLabel>
-            <h2 className="mt-5 text-[1.95rem] font-bold leading-[1.02] tracking-tight text-foreground sm:mt-6 sm:text-[2.55rem] lg:text-[3.25rem]">
+            <h2 className="mt-4 text-[1.82rem] font-bold leading-[1.04] tracking-tight text-foreground sm:mt-6 sm:text-[2.55rem] lg:text-[3.25rem]">
               Send with context, not guesswork.
             </h2>
-            <p className="mt-5 text-[1rem] leading-[1.72] text-muted-foreground sm:mt-6 sm:text-lg">
+            <p className="mt-4 max-w-[34rem] text-[0.98rem] leading-[1.68] text-muted-foreground sm:mt-6 sm:text-lg">
               Send with a named recipient, clear purpose, and visible fee before you approve.
             </p>
-            <div className="mt-7 grid gap-3 sm:grid-cols-3">
+            <div className="mt-6 grid gap-2.5 sm:mt-7 sm:grid-cols-3 sm:gap-3">
               {transferHighlights.map((item) => (
-                <div key={item.label} className={`${insetCardClass} px-3.5 py-3 text-left`}>
+                <div key={item.label} className={`${insetCardClass} px-3 py-2.5 text-left sm:px-3.5 sm:py-3`}>
                   <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-foreground/48">
                     {item.label}
                   </p>
@@ -865,23 +882,23 @@ export function LandingPage({ onConnect }: LandingPageProps) {
 
       <section
         id={HOME_SECTION_IDS.escrow}
-        className="px-4 py-14 sm:px-6 sm:py-16 lg:px-8 lg:py-20"
+        className="px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20"
       >
-        <div className="mx-auto grid max-w-6xl gap-8 sm:gap-10 lg:grid-cols-[0.92fr_1.08fr] lg:gap-14">
+        <div className="mx-auto grid max-w-6xl gap-7 sm:gap-10 lg:grid-cols-[0.92fr_1.08fr] lg:gap-14">
           <motion.div {...sectionReveal(reducedMotion)} className="max-w-xl">
             <SectionLabel>Escrow as Trust Layer</SectionLabel>
-            <h2 className="mt-5 text-[1.95rem] font-bold leading-[1.02] tracking-tight text-foreground sm:mt-6 sm:text-[2.55rem] lg:text-[3.25rem]">
+            <h2 className="mt-4 text-[1.82rem] font-bold leading-[1.04] tracking-tight text-foreground sm:mt-6 sm:text-[2.55rem] lg:text-[3.25rem]">
               Use escrow when trust needs structure.
             </h2>
-            <p className="mt-5 text-[1rem] leading-[1.72] text-muted-foreground sm:mt-6 sm:text-lg">
+            <p className="mt-4 max-w-[34rem] text-[0.98rem] leading-[1.68] text-muted-foreground sm:mt-6 sm:text-lg">
               When a payment needs more structure, lock it first and release or refund with a clear
               state.
             </p>
-            <div className={`mt-8 ${contentCardClass} p-5 sm:p-6`}>
+            <div className={`mt-7 ${contentCardClass} p-4.5 sm:mt-8 sm:p-6`}>
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary/85">
                 When it helps most
               </p>
-              <div className="mt-5 space-y-4">
+              <div className="mt-4 space-y-3.5 sm:mt-5 sm:space-y-4">
                 {[
                   "Merchant transactions where both sides need a clearer handoff.",
                   "Business transfers that require a visible release step.",
@@ -898,14 +915,14 @@ export function LandingPage({ onConnect }: LandingPageProps) {
 
           <motion.div
             {...sectionReveal(reducedMotion, 0.08)}
-            className="grid items-start gap-3 sm:grid-cols-2 sm:gap-4"
+            className="grid items-start gap-2.5 sm:grid-cols-2 sm:gap-4"
           >
             {escrowStates.map((state) => {
               const Icon = state.icon;
               return (
                 <article
                   key={state.title}
-                  className={`${contentCardClass} self-start p-3.5 sm:p-4.5`}
+                  className={`${contentCardClass} self-start p-3.5 transition-[transform,border-color,background-color,box-shadow] duration-300 hover:-translate-y-1 hover:border-primary/18 hover:shadow-[0_18px_40px_rgba(0,0,0,0.16)] sm:p-4.5`}
                 >
                   <div className="flex items-center gap-3">
                     <Icon className="h-[1.05rem] w-[1.05rem] shrink-0 text-primary/88" />
@@ -924,17 +941,17 @@ export function LandingPage({ onConnect }: LandingPageProps) {
       </section>
       <section
         id={HOME_SECTION_IDS.principles}
-        className="px-4 py-14 sm:px-6 sm:py-16 lg:px-8 lg:py-20"
+        className="px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20"
       >
         <div
-          className={`mx-auto grid max-w-6xl gap-8 ${sectionWrapClass} px-5 py-8 sm:gap-10 sm:px-8 sm:py-10 lg:grid-cols-[0.88fr_1.12fr] lg:gap-14 lg:px-10`}
+          className={`mx-auto grid max-w-6xl gap-7 ${sectionWrapClass} px-4.5 py-7 sm:gap-10 sm:px-8 sm:py-10 lg:grid-cols-[0.88fr_1.12fr] lg:gap-14 lg:px-10`}
         >
           <motion.div {...sectionReveal(reducedMotion)} className="max-w-xl">
             <SectionLabel>Principles</SectionLabel>
-            <h2 className="mt-5 text-[1.95rem] font-bold leading-[1.02] tracking-tight text-foreground sm:mt-6 sm:text-[2.55rem] lg:text-[3.25rem]">
+            <h2 className="mt-4 text-[1.82rem] font-bold leading-[1.04] tracking-tight text-foreground sm:mt-6 sm:text-[2.55rem] lg:text-[3.25rem]">
               The product has to earn its language.
             </h2>
-            <p className="mt-5 text-[1rem] leading-[1.72] text-muted-foreground sm:mt-6 sm:text-lg">
+            <p className="mt-4 max-w-[34rem] text-[0.98rem] leading-[1.68] text-muted-foreground sm:mt-6 sm:text-lg">
               Clear fees, visible approval, understandable states, and honest governance should show
               up in the product, not just the copy.
             </p>
@@ -963,19 +980,19 @@ export function LandingPage({ onConnect }: LandingPageProps) {
 
       <section
         id={HOME_SECTION_IDS.howItWorks}
-        className="px-4 py-14 sm:px-6 sm:py-16 lg:px-8 lg:py-20"
+        className="px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20"
       >
-        <div className="mx-auto grid max-w-6xl items-start gap-8 sm:gap-10 lg:grid-cols-[0.92fr_1.08fr] lg:gap-14">
+        <div className="mx-auto grid max-w-6xl items-start gap-7 sm:gap-10 lg:grid-cols-[0.92fr_1.08fr] lg:gap-14">
           <motion.div {...sectionReveal(reducedMotion)}>
             <SectionLabel>How It Works</SectionLabel>
-            <h2 className="mt-5 text-[1.95rem] font-bold leading-[1.02] tracking-tight text-foreground sm:mt-6 sm:text-[2.55rem] lg:text-[3.25rem]">
+            <h2 className="mt-4 text-[1.82rem] font-bold leading-[1.04] tracking-tight text-foreground sm:mt-6 sm:text-[2.55rem] lg:text-[3.25rem]">
               A payment flow that stays readable.
             </h2>
-            <p className="mt-5 max-w-xl text-[1rem] leading-[1.72] text-muted-foreground sm:mt-6 sm:text-lg">
-              Connect, review, approve. That is the flow.
+            <p className="mt-4 max-w-[34rem] text-[0.98rem] leading-[1.68] text-muted-foreground sm:mt-6 sm:text-lg">
+              Connect when ready, review the details, then approve with context.
             </p>
 
-            <div className="mt-9 space-y-7 sm:mt-10 sm:space-y-8">
+            <div className="mt-7 space-y-6 sm:mt-10 sm:space-y-8">
               {workflowSteps.map((item) => (
                 <div key={item.step} className="flex gap-4 sm:gap-6">
                   <div className="text-2xl font-black tracking-tight text-primary/30 sm:text-3xl">
@@ -998,24 +1015,24 @@ export function LandingPage({ onConnect }: LandingPageProps) {
         </div>
       </section>
 
-      <section className="px-4 py-14 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
+      <section className="px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
         <motion.div {...sectionReveal(reducedMotion)} className="mx-auto max-w-4xl text-center">
-          <div className="relative overflow-hidden rounded-[2.1rem] border border-white/8 bg-[linear-gradient(180deg,rgba(10,15,12,0.96)_0%,rgba(7,11,9,0.92)_100%)] p-8 sm:rounded-[2.5rem] sm:p-12 lg:p-16">
+          <div className="relative overflow-hidden rounded-[2.1rem] border border-white/8 bg-[linear-gradient(180deg,rgba(10,15,12,0.96)_0%,rgba(7,11,9,0.92)_100%)] p-6 sm:rounded-[2.5rem] sm:p-12 lg:p-16">
             <div className="absolute inset-0 bg-linear-to-b from-primary/8 via-transparent to-[rgba(223,194,141,0.05)]" />
 
             <div className="relative z-10">
-              <h2 className="text-[1.95rem] font-bold leading-[1.02] tracking-tight text-foreground sm:text-[2.55rem] lg:text-[3.2rem]">
-                Start with the flow, then launch when ready.
+              <h2 className="text-[1.82rem] font-bold leading-[1.04] tracking-tight text-foreground sm:text-[2.55rem] lg:text-[3.2rem]">
+                Review the flow, then open the app with confidence.
               </h2>
-              <p className="mx-auto mt-5 max-w-2xl text-[1rem] leading-[1.72] text-muted-foreground sm:mt-6 sm:text-lg">
-                Review the flow first, then open the app when you are ready.
+              <p className="mx-auto mt-4 max-w-[34rem] text-[0.98rem] leading-[1.68] text-muted-foreground sm:mt-6 sm:text-lg">
+                See how payments, transfers, and escrow fit together before you jump in.
               </p>
 
-              <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <div className="mt-8 flex flex-col items-center justify-center gap-3.5 sm:mt-10 sm:flex-row sm:gap-4">
                 <Button
                   onClick={onConnect}
                   size="lg"
-                  className="h-12 w-full rounded-lg bg-primary px-7 text-base font-semibold text-primary-foreground shadow-[0_14px_34px_rgba(3,13,8,0.28)] transition-colors duration-200 hover:bg-primary/90 sm:w-auto"
+                  className="h-12 w-full rounded-lg bg-primary px-7 text-base font-semibold text-primary-foreground shadow-[0_16px_38px_rgba(3,13,8,0.3)] sm:w-auto"
                 >
                   Launch App
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -1024,9 +1041,9 @@ export function LandingPage({ onConnect }: LandingPageProps) {
                   onClick={() => scrollToSection(HOME_SECTION_IDS.payments)}
                   variant="outline"
                   size="lg"
-                  className="h-12 w-full rounded-lg border-white/10 bg-transparent px-7 text-base font-semibold text-foreground/84 hover:border-white/25 hover:bg-white/5 hover:text-foreground sm:w-auto"
+                  className="h-12 w-full rounded-lg border-[rgba(223,194,141,0.18)] bg-[rgba(223,194,141,0.05)] px-7 text-base font-semibold text-foreground/90 hover:border-[rgba(223,194,141,0.34)] hover:bg-[rgba(223,194,141,0.1)] sm:w-auto"
                 >
-                  Review the Payment Flow
+                  Explore the Flow
                 </Button>
               </div>
             </div>
