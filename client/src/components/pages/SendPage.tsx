@@ -82,7 +82,6 @@ export function SendPage() {
   ];
 
   return (
-    // Added min-h-screen and responsive padding-bottom to ensure bottom content is never cut off
     <div className="max-w-2xl mx-auto px-4 pt-4 pb-20 md:pb-12 min-h-screen">
       <Card className="p-5 md:p-6 bg-card border-border shadow-sm">
         <h2 className="text-xl md:text-2xl font-semibold mb-6">Send Tokens</h2>
