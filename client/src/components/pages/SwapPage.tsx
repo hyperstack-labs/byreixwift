@@ -80,7 +80,7 @@ export function SwapPage() {
               />
               <Button
                 variant="outline"
-                className="flex items-center gap-2 border-border bg-card hover:bg-border h-10 px-3 shrink-0"
+                className="flex items-center gap-2 border-border bg-card hover:bg-border h-10 px-3 shrink-0 cursor-pointer"
               >
                 <span className="font-bold">{fromToken.symbol}</span>
                 <ChevronDown className="h-4 w-4" />
@@ -132,7 +132,7 @@ export function SwapPage() {
               />
               <Button
                 variant="outline"
-                className="flex items-center gap-2 border-border bg-card hover:bg-border h-10 px-3 shrink-0"
+                className="flex items-center gap-2 border-border bg-card hover:bg-border h-10 px-3 shrink-0 cursor-pointer"
               >
                 <span className="font-bold">{toToken.symbol}</span>
                 <ChevronDown className="h-4 w-4" />

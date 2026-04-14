@@ -20,7 +20,7 @@ import { AdSlot, BannerAd, BannerAdSize } from "@/components/ads";
 export function WalletDashboard() {
   const router = useRouter();
   const [balanceVisible, setBalanceVisible] = useState(true);
-
+  
   const tokens = [
     {
       symbol: "SDA",
@@ -143,7 +143,7 @@ export function WalletDashboard() {
         <Card className="border-border bg-card p-4 md:p-6 shadow-sm">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div className="min-w-0 flex-1">
-              <Label className="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <Label className="mb-2 ml-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Your Wallet Address
               </Label>
               <div className="group relative flex items-center rounded-xl border border-border bg-background/50 px-4 py-3">
@@ -152,7 +152,7 @@ export function WalletDashboard() {
                 </code>
               </div>
             </div>
-            <div className="flex shrink-0 items-center gap-2 self-start sm:self-center">
+            <div className="flex shrink-0 items-center gap-2 self-start sm:self-center mt-5">
               <Button
                 aria-label="Copy wallet address"
                 variant="outline"
@@ -189,7 +189,7 @@ export function WalletDashboard() {
                   className="rounded-full p-2 cursor-pointer text-muted-foreground transition-all hover:bg-primary/10 hover:text-primary"
                   aria-label={balanceVisible ? "Hide balance" : "Show balance"}
                 >
-                  {balanceVisible ? <Eye className="h-5 w-5" /> : <EyeOff className="h-5 w-5" />}
+                  {balanceVisible ? <Eye className="h-6 w-6" /> : <EyeOff className="h-5 w-5" />}
                 </button>
               </div>
               <p className="flex items-center gap-2 text-sm font-medium text-primary">

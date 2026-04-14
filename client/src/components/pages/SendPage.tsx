@@ -106,14 +106,14 @@ export function SendPage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-9 w-9 p-0 text-muted-foreground hover:text-primary transition-colors"
+                  className="h-9 w-9 p-0 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
                 >
                   <Scan className="w-4 h-4" />
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-9 w-9 p-0 text-muted-foreground hover:text-primary transition-colors"
+                  className="h-9 w-9 p-0 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
                 >
                   <QrCode className="w-4 h-4" />
                 </Button>
@@ -150,7 +150,7 @@ export function SendPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="flex items-center gap-2 border-border bg-card hover:bg-border h-10 px-3 shrink-0"
+                  className="flex items-center gap-2 border-border bg-card hover:bg-border h-10 px-3 shrink-0 cursor-pointer"
                 >
                   <span className="font-bold">{selectedToken.symbol}</span>
                   <ChevronDown className="w-4 h-4" />
@@ -166,7 +166,7 @@ export function SendPage() {
                 </span>
                 <button
                   onClick={() => setAmount(selectedToken.balance.replace(/,/g, ""))}
-                  className="text-sm font-semibold text-primary hover:underline underline-offset-4"
+                  className="text-sm font-semibold text-primary hover:underline underline-offset-4 cursor-pointer"
                 >
                   Use Maximum
                 </button>
@@ -177,7 +177,7 @@ export function SendPage() {
           {/* Memo (Optional) */}
           <div className="space-y-2">
             <Label htmlFor="memo" className="px-1 text-sm">
-              Memo <span className="text-muted-foreground text-xs ml-1">(Optional)</span>
+              Memo <span className="text-muted-foreground text-xs">(Optional)</span>
             </Label>
             <Input
               id="memo"
