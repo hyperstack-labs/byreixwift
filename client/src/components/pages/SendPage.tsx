@@ -23,11 +23,13 @@ export function SendPage() {
   const [memo, setMemo] = useState("");
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isValidAddress, setIsValidAddress] = useState(true);
-  const { data: tokens } = useSidraTokens();
 
-  const selectedTokenData = tokens?.find(
+  const { data: tokenData } = useSidraTokens();
+
+  const selectedTokenData = tokenData?.find(
     (t) => t.symbol === selectedToken.symbol
   );
+
 
   const priceUsd = selectedTokenData?.priceUsd || 0;
 
@@ -83,23 +85,25 @@ export function SendPage() {
     { name: "John Doe", address: "0x5e8b...4fA1" },
   ];
 
-  return (
+ return (
     <div className="max-w-2xl mx-auto">
       <Card className="p-6 bg-card border-border">
         <h2 className="text-2xl font-semibold mb-6">Send Tokens</h2>
-
+ 
         <div className="space-y-6">
-          {/* Recipient Address */}
+          {/* ── Recipient ─────────────────────────────────────────────────── */}
           <div className="space-y-2">
             <Label htmlFor="recipient">Recipient Address</Label>
             <div className="relative">
               <Input
                 id="recipient"
-                placeholder="0x... or ENS name"
+                placeholder="Enter wallet address"
                 value={recipient}
                 onChange={(e) => handleRecipientChange(e.target.value)}
                 className={`pr-20 bg-background border-border ${
-                  !isValidAddress && recipient ? "border-red-500 focus-visible:ring-red-500" : ""
+                  !isValidAddress && recipient
+                    ? "border-red-500 focus-visible:ring-red-500"
+                    : ""
                 }`}
               />
               <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
@@ -126,8 +130,8 @@ export function SendPage() {
               </p>
             )}
           </div>
-
-          {/* Token Selection and Amount */}
+ 
+          {/*  Amount  */}
           <div className="space-y-2">
             <Label htmlFor="amount">Amount</Label>
             <div className="p-4 rounded-xl bg-background border border-border">
@@ -152,18 +156,19 @@ export function SendPage() {
                 className="bg-transparent border-none text-3xl p-0 h-auto focus-visible:ring-0"
               />
               <button
-                onClick={() => setAmount(selectedToken.balance.replace(/,/g, ""))}
+                onClick={() => setAmount(String(amount))}
                 className="text-sm text-primary mt-2 hover:underline"
               >
                 Use Maximum Balance
               </button>
             </div>
           </div>
-
-          {/* Memo (Optional) */}
+ 
+          {/*  Memo  */}
           <div className="space-y-2">
             <Label htmlFor="memo">
-              Memo <span className="text-muted-foreground text-sm">(Optional)</span>
+              Memo{" "}
+              <span className="text-muted-foreground text-sm">(Optional)</span>
             </Label>
             <Input
               id="memo"
@@ -173,19 +178,19 @@ export function SendPage() {
               className="bg-background border-border"
             />
           </div>
-
-          {/* Transaction Details */}
+ 
+          {/*  Transaction details  */}
           {amount && (
             <div className="p-4 rounded-xl bg-background border border-border space-y-2">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Token Value (USD)</span>
-                <span className="text-foreground">
-                  ${usdValue.toFixed(2)}
-                </span>
-               </div>
+                <span className="text-foreground">${usdValue.toFixed(2)}</span>
+              </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Network Fee</span>
-                <span className="text-foreground">${networkFeeUsd.toFixed(2)} </span>
+                <span className="text-foreground">
+                  ${networkFeeUsd.toFixed(2)}
+                </span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Total Amount</span>
@@ -194,36 +199,37 @@ export function SendPage() {
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                 <span className="text-muted-foreground">Total Cost</span>
-                 <span className="text-foreground font-semibold">
-                   ${totalUsd.toFixed(2)}
-                 </span>
-             </div>
+                <span className="text-muted-foreground">Total Cost</span>
+                <span className="text-foreground font-semibold">
+                  ${totalUsd.toFixed(2)}
+                </span>
+              </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Estimated Time</span>
                 <span className="text-foreground">~30 seconds</span>
               </div>
             </div>
           )}
-
-          {/* Send Button */}
+          {/*  Send button */}
           <Button
             onClick={handleSend}
             className="w-full bg-primary hover:bg-primary/90 text-black py-6 text-lg"
           >
             <Send className="w-5 h-5 mr-2" />
-            {amount ? `Send ${amount} ${selectedToken.symbol}` : "Send Tokens"}
+            {amount
+              ? `Send ${amount} ${selectedToken.symbol}`
+              : "Send Tokens"}
           </Button>
         </div>
       </Card>
-
-      {/* Recent Contacts */}
+ 
+      {/*  Recent Contacts  */}
       <Card className="mt-6 p-6 bg-card border-border">
         <h3 className="text-lg font-semibold mb-4">Recent Contacts</h3>
         <div className="space-y-3">
-          {recentContacts.map((contact, index) => (
+          {recentContacts.map((contact) => (
             <button
-              key={index}
+              key={contact.address}
               onClick={() => {
                 setRecipient(contact.address);
                 setIsValidAddress(true);
@@ -232,15 +238,17 @@ export function SendPage() {
             >
               <div>
                 <p className="text-sm font-semibold">{contact.name}</p>
-                <p className="text-xs text-muted-foreground font-mono">{contact.address}</p>
+                <p className="text-xs text-muted-foreground font-mono">
+                  {contact.address}
+                </p>
               </div>
               <ChevronDown className="w-4 h-4 text-muted-foreground -rotate-90" />
             </button>
           ))}
         </div>
       </Card>
-
-      {/* Confirmation Dialog */}
+ 
+      {/*Confirmation Dialog */}
       <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
         <DialogContent className="bg-card border-border">
           <DialogHeader>
@@ -249,21 +257,18 @@ export function SendPage() {
               Please review the transaction details before confirming.
             </DialogDescription>
           </DialogHeader>
-
+ 
           <div className="space-y-4 my-4">
             <div className="p-4 rounded-lg bg-background border border-border space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Token Price</span>
-                <span className="text-sm">
-                  ${priceUsd.toFixed(4)}
+                <span className="text-sm text-muted-foreground">
+                  Token Price
                 </span>
+                <span className="text-sm">${priceUsd.toFixed(4)}</span>
               </div>
-
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">USD Value</span>
-                <span className="text-sm">
-                  ${usdValue.toFixed(2)}
-                </span>
+                <span className="text-sm">${usdValue.toFixed(2)}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">To</span>
@@ -282,17 +287,20 @@ export function SendPage() {
                 </div>
               )}
               <div className="flex items-center justify-between pt-3 border-t border-border">
-                <span className="text-sm text-muted-foreground">Network Fee</span>
-                <span className="text-sm"> ${networkFeeUsd.toFixed(2)}</span>
+                <span className="text-sm text-muted-foreground">
+                  Network Fee
+                </span>
+                <span className="text-sm">${networkFeeUsd.toFixed(2)}</span>
               </div>
             </div>
-
+ 
             <div className="flex items-start gap-2 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
               <AlertCircle className="w-4 h-4 text-yellow-500 mt-0.5 shrink-0" />
               <p className="text-sm text-yellow-200">
                 This transaction cannot be reversed. Please verify all details.
               </p>
             </div>
+ 
             <div className="flex items-center justify-between pt-3 border-t border-border">
               <span className="text-sm text-muted-foreground">Total Cost</span>
               <span className="text-sm font-semibold">
@@ -300,7 +308,7 @@ export function SendPage() {
               </span>
             </div>
           </div>
-
+ 
           <div className="flex gap-3">
             <Button
               variant="outline"
