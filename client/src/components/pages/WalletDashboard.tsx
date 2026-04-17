@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button, Card } from "../ui";
+import { Button, Card, Label } from "../ui";
 import {
   ArrowUpRight,
   ArrowDownLeft,
@@ -20,7 +20,7 @@ import { AdSlot, BannerAd, BannerAdSize } from "@/components/ads";
 export function WalletDashboard() {
   const router = useRouter();
   const [balanceVisible, setBalanceVisible] = useState(true);
-
+  
   const tokens = [
     {
       symbol: "SDA",
@@ -101,28 +101,28 @@ export function WalletDashboard() {
   const routeActions = [
     {
       title: "Swap",
-      description: "Open the quote flow and review token conversion details.",
+      description: "Instantly convert assets with real-time price routing.",
       icon: ArrowUpRight,
       href: "/app/swap",
       primary: true,
     },
     {
       title: "Send",
-      description: "Move funds to a wallet or business address with review before confirmation.",
+      description: "Transfer funds securely to external wallet addresses.",
       icon: ArrowDownLeft,
       href: "/app/send",
       primary: false,
     },
     {
       title: "Trends",
-      description: "Check price movement and market context before taking action.",
+      description: "Analyze market movements and asset performance.",
       icon: TrendingUp,
       href: "/app/trends",
       primary: false,
     },
     {
       title: "Escrow",
-      description: "Create and track protected transactions with visible state changes.",
+      description: "Enable buyer protection for high-value transactions.",
       icon: ShieldCheck,
       href: "/app/escrow",
       primary: false,
@@ -137,32 +137,35 @@ export function WalletDashboard() {
   };
 
   return (
-    <div className="min-h-screen px-4 pt-24 pb-32 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-7xl space-y-8">
-        <Card className="border-border bg-card p-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div className="min-h-screen px-4 pt-20 pb-24 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl space-y-6 md:space-y-8">
+        {/* Wallet Identity Card */}
+        <Card className="border-border bg-card p-4 md:p-6 shadow-sm">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div className="min-w-0 flex-1">
-              <p className="mb-2 text-sm text-muted-foreground">Wallet Address</p>
-              <div className="rounded-2xl border border-border bg-background/45 px-4 py-3">
-                <code className="block overflow-hidden text-ellipsis break-all font-mono text-sm text-white sm:text-base">
+              <Label className="mb-2 ml-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Your Wallet Address
+              </Label>
+              <div className="group relative flex items-center rounded-xl border border-border bg-background/50 px-4 py-3">
+                <code className="block flex-1 overflow-hidden text-ellipsis break-all font-mono text-sm text-foreground sm:text-base">
                   0x742d35Cc6634C0532925a3b844Bc9e7595f9aB8
                 </code>
               </div>
             </div>
-            <div className="flex shrink-0 items-center gap-2 self-end sm:self-start">
+            <div className="flex shrink-0 items-center gap-2 self-start sm:self-center mt-5">
               <Button
                 aria-label="Copy wallet address"
-                variant="ghost"
-                size="sm"
+                variant="outline"
+                size="icon"
                 onClick={copyAddress}
-                className="h-10 w-10 rounded-xl border border-border bg-background/45 p-0 text-muted-foreground hover:text-primary"
+                className="h-10 w-10 rounded-xl border-border bg-background hover:text-primary transition-all cursor-pointer"
               >
                 <Copy className="h-4 w-4" />
               </Button>
               <Button
-                variant="ghost"
-                size="sm"
-                className="h-10 w-10 rounded-xl border border-border bg-background/45 p-0 text-muted-foreground hover:text-primary"
+                variant="outline"
+                size="icon"
+                className="h-10 w-10 rounded-xl border-border bg-background hover:text-primary transition-all cursor-pointer"
               >
                 <ExternalLink className="h-4 w-4" />
               </Button>
@@ -170,152 +173,160 @@ export function WalletDashboard() {
           </div>
         </Card>
 
-        <Card className="border-border bg-linear-to-br from-card to-background p-8">
-          <div className="mb-6 flex items-start justify-between gap-4">
-            <div>
-              <p className="mb-2 text-sm text-muted-foreground">Total Portfolio Value</p>
-              <div className="flex items-center gap-3">
-                <h2 className="text-5xl font-bold">{balanceVisible ? totalBalance : "******"}</h2>
+        {/* Portfolio Overview */}
+        <Card className="border-border bg-linear-to-br from-card via-card to-background/50 p-6 md:p-10 shadow-lg">
+          <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Total Portfolio Value
+              </Label>
+              <div className="flex items-center gap-4">
+                <h2 className="text-4xl md:text-6xl font-black tracking-tight">
+                  {balanceVisible ? totalBalance : "••••••••"}
+                </h2>
                 <button
                   onClick={() => setBalanceVisible(!balanceVisible)}
-                  className="text-muted-foreground transition-colors hover:text-foreground"
+                  className="rounded-full p-2 cursor-pointer text-muted-foreground transition-all hover:bg-primary/10 hover:text-primary"
                   aria-label={balanceVisible ? "Hide balance" : "Show balance"}
-                  aria-pressed={balanceVisible}
                 >
-                  {balanceVisible ? <Eye className="h-5 w-5" /> : <EyeOff className="h-5 w-5" />}
+                  {balanceVisible ? <Eye className="h-6 w-6" /> : <EyeOff className="h-5 w-5" />}
                 </button>
               </div>
-              <p className="mt-2 text-sm text-primary">+$2,345.50 (+5.5%) today</p>
+              <p className="flex items-center gap-2 text-sm font-medium text-primary">
+                <TrendingUp className="h-4 w-4" />
+                +$2,345.50 (5.5%) <span className="text-muted-foreground">last 24h</span>
+              </p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
             {routeActions.map((action) => (
-              <Button
-                key={action.title}
-                onClick={() => router.push(action.href)}
-                variant={action.primary ? "default" : "outline"}
-                className={
-                  action.primary
-                    ? "justify-start bg-primary text-black hover:bg-primary/90"
-                    : "justify-start border-border bg-background hover:bg-border"
-                }
-              >
-                <action.icon className="mr-2 h-4 w-4" />
-                {action.title}
-              </Button>
-            ))}
-          </div>
-
-          <div className="mt-4 grid grid-cols-1 gap-3 xl:grid-cols-4">
-            {routeActions.map((action) => (
-              <div
-                key={`${action.title}-detail`}
-                className="rounded-2xl border border-border bg-background/45 p-4"
-              >
-                <p className="text-sm font-semibold text-foreground">{action.title}</p>
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">{action.description}</p>
+              <div key={action.title} className="flex flex-col gap-2">
+                <Button
+                  onClick={() => router.push(action.href)}
+                  variant={action.primary ? "default" : "outline"}
+                  className={`h-14 w-full justify-start cursor-pointer rounded-xl px-4 text-base font-bold transition-all active:scale-95 ${
+                    action.primary
+                      ? "bg-primary text-black hover:bg-primary/90"
+                      : "border-border bg-background/50 hover:bg-background"
+                  }`}
+                >
+                  <action.icon
+                    className={`mr-3 h-5 w-5 ${action.primary ? "text-black" : "text-primary"}`}
+                  />
+                  {action.title}
+                </Button>
+                <p className="hidden md:block px-1 text-xs leading-relaxed text-muted-foreground/80">
+                  {action.description}
+                </p>
               </div>
             ))}
           </div>
         </Card>
 
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:gap-8">
+          {/* Asset List */}
           <div className="space-y-4 lg:col-span-2">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-xl font-semibold">Assets</h3>
-              <Button variant="ghost" size="sm" className="text-muted-foreground">
+            <div className="flex items-center justify-between px-1">
+              <h3 className="text-lg font-bold tracking-tight">Your Assets</h3>
+              <Button variant="link" size="sm" className="font-semibold text-primary">
                 View All
               </Button>
             </div>
 
-            {tokens.map((token) => (
-              <Card
-                key={token.symbol}
-                className="cursor-pointer border-border bg-card p-4 transition-all hover:border-primary/50"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <Image
-                      src={token.icon}
-                      alt={token.name}
-                      width={48}
-                      height={48}
-                      className="h-12 w-12 rounded-full"
-                    />
-                    <div>
-                      <p className="font-semibold">{token.symbol}</p>
-                      <p className="text-sm text-muted-foreground">{token.name}</p>
+            <div className="grid gap-3">
+              {tokens.map((token) => (
+                <Card
+                  key={token.symbol}
+                  className="group cursor-pointer border-border bg-card p-4 transition-all hover:border-primary/40"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="relative h-12 w-12 overflow-hidden rounded-full border border-border bg-background">
+                        <Image src={token.icon} alt={token.name} fill className="object-cover" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-bold leading-none">{token.symbol}</p>
+                        <p className="mt-1 text-xs text-muted-foreground font-medium uppercase">
+                          {token.name}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold">{token.amount}</p>
+                      <p className="text-xs text-muted-foreground font-medium">{token.usdValue}</p>
+                    </div>
+                    <div className="hidden sm:block text-right min-w-20">
+                      <p
+                        className={`text-sm font-bold ${token.changePositive ? "text-primary" : "text-red-500"}`}
+                      >
+                        {token.change}
+                      </p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-semibold">{token.amount}</p>
-                    <p className="text-sm text-muted-foreground">{token.usdValue}</p>
-                  </div>
-                  <div className="text-right">
-                    <p
-                      className={`text-sm font-semibold ${
-                        token.changePositive ? "text-primary" : "text-red-500"
-                      }`}
-                    >
-                      {token.change}
-                    </p>
-                  </div>
-                </div>
-              </Card>
-            ))}
+                </Card>
+              ))}
+            </div>
           </div>
 
+          {/* Activity Sidebar */}
           <div className="space-y-4">
-            <h3 className="mb-4 text-xl font-semibold">Recent Activity</h3>
+            <h3 className="text-lg font-bold tracking-tight px-1">Recent Activity</h3>
 
-            {transactions.map((tx, index) => (
-              <Card key={index} className="border-border bg-card p-4">
-                <div className="flex items-start gap-3">
-                  <div
-                    className={`flex h-10 w-10 items-center justify-center rounded-full ${
-                      tx.type === "send"
-                        ? "bg-red-500/10"
-                        : tx.type === "receive"
-                          ? "bg-primary/10"
-                          : "bg-accent/10"
-                    }`}
-                  >
-                    {tx.type === "send" ? (
-                      <ArrowUpRight className="h-5 w-5 text-red-500" />
-                    ) : tx.type === "receive" ? (
-                      <ArrowDownLeft className="h-5 w-5 text-primary" />
-                    ) : (
-                      <TrendingUp className="h-5 w-5 text-(--byreix-gold)" />
-                    )}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="mb-1 flex items-center justify-between">
-                      <p className="font-semibold capitalize">{tx.type}</p>
-                      <p className="font-semibold">{tx.amount}</p>
-                    </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <p className="truncate text-sm text-muted-foreground">
-                        {tx.type === "send"
-                          ? `To ${tx.to}`
+            <div className="grid gap-3">
+              {transactions.map((tx, index) => (
+                <Card key={index} className="border-border bg-card/50 p-4">
+                  <div className="flex items-start gap-4">
+                    <div
+                      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
+                        tx.type === "send"
+                          ? "bg-red-500/10"
                           : tx.type === "receive"
-                            ? `From ${tx.from}`
-                            : tx.token}
-                      </p>
-                      <p className="text-sm text-muted-foreground">{tx.usdValue}</p>
+                            ? "bg-primary/10"
+                            : "bg-amber-500/10"
+                      }`}
+                    >
+                      {tx.type === "send" ? (
+                        <ArrowUpRight className="h-5 w-5 text-red-500" />
+                      ) : tx.type === "receive" ? (
+                        <ArrowDownLeft className="h-5 w-5 text-primary" />
+                      ) : (
+                        <TrendingUp className="h-5 w-5 text-amber-500" />
+                      )}
                     </div>
-                    <p className="mt-1 text-xs text-muted-foreground">{tx.time}</p>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between">
+                        <p className="font-bold capitalize leading-none text-sm">{tx.type}</p>
+                        <p className="text-sm font-bold">{tx.amount}</p>
+                      </div>
+                      <div className="mt-1 flex items-center justify-between gap-2">
+                        <p className="truncate text-xs text-muted-foreground font-medium">
+                          {tx.type === "send"
+                            ? `To ${tx.to}`
+                            : tx.type === "receive"
+                              ? `From ${tx.from}`
+                              : tx.token}
+                        </p>
+                        <p className="text-xs text-muted-foreground font-medium">{tx.usdValue}</p>
+                      </div>
+                      <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+                        {tx.time}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </Card>
-            ))}
+                </Card>
+              ))}
+            </div>
 
-            <AdSlot adId="wallet-sidebar-ad" className="mt-8">
+            <AdSlot
+              adId="wallet-sidebar-ad"
+              className="mt-6 rounded-2xl overflow-hidden border border-border"
+            >
               <BannerAd
                 imageURL="/ads.mp4"
                 linkURL="https://example.com"
                 size={BannerAdSize.MEDIUM_RECTANGLE}
-                altText="Video Ad"
+                altText="Featured"
                 mediaType="video"
               />
             </AdSlot>

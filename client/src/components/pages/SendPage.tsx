@@ -93,7 +93,9 @@ export function SendPage() {
         <div className="space-y-6">
           {/* ── Recipient ─────────────────────────────────────────────────── */}
           <div className="space-y-2">
-            <Label htmlFor="recipient">Recipient Address</Label>
+            <Label htmlFor="recipient" className="px-1 text-sm">
+              Recipient Address
+            </Label>
             <div className="relative">
               <Input
                 id="recipient"
@@ -110,21 +112,21 @@ export function SendPage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 w-8 p-0 text-muted-foreground hover:text-primary"
+                  className="h-9 w-9 p-0 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
                 >
                   <Scan className="w-4 h-4" />
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 w-8 p-0 text-muted-foreground hover:text-primary"
+                  className="h-9 w-9 p-0 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
                 >
                   <QrCode className="w-4 h-4" />
                 </Button>
               </div>
             </div>
             {!isValidAddress && recipient && (
-              <p className="text-sm text-red-500 flex items-center gap-1">
+              <p className="text-sm text-red-500 flex items-center gap-1 px-1">
                 <AlertCircle className="w-4 h-4" />
                 Invalid address format
               </p>
@@ -133,19 +135,47 @@ export function SendPage() {
  
           {/*  Amount  */}
           <div className="space-y-2">
-            <Label htmlFor="amount">Amount</Label>
-            <div className="p-4 rounded-xl bg-background border border-border">
-              <div className="flex items-center justify-between mb-2">
+            <div className="flex justify-between items-center px-1">
+              <Label htmlFor="amount" className="text-sm">
+                Amount
+              </Label>
+              <span className="text-xs text-muted-foreground">
+                Balance: {selectedToken.balance} {selectedToken.symbol}
+              </span>
+            </div>
+            <div className="p-4 rounded-xl bg-background border border-border transition-colors focus-within:border-primary/50">
+              <div className="flex items-center justify-between gap-4 mb-2">
+                <Input
+                  id="amount"
+                  type="number"
+                  placeholder="0.00"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  className="bg-transparent border-none text-3xl md:text-4xl p-0 h-auto focus-visible:ring-0 flex-1 min-w-0"
+                />
                 <Button
                   variant="outline"
-                  className="flex items-center gap-2 border-border bg-card hover:bg-border"
+                  size="sm"
+                  className="flex items-center gap-2 border-border bg-card hover:bg-border h-10 px-3 shrink-0 cursor-pointer"
                 >
-                  <span className="font-semibold">{selectedToken.symbol}</span>
+                  <span className="font-bold">{selectedToken.symbol}</span>
                   <ChevronDown className="w-4 h-4" />
                 </Button>
-                <span className="text-sm text-muted-foreground">
-                  Balance: {selectedToken.balance}
+              </div>
+              <div className="flex items-center justify-between mt-4">
+                <span className="text-sm text-muted-foreground font-medium">
+                  ≈ $
+                  {usdValue.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
                 </span>
+                <button
+                  onClick={() => setAmount(selectedToken.balance.replace(/,/g, ""))}
+                  className="text-sm font-semibold text-primary hover:underline underline-offset-4 cursor-pointer"
+                >
+                  Use Maximum
+                </button>
               </div>
               <Input
                 id="amount"
@@ -172,10 +202,10 @@ export function SendPage() {
             </Label>
             <Input
               id="memo"
-              placeholder="Add a note..."
+              placeholder="What is this for?"
               value={memo}
               onChange={(e) => setMemo(e.target.value)}
-              className="bg-background border-border"
+              className="bg-background border-border h-11"
             />
           </div>
  
@@ -192,10 +222,10 @@ export function SendPage() {
                   ${networkFeeUsd.toFixed(2)}
                 </span>
               </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Total Amount</span>
-                <span className="text-foreground">
-                  {amount} {selectedToken.symbol}
+              <div className="pt-2 border-t border-border flex items-center justify-between text-sm">
+                <span className="font-medium">Total Cost</span>
+                <span className="text-foreground font-bold text-base">
+                  ${totalUsd.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
@@ -213,7 +243,7 @@ export function SendPage() {
           {/*  Send button */}
           <Button
             onClick={handleSend}
-            className="w-full bg-primary hover:bg-primary/90 text-black py-6 text-lg"
+            className="w-full cursor-pointer bg-primary hover:bg-primary/90 text-black py-7 text-lg font-bold transition-all active:scale-[0.98]"
           >
             <Send className="w-5 h-5 mr-2" />
             {amount
@@ -234,7 +264,7 @@ export function SendPage() {
                 setRecipient(contact.address);
                 setIsValidAddress(true);
               }}
-              className="w-full flex items-center justify-between p-3 rounded-lg bg-background border border-border hover:border-primary/50 transition-colors text-left"
+              className="w-full cursor-pointer flex items-center justify-between p-4 rounded-xl bg-card border border-border hover:border-primary/50 hover:bg-accent/50 transition-all text-left group"
             >
               <div>
                 <p className="text-sm font-semibold">{contact.name}</p>
@@ -242,7 +272,7 @@ export function SendPage() {
                   {contact.address}
                 </p>
               </div>
-              <ChevronDown className="w-4 h-4 text-muted-foreground -rotate-90" />
+              <ChevronDown className="w-4 h-4 text-muted-foreground -rotate-90 group-hover:text-primary transition-colors shrink-0 ml-2" />
             </button>
           ))}
         </div>
@@ -250,7 +280,7 @@ export function SendPage() {
  
       {/*Confirmation Dialog */}
       <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
-        <DialogContent className="bg-card border-border">
+        <DialogContent className="bg-card border-border sm:max-w-md mx-4 rounded-2xl">
           <DialogHeader>
             <DialogTitle>Confirm Transaction</DialogTitle>
             <DialogDescription>
@@ -280,10 +310,11 @@ export function SendPage() {
                   {amount} {selectedToken.symbol}
                 </span>
               </div>
+
               {memo && (
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Memo</span>
-                  <span className="text-sm">{memo}</span>
+                <div className="pt-2 border-t border-border flex flex-col gap-1">
+                  <span className="text-xs text-muted-foreground uppercase">Memo</span>
+                  <span className="text-sm italic">&quot;{memo}&quot;</span>
                 </div>
               )}
               <div className="flex items-center justify-between pt-3 border-t border-border">
@@ -313,13 +344,13 @@ export function SendPage() {
             <Button
               variant="outline"
               onClick={() => setShowConfirmDialog(false)}
-              className="flex-1 border-border"
+              className="flex-1 border-border h-11"
             >
               Cancel
             </Button>
             <Button
               onClick={confirmSend}
-              className="flex-1 bg-primary hover:bg-primary/90 text-black"
+              className="flex-1 bg-primary hover:bg-primary/90 text-black font-bold h-11"
             >
               <CheckCircle2 className="w-4 h-4 mr-2" />
               Confirm Send

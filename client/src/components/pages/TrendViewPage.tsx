@@ -43,6 +43,7 @@ export function TrendViewPage() {
   const [timeRange, setTimeRange] = useState("7D");
   const formatPrice = (value: number) => `$${value.toFixed(4)}`;
   const { data: realTokens } = useSidraTokens();
+
   const tokens = realTokens
     ? realTokens.map((t) => ({
         symbol: t.symbol,
@@ -64,29 +65,31 @@ export function TrendViewPage() {
   const stats = [
     {
       label: "Market Cap",
-      value: realTokens ? `$${(currentToken?.marketCap || 0).toLocaleString()}` : "$24.5B",
+      value: realTokens ? `$${(currentToken?.marketCap || 0).toLocaleString()}` : "$250,000,000",
     },
     {
       label: "24h Volume",
-      value: realTokens ? `$${(currentToken?.volume24h || 0).toLocaleString()}` : "$1.2B",
+      value: realTokens ? `$${(currentToken?.volume24h || 0).toLocaleString()}` : "$15,400,000",
     },
     { label: "Circulating Supply", value: "100 Billion SDA" },
     { label: "All Time High", value: "$3.45" },
   ];
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
+    <div className="max-w-7xl mx-auto space-y-8 px-4 py-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-3 mb-2">
-            <h2 className="text-3xl font-bold">{selectedTokenData.name}</h2>
-            <span className="text-2xl text-muted-foreground">{selectedToken}</span>
-          </div>
+      <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6">
+        <div className="space-y-2">
           <div className="flex items-center gap-3">
-            <span className="text-3xl font-bold">{selectedTokenData.price}</span>
+            <h2 className="text-3xl md:text-4xl font-black tracking-tight">
+              {selectedTokenData.name}
+            </h2>
+            <span className="text-xl font-medium text-muted-foreground">{selectedToken}</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="text-4xl font-bold tabular-nums">{selectedTokenData.price}</span>
             <span
-              className={`flex items-center gap-1 text-lg ${
+              className={`flex items-center gap-1 text-lg font-bold ${
                 selectedTokenData.positive ? "text-primary" : "text-red-500"
               }`}
             >
@@ -102,30 +105,30 @@ export function TrendViewPage() {
 
         <Button
           variant="outline"
-          className="flex items-center gap-2 border-border bg-card hover:bg-border"
+          className="flex items-center gap-2 border-border bg-card hover:bg-muted h-12 px-6 rounded-xl cursor-pointer"
         >
-          <span className="font-semibold">{selectedToken}</span>
-          <ChevronDown className="w-4 h-4" />
+          <span className="font-bold">{selectedToken}</span>
+          <ChevronDown className="w-4 h-4 opacity-50" />
         </Button>
       </div>
 
       {/* Chart */}
-      <Card className="p-6 bg-card border-border">
+      <Card className="p-4 md:p-8 bg-card border-border shadow-lg">
         {/* Time Range Selector */}
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold">Price Chart</h3>
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+          <h3 className="text-lg font-bold tracking-tight">Market Performance</h3>
+          <div className="flex items-center gap-1 p-1 bg-background/50 rounded-xl border border-border overflow-x-auto max-w-full">
             {timeRanges.map((range) => (
               <Button
                 key={range}
                 variant={timeRange === range ? "default" : "ghost"}
                 size="sm"
                 onClick={() => setTimeRange(range)}
-                className={
+                className={`text-xs font-black transition-all cursor-pointer ${
                   timeRange === range
-                    ? "bg-primary text-black hover:bg-primary/90"
-                    : "text-muted-foreground hover:text-white hover:bg-border"
-                }
+                    ? "bg-primary text-black hover:bg-primary/90 shadow-sm"
+                    : "text-muted-foreground hover:text-foreground hover:bg-transparent"
+                }`}
               >
                 {range}
               </Button>
@@ -134,36 +137,50 @@ export function TrendViewPage() {
         </div>
 
         {/* Chart */}
-        <div className="h-100 min-h-75">
+        <div className="h-75 md:h-100 w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={currentData}>
+            <AreaChart data={currentData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3} />
                   <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis dataKey="time" stroke="var(--muted-foreground)" style={{ fontSize: "12px" }} />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke="var(--border)"
+                opacity={0.4}
+              />
+              <XAxis
+                dataKey="time"
+                stroke="var(--muted-foreground)"
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+              />
               <YAxis
                 stroke="var(--muted-foreground)"
-                style={{ fontSize: "12px" }}
-                domain={["auto", "auto"]}
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+                domain={["dataMin", "auto"]}
+                tickFormatter={(val) => `$${val.toFixed(2)}`}
               />
               <Tooltip
                 contentStyle={{
                   backgroundColor: "var(--card)",
                   border: "1px solid var(--border)",
-                  borderRadius: "8px",
-                  color: "var(--foreground)",
+                  borderRadius: "12px",
+                  boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
                 }}
-                labelStyle={{ color: "var(--muted-foreground)" }}
               />
               <Area
                 type="monotone"
                 dataKey="price"
                 stroke="var(--primary)"
-                strokeWidth={2}
+                strokeWidth={3}
+                fillOpacity={1}
                 fill="url(#colorPrice)"
               />
             </AreaChart>
@@ -172,41 +189,52 @@ export function TrendViewPage() {
       </Card>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat) => (
-          <Card key={stat.label} className="p-4 bg-card border-border">
-            <p className="text-sm text-muted-foreground mb-1">{stat.label}</p>
-            <p className="text-xl font-semibold">{stat.value}</p>
+          <Card
+            key={stat.label}
+            className="p-5 bg-card border-border shadow-sm group hover:border-primary/30 transition-colors"
+          >
+            <p className="text-xs font-black uppercase tracking-widest text-muted-foreground mb-2">
+              {stat.label}
+            </p>
+            <p className="text-2xl font-bold tracking-tight group-hover:text-primary transition-colors">
+              {stat.value}
+            </p>
           </Card>
         ))}
       </div>
 
       {/* Token List */}
-      <Card className="p-6 bg-card border-border">
-        <h3 className="text-lg font-semibold mb-4">All Tokens</h3>
+      <Card className="p-6 bg-card border-border shadow-lg">
+        <h3 className="text-lg font-bold tracking-tight mb-6">Market Watchlist</h3>
         <div className="space-y-3">
           {tokens.map((token) => (
             <button
               key={token.symbol}
               onClick={() => setSelectedToken(token.symbol)}
-              className={`w-full flex items-center justify-between p-4 rounded-lg transition-all ${
+              className={`w-full flex items-center justify-between p-4 rounded-xl cursor-pointer transition-all border active:scale-[0.98] ${
                 selectedToken === token.symbol
-                  ? "bg-primary/10 border border-primary/50"
-                  : "bg-background border border-border hover:border-primary/30"
+                  ? "bg-primary/5 border-primary/40 ring-1 ring-primary/20"
+                  : "bg-background/40 border-transparent hover:border-border hover:bg-background"
               }`}
             >
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20">
                   <span className="text-sm font-bold text-primary">{token.symbol?.[0] ?? "?"}</span>
                 </div>
                 <div className="text-left">
-                  <p className="font-semibold">{token.symbol}</p>
-                  <p className="text-sm text-muted-foreground">{token.name}</p>
+                  <p className="font-bold text-base leading-tight">{token.symbol}</p>
+                  <p className="text-xs text-muted-foreground font-medium uppercase mt-0.5">
+                    {token.name}
+                  </p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="font-semibold">{token.price}</p>
-                <p className={`text-sm ${token.positive ? "text-primary" : "text-red-500"}`}>
+                <p className="font-bold text-base tabular-nums leading-tight">{token.price}</p>
+                <p
+                  className={`text-xs font-bold mt-0.5 ${token.positive ? "text-primary" : "text-red-500"}`}
+                >
                   {token.change}
                 </p>
               </div>

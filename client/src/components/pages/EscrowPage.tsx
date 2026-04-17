@@ -346,9 +346,9 @@ export function EscrowPage() {
             <DialogTrigger asChild>
               <Button
                 size="sm"
-                className="bg-primary hover:bg-primary/90 text-primary-foreground cursor-pointer"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground cursor-pointer font-bold"
               >
-                <Plus className="w-4 h-4 mr-1" />
+                <Plus className="w-4 h-4 " />
                 New
               </Button>
             </DialogTrigger>
