@@ -51,6 +51,9 @@ importers:
       '@types/cookie-parser':
         specifier: ^1.4.10
         version: 1.4.10(@types/express@5.0.6)
+      '@types/express':
+        specifier: ^5.0.6
+        version: 5.0.6
       '@types/jsonwebtoken':
         specifier: ^9.0.10
         version: 9.0.10

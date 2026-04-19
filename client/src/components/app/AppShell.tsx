@@ -50,6 +50,16 @@ export function AppShell({ children }: AppShellProps) {
     }
   }, [isAuthenticated, pathname, router]);
 
+  useEffect(() => {
+    const handleAuthError = () => {
+      logout();
+      router.push("/login");
+    };
+
+    window.addEventListener("auth-error", handleAuthError);
+    return () => window.removeEventListener("auth-error", handleAuthError);
+  }, [logout, router]);
+
   if (!isAuthenticated) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-4 text-center text-muted-foreground">
