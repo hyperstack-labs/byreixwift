@@ -7,9 +7,8 @@ import { Wallet, Loader2, AlertCircle, ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
 import { useShake } from "@/hooks";
 
-interface EthereumProvider {
-  request: (args: { method: string; params?: unknown[] }) => Promise<string[]>;
-}
+import { useAccount, useConnect } from "wagmi";
+import { useShake } from "@/hooks";
 
 interface WalletLoginButtonProps {
   onConnect: (address: string) => void;
@@ -17,60 +16,15 @@ interface WalletLoginButtonProps {
 }
 
 export function WalletLoginButton({ onConnect, disabled = false }: WalletLoginButtonProps) {
-  const [status, setStatus] = useState<"idle" | "connecting" | "error" | "no-wallet">("idle");
-
-  const [error, setError] = useState("");
-
+  const { isConnecting } = useAccount();
+  const { connect, connectors, error: connectError } = useConnect();
   const { shakeTrigger, triggerShake } = useShake();
 
   const handleConnect = async () => {
-    setStatus("connecting");
-    setError("");
-
-    try {
-      //STEP 1: Sidra Chain Wallet Detection
-      // no sidra chain extension so will use metamask or simulation
-
-      if (typeof window !== "undefined" && "ethereum" in window) {
-        const provider = window.ethereum as unknown as EthereumProvider;
-
-        // STEP 2: Sidra Chain Account Address request
-        // There should be a popup where the sidra chain address will be shown
-
-        const accounts = await provider.request({
-          method: "eth_requestAccounts",
-        });
-
-        if (accounts.length > 0) {
-          const walletAddress = accounts[0];
-
-          // Step 3: Web3 network check to ensure that the wallet is on the sidra chain (e.g sidra testnet)
-          // if not switch to sidra testnet
-
-          // Step 4: Backend authentication flow
-          // API call to the Node/NestJS backend to issue a nonce.
-          // The nonce will be signed by the wallet and verified by the API
-          // before a real session token is returned.
-
-          // SUCCESSFUL AUTHENTICATION
-
-          setStatus("idle");
-          onConnect(walletAddress);
-        }
-      } else {
-        triggerShake();
-        setStatus("no-wallet");
-        setError("Sidra Wallet not detected. Please install the Sidra Wallet/Extention.");
-      }
-    } catch (err: unknown) {
-      setStatus("error");
+    if (connectors.length > 0) {
+      connect({ connector: connectors[0] });
+    } else {
       triggerShake();
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        triggerShake();
-        setError("Failed to connect wallet.");
-      }
     }
   };
 
@@ -83,23 +37,23 @@ export function WalletLoginButton({ onConnect, disabled = false }: WalletLoginBu
     >
       <Button
         onClick={handleConnect}
-        disabled={status === "connecting" || disabled}
+        disabled={isConnecting || disabled}
         className="flex items-center w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-7 text-base transition-all hover:shadow-[0_0_30px_rgba(38,213,120,0.3)] group"
       >
-        {status === "connecting" ? (
+        {isConnecting ? (
           <Loader2 className="w-6 h-6 mr-3 animate-spin" />
         ) : (
           <Wallet className="w-6 h-6 mr-3 group-hover:scale-110 transition-transform" />
         )}
-        {status === "connecting" ? "Connecting..." : "Connect Sidra Wallet"}
+        {isConnecting ? "Connecting..." : "Connect Sidra Wallet"}
         <ArrowRight className="w-6 h-6 ml-3 group-hover:translate-x-1 transition-transform" />
       </Button>
 
       {/* User Feedback/Error Message */}
-      {(status === "error" || status === "no-wallet") && (
+      {connectError && (
         <div className="flex items-center gap-2 p-3 rounded-md bg-red-500/10 border border-red-500/20 text-red-500 text-sm">
           <AlertCircle className="w-4 h-4 shrink-0" />
-          <p>{error}</p>
+          <p>{connectError.message}</p>
         </div>
       )}
     </motion.div>

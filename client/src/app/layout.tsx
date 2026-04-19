@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Manrope } from "next/font/google";
 import "./globals.css";
-import QueryProvider from "@/providers/QueryProvider";
+import { Web3Provider } from "@/providers/Web3Provider";
 import { Toaster } from "@/components/ui/sonner";
 
 const manrope = Manrope({
@@ -29,7 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${manrope.variable} antialiased`}>
-        <QueryProvider>{children}</QueryProvider>
+        <Web3Provider>{children}</Web3Provider>
         <Toaster
           position="top-right"
           toastOptions={{

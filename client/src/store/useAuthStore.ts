@@ -4,8 +4,10 @@ import { persist } from "zustand/middleware";
 interface AuthState {
   isAuthenticated: boolean;
   identity: string | null;
-  login: (email: string) => void;
+  accessToken: string | null;
+  login: (identity: string, accessToken: string) => void;
   logout: () => void;
+  setAccessToken: (token: string) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -13,14 +15,17 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       isAuthenticated: false,
       identity: null,
-      login: (identity) => set({ isAuthenticated: true, identity }),
-      logout: () => set({ isAuthenticated: false, identity: null }),
+      accessToken: null,
+      login: (identity, accessToken) => set({ isAuthenticated: true, identity, accessToken }),
+      logout: () => set({ isAuthenticated: false, identity: null, accessToken: null }),
+      setAccessToken: (accessToken) => set({ accessToken }),
     }),
     {
       name: "byreixwift-auth",
       partialize: (state) => ({
         isAuthenticated: state.isAuthenticated,
         identity: state.identity,
+        accessToken: state.accessToken,
       }),
     }
   )
