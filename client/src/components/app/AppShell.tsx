@@ -114,9 +114,16 @@ export function AppShell({ children }: AppShellProps) {
     }
   };
 
-  const handleDisconnect = () => {
-    logout();
-    router.push("/");
+  const handleDisconnect = async () => {
+    try {
+      const { api } = await import("@/lib/api");
+      await api.post("/auth/logout");
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      logout();
+      router.push("/");
+    }
   };
 
   return (
