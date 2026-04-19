@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui";
-import { ArrowRight, Shield, Wallet } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui";
+import { Shield, Wallet } from "lucide-react";
 import { motion } from "motion/react";
 import { WalletLoginButton } from "../WalletLoginButton";
 

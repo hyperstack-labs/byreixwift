@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { LoginPage } from "@/components/pages";
@@ -34,9 +34,8 @@ export function LoginRouteClient() {
     }
   }, [isAuthenticated, nextPath, router]);
 
-  const handleWalletConnect = async () => {
-    if (!isConnected || !address) {
-      // WalletLoginButton handles connection, but if we get here without address, we wait
+  const handleWalletConnect = useCallback(async () => {
+    if (!isConnected || !address || isAuthenticated || isLoading) {
       return;
     }
 
@@ -78,14 +77,14 @@ export function LoginRouteClient() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [isConnected, address, isAuthenticated, isLoading, login, nextPath, router, signMessageAsync, disconnect]);
 
   // Trigger SIWE once wallet is connected
   useEffect(() => {
     if (isConnected && !isAuthenticated && !isLoading) {
       handleWalletConnect();
     }
-  }, [isConnected, isAuthenticated]);
+  }, [isConnected, isAuthenticated, isLoading, handleWalletConnect]);
 
   return (
     <PublicSiteShell currentPage="login">

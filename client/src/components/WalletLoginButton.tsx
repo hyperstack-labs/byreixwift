@@ -1,21 +1,18 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "./ui/button";
 import { Wallet, Loader2, AlertCircle, ArrowRight } from "lucide-react";
 
 import { motion } from "motion/react";
-import { useShake } from "@/hooks";
-
 import { useAccount, useConnect } from "wagmi";
 import { useShake } from "@/hooks";
 
 interface WalletLoginButtonProps {
-  onConnect: (address: string) => void;
+  onConnect?: (address: string) => void;
   disabled?: boolean;
 }
 
-export function WalletLoginButton({ onConnect, disabled = false }: WalletLoginButtonProps) {
+export function WalletLoginButton({ disabled = false }: WalletLoginButtonProps) {
   const { isConnecting } = useAccount();
   const { connect, connectors, error: connectError } = useConnect();
   const { shakeTrigger, triggerShake } = useShake();

@@ -26,6 +26,8 @@ export function WalletDashboard() {
   const walletAddress = identity || "0x0000...0000";
 
   const tokens = [
+    {
+      symbol: "SDA",
       name: "Sidra",
       amount: "12,450.50",
       usdValue: "$24,901.00",
