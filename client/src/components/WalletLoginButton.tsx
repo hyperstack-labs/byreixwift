@@ -20,6 +20,7 @@ export function WalletLoginButton({ disabled = false }: WalletLoginButtonProps) 
   const { shakeTrigger, triggerShake } = useShake();
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
