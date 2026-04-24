@@ -87,22 +87,6 @@ export const USE_MOCK: boolean = false; // flip this line
 
 ---
 
-## Integration Points Checklist
-
-When the official Sidra API docs are published, work through this list in order:
-
-- [ ] Confirm base URL and auth mechanism → update `SidraTokenDataProvider` + `SidraTrendDataProvider`
-- [ ] Confirm `/token/list` response schema → update or add `mapResponse()` in `SidraTokenDataProvider`
-- [ ] Confirm `/token/metrics` response schema
-- [ ] Confirm `/token/history` endpoint path and query params
-- [ ] Confirm supported time ranges → update `SIDRA_SUPPORTED_RANGES` in `SidraTrendDataProvider`
-- [ ] Confirm timestamp format (ISO 8601 assumed) → review `formatLabel()` in `SidraTrendDataProvider`
-- [ ] Set `NEXT_PUBLIC_USE_MOCK=false` in staging environment
-- [ ] Run end-to-end smoke test on `TrendViewPage` and `TokenPriceBoard`
-- [ ] Remove `@deprecated` shim (`services/tokenMetrics.ts`) once no callers remain
-- [ ] Delete `providers/data/mock/` if mock data is no longer needed in any environment
-
----
 
 ## Adding a New Data Domain
 
