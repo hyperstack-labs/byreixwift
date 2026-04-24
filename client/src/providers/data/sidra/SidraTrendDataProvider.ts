@@ -7,7 +7,7 @@ import {
 } from "../ITrendDataProvider";
 
 const BASE_URL =
-  process.env.NEXT_PUBLIC_SIDRA_API_URL ?? "https://localhost:3001/api";
+  process.env.NEXT_PUBLIC_SIDRA_API_URL ?? "http://localhost:3001/api";
 
 const SIDRA_SUPPORTED_RANGES: TrendTimeRange[] = ["1H", "24H", "7D", "30D", "1Y"];
 
