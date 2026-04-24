@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { Card, Button } from "../ui";
 import { useSidraTokens } from "@/hooks/useSidraTokens";
+import { useTrendData, useSupportedRanges } from "@/hooks/useTrendData";
+import { TrendTimeRange } from "@/providers/data/ITrendDataProvider";
 import { TrendingUp, TrendingDown, ChevronDown } from "lucide-react";
 import {
   AreaChart,
@@ -14,35 +16,20 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-// Mock data for different time ranges
-const CHART_DATA = {
-  "1H": Array.from({ length: 12 }, (_, i) => ({
-    time: `${i * 5}m`,
-    price: 2.0 + (i % 3) * 0.05 - 0.02,
-  })),
-  "24H": Array.from({ length: 24 }, (_, i) => ({
-    time: `${i}:00`,
-    price: 2.0 + (i % 5) * 0.1 - 0.05,
-  })),
-  "7D": Array.from({ length: 7 }, (_, i) => ({
-    time: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][i],
-    price: 1.8 + i * 0.04 + (i % 2) * 0.05,
-  })),
-  "30D": Array.from({ length: 30 }, (_, i) => ({
-    time: `${i + 1}`,
-    price: 1.6 + i * 0.015 + (i % 4) * 0.025,
-  })),
-  "1Y": Array.from({ length: 12 }, (_, i) => ({
-    time: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][i],
-    price: 1.0 + i * 0.1 + (i % 3) * 0.1,
-  })),
-};
-
 export function TrendViewPage() {
-  const [selectedToken, setSelectedToken] = useState("SDA");
-  const [timeRange, setTimeRange] = useState("7D");
+  const [selectedToken, setSelectedToken] = useState<string>("SDA");
+  const [timeRange, setTimeRange] = useState<TrendTimeRange>("7D");
+
   const formatPrice = (value: number) => `$${value.toFixed(4)}`;
+
+  // Token list — sourced from the active provider via hook
   const { data: realTokens } = useSidraTokens();
+
+  // Historical chart data — sourced from the active trend provider via hook
+  const { data: currentData = [] } = useTrendData(selectedToken, timeRange);
+
+  // Range buttons driven by the provider's capability declaration
+  const { data: timeRanges = ["1H", "24H", "7D", "30D", "1Y"] } = useSupportedRanges();
 
   const tokens = realTokens
     ? realTokens.map((t) => ({
@@ -57,21 +44,25 @@ export function TrendViewPage() {
         { symbol: "BRXW", name: "ByReiXwift", price: "$0.15", change: "+5.2%", positive: true },
       ];
 
-  const timeRanges = ["1H", "24H", "7D", "30D", "1Y"];
   const currentToken = realTokens?.find((t) => t.symbol === selectedToken);
-  const currentData = CHART_DATA[timeRange as keyof typeof CHART_DATA];
   const selectedTokenData = tokens.find((t) => t.symbol === selectedToken) || tokens[0];
 
   const stats = [
     {
       label: "Market Cap",
-      value: realTokens ? `$${(currentToken?.marketCap || 0).toLocaleString()}` : "$250,000,000",
+      value: currentToken
+        ? `$${currentToken.marketCap.toLocaleString()}`
+        : "$250,000,000",
     },
     {
       label: "24h Volume",
-      value: realTokens ? `$${(currentToken?.volume24h || 0).toLocaleString()}` : "$15,400,000",
+      value: currentToken
+        ? `$${currentToken.volume24h.toLocaleString()}`
+        : "$15,400,000",
     },
+    // @integration-point: replace with real circulating supply from Sidra API
     { label: "Circulating Supply", value: "100 Billion SDA" },
+    // @integration-point: replace with real ATH from Sidra API
     { label: "All Time High", value: "$3.45" },
   ];
 
@@ -123,7 +114,7 @@ export function TrendViewPage() {
                 key={range}
                 variant={timeRange === range ? "default" : "ghost"}
                 size="sm"
-                onClick={() => setTimeRange(range)}
+                onClick={() => setTimeRange(range as TrendTimeRange)}
                 className={`text-xs font-black transition-all cursor-pointer ${
                   timeRange === range
                     ? "bg-primary text-black hover:bg-primary/90 shadow-sm"
