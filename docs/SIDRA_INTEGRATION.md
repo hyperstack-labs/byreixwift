@@ -36,7 +36,7 @@ layer boundaries above.
 ```bash
 # .env.local
 NEXT_PUBLIC_USE_MOCK=false
-NEXT_PUBLIC_SIDRA_API_URL=https://api.sidra.io/v1
+NEXT_PUBLIC_SIDRA_API_URL=http://localhost:3001/api/
 ```
 
 No code changes required. `DataProviderFactory` reads the flag at module
