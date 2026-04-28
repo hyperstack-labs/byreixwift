@@ -16,11 +16,15 @@ import {
 import { toast } from "sonner";
 import Image from "next/image";
 import { AdSlot, BannerAd, BannerAdSize } from "@/components/ads";
+import { useAuthStore } from "@/store";
 
 export function WalletDashboard() {
   const router = useRouter();
+  const { identity } = useAuthStore();
   const [balanceVisible, setBalanceVisible] = useState(true);
   
+  const walletAddress = identity || "0x0000...0000";
+
   const tokens = [
     {
       symbol: "SDA",
@@ -132,8 +136,10 @@ export function WalletDashboard() {
   const totalBalance = "$44,976.00";
 
   const copyAddress = () => {
-    navigator.clipboard.writeText("0x742d35Cc6634C0532925a3b844Bc9e7595f9aB8");
-    toast.success("Address copied to clipboard");
+    if (identity) {
+      navigator.clipboard.writeText(identity);
+      toast.success("Address copied to clipboard");
+    }
   };
 
   return (
@@ -148,7 +154,7 @@ export function WalletDashboard() {
               </Label>
               <div className="group relative flex items-center rounded-xl border border-border bg-background/50 px-4 py-3">
                 <code className="block flex-1 overflow-hidden text-ellipsis break-all font-mono text-sm text-foreground sm:text-base">
-                  0x742d35Cc6634C0532925a3b844Bc9e7595f9aB8
+                  {walletAddress}
                 </code>
               </div>
             </div>

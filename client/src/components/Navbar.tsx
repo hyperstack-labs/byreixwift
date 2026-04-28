@@ -131,7 +131,7 @@ export function Navbar({
             duration: 0.35,
             ease: [0.22, 1, 0.36, 1],
           }}
-          className={`pointer-events-auto overflow-hidden border transition-[background-color,border-color,box-shadow] duration-300 ${
+          className={`pointer-events-auto overflow-visible border transition-[background-color,border-color,box-shadow] duration-300 ${
             useSolidChrome
               ? "w-full min-w-full rounded-none border-x-0 border-t-0 border-b-[rgba(214,196,133,0.12)] bg-[linear-gradient(180deg,rgba(5,18,12,0.9)_0%,rgba(5,18,12,0.78)_100%)] backdrop-blur-xl shadow-none"
               : "w-full min-w-full rounded-none border-transparent bg-transparent shadow-none"

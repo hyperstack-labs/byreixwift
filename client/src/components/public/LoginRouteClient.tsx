@@ -1,24 +1,30 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { LoginPage } from "@/components/pages";
 import { PublicSiteShell } from "@/components/public/PublicSiteShell";
 import { useAuthStore } from "@/store";
+import { useAccount, useSignMessage, useDisconnect } from "wagmi";
+import { SiweMessage } from "siwe";
+import { api } from "@/lib/api";
 
 export function LoginRouteClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isAuthenticated, login } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
+  
+  const { address, isConnected } = useAccount();
+  const { signMessageAsync } = useSignMessage();
+  const { disconnect } = useDisconnect();
+
   const nextPath = useMemo(() => {
     const requestedPath = searchParams.get("next");
-
     if (requestedPath && requestedPath.startsWith("/")) {
       return requestedPath;
     }
-
     return "/app";
   }, [searchParams]);
 
@@ -28,15 +34,57 @@ export function LoginRouteClient() {
     }
   }, [isAuthenticated, nextPath, router]);
 
-  const finishLogin = (message: string, identity: string) => {
-    setIsLoading(true);
+  const handleWalletConnect = useCallback(async () => {
+    if (!isConnected || !address || isAuthenticated || isLoading) {
+      return;
+    }
 
-    window.setTimeout(() => {
-      login(identity);
-      toast.success(message);
+    setIsLoading(true);
+    try {
+      // 1. Get Nonce
+      const { data: { nonce } } = await api.get("/auth/nonce");
+
+      // 2. Create SIWE Message
+      const message = new SiweMessage({
+        domain: window.location.host,
+        address,
+        statement: "Sign in with Ethereum to ByReiXwift.",
+        uri: window.location.origin,
+        version: "1",
+        chainId: 1, // Change as needed for Sidrachain
+        nonce,
+      });
+
+      const preparedMessage = message.prepareMessage();
+
+      // 3. Sign Message
+      const signature = await signMessageAsync({ message: preparedMessage });
+
+      // 4. Verify on Backend
+      const { data } = await api.post("/auth/verify", {
+        message: preparedMessage,
+        signature,
+      });
+
+      // 5. Update Store
+      login(data.user.address, data.accessToken);
+      toast.success("Wallet access granted. Welcome back!");
       router.push(nextPath);
-    }, 700);
-  };
+    } catch (error) {
+      console.error("SIWE error:", error);
+      toast.error("Authentication failed. Please try again.");
+      disconnect();
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isConnected, address, isAuthenticated, isLoading, login, nextPath, router, signMessageAsync, disconnect]);
+
+  // Trigger SIWE once wallet is connected
+  useEffect(() => {
+    if (isConnected && !isAuthenticated && !isLoading) {
+      handleWalletConnect();
+    }
+  }, [isConnected, isAuthenticated, isLoading, handleWalletConnect]);
 
   return (
     <PublicSiteShell currentPage="login">
@@ -47,28 +95,19 @@ export function LoginRouteClient() {
             router.push("/");
             return;
           }
-
           if (page === "signup") {
             router.push("/contact");
             return;
           }
-
           if (page.startsWith("/")) {
             router.push(page);
             return;
           }
-
           router.push("/");
         }}
-        onGoogleLogin={() =>
-          finishLogin("Google access granted. Open the app to continue.", "demo@byreixwift.local")
-        }
-        onWalletConnect={() =>
-          finishLogin(
-            "Wallet access granted. Open the app to continue.",
-            "wallet@byreixwift.local"
-          )
-        }
+        onWalletConnect={() => {
+          // Connection is handled by wagmi inside the LoginPage's WalletLoginButton
+        }}
       />
     </PublicSiteShell>
   );
