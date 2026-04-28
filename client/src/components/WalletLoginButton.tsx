@@ -5,8 +5,7 @@ import { Wallet, Loader2, AlertCircle, ArrowRight } from "lucide-react";
 
 import { motion } from "motion/react";
 import { useAccount, useConnect } from "wagmi";
-import { useShake } from "@/hooks";
-import { useEffect, useState } from "react";
+import { useShake, useIsClient } from "@/hooks";
 
 interface WalletLoginButtonProps {
   onConnect?: (address: string) => void;
@@ -14,14 +13,10 @@ interface WalletLoginButtonProps {
 }
 
 export function WalletLoginButton({ disabled = false }: WalletLoginButtonProps) {
-  const [mounted, setMounted] = useState(false);
+  const isClient = useIsClient();
   const { isConnecting } = useAccount();
   const { connect, connectors, error: connectError } = useConnect();
   const { shakeTrigger, triggerShake } = useShake();
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const handleConnect = async () => {
     if (connectors.length > 0) {
@@ -31,7 +26,7 @@ export function WalletLoginButton({ disabled = false }: WalletLoginButtonProps) 
     }
   };
 
-  if (!mounted) {
+  if (!isClient) {
     return (
       <Button
         disabled

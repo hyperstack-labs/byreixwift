@@ -1,16 +1,10 @@
 "use client";
 
 import { X, Megaphone, AlertTriangle, Info } from "lucide-react";
-import { useState, useSyncExternalStore } from "react";
+import { useState } from "react";
 import { useActiveAnnouncement } from "@/store";
+import { useIsClient } from "@/hooks";
 
-function useIsClient() {
-  return useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false
-  );
-}
 
 export function AnnouncementBanner() {
   const activeAnnouncement = useActiveAnnouncement();
