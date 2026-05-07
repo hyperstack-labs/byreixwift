@@ -81,9 +81,16 @@ export function LoginRouteClient() {
 
   // Trigger SIWE once wallet is connected
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
     if (isConnected && !isAuthenticated && !isLoading) {
-      handleWalletConnect();
+      // Defer to avoid "setState synchronously within an effect" warning
+      timeoutId = setTimeout(() => {
+        handleWalletConnect();
+      }, 0);
     }
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, [isConnected, isAuthenticated, isLoading, handleWalletConnect]);
 
   return (
