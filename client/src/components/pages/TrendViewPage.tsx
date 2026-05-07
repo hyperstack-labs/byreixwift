@@ -50,15 +50,11 @@ export function TrendViewPage() {
   const stats = [
     {
       label: "Market Cap",
-      value: currentToken
-        ? `$${currentToken.marketCap.toLocaleString()}`
-        : "$250,000,000",
+      value: currentToken ? `$${currentToken.marketCap.toLocaleString()}` : "$250,000,000",
     },
     {
       label: "24h Volume",
-      value: currentToken
-        ? `$${currentToken.volume24h.toLocaleString()}`
-        : "$15,400,000",
+      value: currentToken ? `$${currentToken.volume24h.toLocaleString()}` : "$15,400,000",
     },
     // @integration-point: replace with real circulating supply from Sidra API
     { label: "Circulating Supply", value: "100 Billion SDA" },

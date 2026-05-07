@@ -319,7 +319,7 @@ function PreviewShell({
     if (!isInView || hasStartedRef.current === true) {
       return;
     }
-    
+
     hasStartedRef.current = true;
     void controls.start("visible");
   }, [controls, isInView]);
@@ -576,11 +576,14 @@ function ApprovalPreview({ reducedMotion }: { reducedMotion: boolean }) {
                   <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{item.copy}</p>
                 </div>
               </div>
-              </motion.div>
+            </motion.div>
           ))}
         </motion.div>
 
-        <motion.div variants={previewGroup(reducedMotion)} className="mt-4 grid gap-3 sm:grid-cols-2">
+        <motion.div
+          variants={previewGroup(reducedMotion)}
+          className="mt-4 grid gap-3 sm:grid-cols-2"
+        >
           {visibilityRows.slice(0, 4).map((row) => (
             <motion.div
               key={row.label}
@@ -633,7 +636,12 @@ export function LandingPage({ onConnect }: LandingPageProps) {
             transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1], delay: 0.08 }}
             className="pointer-events-none absolute left-1/2 top-[56svh] h-[46svh] w-[210vw] max-w-none -translate-x-1/2 sm:top-[58svh] sm:h-[48svh] sm:w-[168vw] lg:w-[126vw]"
           >
-            <Image src="/horizon_glow.png" alt="" fill className="object-cover mix-blend-screen opacity-80" />
+            <Image
+              src="/horizon_glow.png"
+              alt=""
+              fill
+              className="object-cover mix-blend-screen opacity-80"
+            />
           </motion.div>
 
           <motion.div
@@ -724,7 +732,10 @@ export function LandingPage({ onConnect }: LandingPageProps) {
             </p>
           </motion.div>
 
-          <motion.div {...sectionReveal(reducedMotion, 0.08)} className="grid gap-3 sm:gap-4 sm:grid-cols-2">
+          <motion.div
+            {...sectionReveal(reducedMotion, 0.08)}
+            className="grid gap-3 sm:gap-4 sm:grid-cols-2"
+          >
             <div className={`${contentCardClass} p-4.5 sm:p-6`}>
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/85">
                 What users still face
@@ -866,7 +877,10 @@ export function LandingPage({ onConnect }: LandingPageProps) {
             </p>
             <div className="mt-6 grid gap-2.5 sm:mt-7 sm:grid-cols-3 sm:gap-3">
               {transferHighlights.map((item) => (
-                <div key={item.label} className={`${insetCardClass} px-3 py-2.5 text-left sm:px-3.5 sm:py-3`}>
+                <div
+                  key={item.label}
+                  className={`${insetCardClass} px-3 py-2.5 text-left sm:px-3.5 sm:py-3`}
+                >
                   <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-foreground/48">
                     {item.label}
                   </p>

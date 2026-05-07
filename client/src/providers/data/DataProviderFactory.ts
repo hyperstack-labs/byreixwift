@@ -1,5 +1,3 @@
-
-
 import { ITokenDataProvider } from "./ITokenDataProvider";
 import { ITrendDataProvider } from "./ITrendDataProvider";
 import { MockTokenDataProvider } from "@/providers/data/mock/MockTokenDataProvider";
@@ -12,8 +10,7 @@ import { SidraTrendDataProvider } from "@/providers/data/sidra/SidraTrendDataPro
  *   Flip to false (or set NEXT_PUBLIC_USE_MOCK=false) when the Sidra API
  *   is available and credentials are in place.
  */
-export const USE_MOCK: boolean =
-  process.env.NEXT_PUBLIC_USE_MOCK !== "false";
+export const USE_MOCK: boolean = process.env.NEXT_PUBLIC_USE_MOCK !== "false";
 
 // Singleton instances — providers are stateless so one per app is fine.
 let _tokenProvider: ITokenDataProvider | null = null;
@@ -26,9 +23,7 @@ export const DataProviderFactory = {
    */
   getTokenProvider(): ITokenDataProvider {
     if (!_tokenProvider) {
-      _tokenProvider = USE_MOCK
-        ? new MockTokenDataProvider()
-        : new SidraTokenDataProvider();
+      _tokenProvider = USE_MOCK ? new MockTokenDataProvider() : new SidraTokenDataProvider();
     }
     return _tokenProvider;
   },
@@ -39,9 +34,7 @@ export const DataProviderFactory = {
    */
   getTrendProvider(): ITrendDataProvider {
     if (!_trendProvider) {
-      _trendProvider = USE_MOCK
-        ? new MockTrendDataProvider()
-        : new SidraTrendDataProvider();
+      _trendProvider = USE_MOCK ? new MockTrendDataProvider() : new SidraTrendDataProvider();
     }
     return _trendProvider;
   },

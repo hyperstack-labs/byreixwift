@@ -40,16 +40,16 @@ export function Navbar({
   const menuRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useScroll();
 
- useEffect(() => {
-  const handleScroll = () => {
-    setScrolled(window.scrollY > 18);
-  };
-  window.addEventListener("scroll", handleScroll);
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 18);
+    };
+    window.addEventListener("scroll", handleScroll);
 
-  requestAnimationFrame(handleScroll);
+    requestAnimationFrame(handleScroll);
 
-  return () => window.removeEventListener("scroll", handleScroll);
-}, []);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setScrolled(latest > 18);
@@ -243,7 +243,9 @@ export function Navbar({
 
             {/* Action Area - Unified Auth Group */}
             <div className="flex items-center justify-end">
-              <div className={`hidden items-center md:flex ${useSolidChrome ? "gap-3 lg:gap-4" : "gap-4 lg:gap-5"}`}>
+              <div
+                className={`hidden items-center md:flex ${useSolidChrome ? "gap-3 lg:gap-4" : "gap-4 lg:gap-5"}`}
+              >
                 {!isConnected && currentPage !== "login" && (
                   <button
                     onClick={() => onNavigate?.("login")}

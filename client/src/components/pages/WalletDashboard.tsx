@@ -22,7 +22,7 @@ export function WalletDashboard() {
   const router = useRouter();
   const { identity } = useAuthStore();
   const [balanceVisible, setBalanceVisible] = useState(true);
-  
+
   const walletAddress = identity || "0x0000...0000";
 
   const tokens = [

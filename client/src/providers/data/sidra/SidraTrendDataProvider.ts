@@ -1,13 +1,6 @@
+import { ITrendDataProvider, TrendDataPoint, TrendTimeRange } from "../ITrendDataProvider";
 
-
-import {
-  ITrendDataProvider,
-  TrendDataPoint,
-  TrendTimeRange,
-} from "../ITrendDataProvider";
-
-const BASE_URL =
-  process.env.NEXT_PUBLIC_SIDRA_API_URL ?? "http://localhost:3001/api";
+const BASE_URL = process.env.NEXT_PUBLIC_SIDRA_API_URL ?? "http://localhost:3001/api";
 
 const SIDRA_SUPPORTED_RANGES: TrendTimeRange[] = ["1H", "24H", "7D", "30D", "1Y"];
 
@@ -50,9 +43,7 @@ export class SidraTrendDataProvider implements ITrendDataProvider {
     });
 
     if (!res.ok) {
-      throw new Error(
-        `[SidraTrendDataProvider] ${res.status} ${res.statusText} — ${url}`
-      );
+      throw new Error(`[SidraTrendDataProvider] ${res.status} ${res.statusText} — ${url}`);
     }
 
     const raw: SidraHistoryPoint[] = await res.json();
