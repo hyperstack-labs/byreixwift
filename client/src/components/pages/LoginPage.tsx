@@ -9,6 +9,7 @@ import { WalletLoginButton } from "../WalletLoginButton";
 interface LoginPageProps {
   onWalletConnect: () => void;
   onNavigate: (page: string) => void;
+  onGoogleLogin?: () => void;
   isLoading?: boolean;
 }
 
@@ -18,11 +19,7 @@ type Feature = {
   description: string;
 };
 
-export function LoginPage({
-  onWalletConnect,
-  onNavigate,
-  isLoading = false,
-}: LoginPageProps) {
+export function LoginPage({ onWalletConnect, onNavigate, isLoading = false }: LoginPageProps) {
   const [hasAcceptedTerms, setHasAcceptedTerms] = useState(false);
   const features: Feature[] = [
     {
@@ -62,7 +59,9 @@ export function LoginPage({
           <Card className="gap-0 overflow-hidden border-white/14 bg-card/92 shadow-[0_28px_90px_rgba(0,0,0,0.42)] backdrop-blur-xl">
             <div className="h-px w-full bg-linear-to-r from-transparent via-primary/22 to-transparent" />
             <CardHeader className="pb-4 sm:pb-5">
-              <CardTitle className="text-3xl tracking-[-0.02em] sm:text-[2.15rem]">Sign In</CardTitle>
+              <CardTitle className="text-3xl tracking-[-0.02em] sm:text-[2.15rem]">
+                Sign In
+              </CardTitle>
               <CardDescription className="max-w-sm pt-0.5 text-sm text-muted-foreground/88 sm:text-[0.98rem]">
                 Continue with your Sidra Wallet.
               </CardDescription>
@@ -212,7 +211,6 @@ export function LoginPage({
                 ))}
               </div>
             </div>
-
           </motion.div>
         </div>
       </div>

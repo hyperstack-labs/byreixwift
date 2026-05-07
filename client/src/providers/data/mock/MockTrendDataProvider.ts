@@ -42,10 +42,7 @@ const MOCK_CHART_DATA: Record<TrendTimeRange, TrendDataPoint[]> = {
 };
 
 export class MockTrendDataProvider implements ITrendDataProvider {
-  async getTrendData(
-    _symbol: string,
-    range: TrendTimeRange
-  ): Promise<TrendDataPoint[]> {
+  async getTrendData(_symbol: string, range: TrendTimeRange): Promise<TrendDataPoint[]> {
     // Simulate a small network delay
     await new Promise((r) => setTimeout(r, 100));
     // Mock data is the same for all symbols; SidraTrendDataProvider

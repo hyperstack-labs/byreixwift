@@ -5,7 +5,6 @@ import { useState } from "react";
 import { useActiveAnnouncement } from "@/store";
 import { useIsClient } from "@/hooks";
 
-
 export function AnnouncementBanner() {
   const activeAnnouncement = useActiveAnnouncement();
   const isClient = useIsClient();

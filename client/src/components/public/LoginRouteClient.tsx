@@ -13,9 +13,10 @@ import { api } from "@/lib/api";
 export function LoginRouteClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isAuthenticated, login } = useAuthStore();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const login = useAuthStore((state) => state.login);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const { address, isConnected } = useAccount();
   const { signMessageAsync } = useSignMessage();
   const { disconnect } = useDisconnect();
@@ -42,7 +43,9 @@ export function LoginRouteClient() {
     setIsLoading(true);
     try {
       // 1. Get Nonce
-      const { data: { nonce } } = await api.get("/auth/nonce");
+      const {
+        data: { nonce },
+      } = await api.get("/auth/nonce");
 
       // 2. Create SIWE Message
       const message = new SiweMessage({
@@ -77,7 +80,17 @@ export function LoginRouteClient() {
     } finally {
       setIsLoading(false);
     }
-  }, [isConnected, address, isAuthenticated, isLoading, login, nextPath, router, signMessageAsync, disconnect]);
+  }, [
+    isConnected,
+    address,
+    isAuthenticated,
+    isLoading,
+    login,
+    nextPath,
+    router,
+    signMessageAsync,
+    disconnect,
+  ]);
 
   // Trigger SIWE once wallet is connected
   useEffect(() => {
@@ -114,6 +127,9 @@ export function LoginRouteClient() {
         }}
         onWalletConnect={() => {
           // Connection is handled by wagmi inside the LoginPage's WalletLoginButton
+        }}
+        onGoogleLogin={() => {
+          toast.info("Google login coming soon!");
         }}
       />
     </PublicSiteShell>
