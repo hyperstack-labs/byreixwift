@@ -7,7 +7,7 @@ import {
   EscrowRecord,
 } from "@/types/escrow";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 const ESCROW_QUERY_KEY = ["escrows"];
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {

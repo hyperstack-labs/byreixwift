@@ -33,129 +33,12 @@ import {
   useRefundEscrow,
   useReleaseEscrow,
 } from "@/hooks";
-import { EscrowState, EscrowRecord, EscrowEventRecord } from "@/types/escrow";
+import { EscrowRecord } from "@/types/escrow";
 import {
   EscrowTransactionModal,
   EscrowStatusBadge,
   STATE_CONFIG,
 } from "@/components/EscrowTransactionModal";
-
-// Feature flag: set to false to switch from mock data to real API/hooks
-const USE_MOCK = true;
-
-let _mockStore: EscrowRecord[] = [
-  // Temporarily remove value to see empty state
-  {
-    id: "esc-001-mock",
-    buyer: "0x742d35Cc6634C0532925a3b844Bc454e7595f9aB8",
-    seller: "0x9f3aD15A12e1F3514d8B8E9c6F16C2E8922A7cD2",
-    amount: 250,
-    tokenSymbol: "SDA",
-    fixedFee: 5,
-    description: "Website redesign milestone #1",
-    state: "pending",
-    createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-    updatedAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-  },
-];
-
-const _mockEventStore: Record<string, EscrowEventRecord[]> = {
-  "esc-001-mock": [
-    {
-      id: "e1",
-      escrowId: "esc-001-mock",
-      type: "EscrowCreated",
-      state: "pending",
-      occurredAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-    },
-  ],
-};
-
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
-// Mock hooks
-function useMockEscrows() {
-  const [escrows, setEscrows] = useState<EscrowRecord[]>(_mockStore);
-  const refresh = useCallback(() => setEscrows([..._mockStore]), []);
-  return { data: escrows, isLoading: false, error: null, refresh };
-}
-
-function useMockEscrowEvents(id: string | null) {
-  const [events, setEvents] = useState<EscrowEventRecord[]>(id ? (_mockEventStore[id] ?? []) : []);
-  const refresh = useCallback(
-    (newId: string | null) => setEvents(newId ? (_mockEventStore[newId] ?? []) : []),
-    []
-  );
-  return { data: events, refresh };
-}
-
-function useMockCreateEscrow(refreshEscrows: () => void) {
-  const [isPending, setIsPending] = useState(false);
-  const mutateAsync = useCallback(
-    async (payload: Omit<EscrowRecord, "id" | "state" | "createdAt">) => {
-      setIsPending(true);
-      await sleep(600);
-      const newEscrow: EscrowRecord = {
-        ...payload,
-        id: `esc-${Date.now()}-mock`,
-        state: "pending",
-        createdAt: new Date().toISOString(),
-      } as EscrowRecord;
-      _mockStore = [newEscrow, ..._mockStore];
-      _mockEventStore[newEscrow.id] = [
-        {
-          id: `e-${Date.now()}`,
-          escrowId: newEscrow.id,
-          type: "EscrowCreated",
-          state: "pending",
-          occurredAt: new Date().toISOString(),
-        },
-      ];
-      setIsPending(false);
-      refreshEscrows();
-      return { escrow: newEscrow };
-    },
-    [refreshEscrows]
-  );
-  return { isPending, mutateAsync };
-}
-
-function useMockTransition(refreshEscrows: () => void, refreshEvents: (id: string | null) => void) {
-  const [isPending, setIsPending] = useState(false);
-  const mutate = useCallback(
-    async (action: "lock" | "release" | "refund", id: string) => {
-      setIsPending(true);
-      await sleep(600);
-      const nextState: Record<string, EscrowState> = {
-        lock: "locked",
-        release: "released",
-        refund: "refunded",
-      };
-      const evtType: Record<string, EscrowEventRecord["type"]> = {
-        created: "EscrowCreated",
-        lock: "TransactionLocked",
-        release: "FundsReleased",
-        refund: "FundsRefunded",
-      };
-      _mockStore = _mockStore.map((e) => (e.id === id ? { ...e, state: nextState[action] } : e));
-      _mockEventStore[id] = [
-        ...(_mockEventStore[id] ?? []),
-        {
-          id: `e-${Date.now()}`,
-          escrowId: id,
-          type: evtType[action],
-          state: nextState[action],
-          occurredAt: new Date().toISOString(),
-        },
-      ];
-      setIsPending(false);
-      refreshEscrows();
-      refreshEvents(id);
-    },
-    [refreshEscrows, refreshEvents]
-  );
-  return { isPending, mutate };
-}
 
 // EscrowPage
 const DEFAULT_BUYER = "0x742d35Cc6634C0532925a3b844Bc454e7595f9aB";
@@ -177,24 +60,14 @@ export function EscrowPage() {
     fixedFee: "0",
   });
 
-  // Mock hooks (always constructed — hooks can't be conditional)
-  const mockEscrows = useMockEscrows();
-  const mockEvents = useMockEscrowEvents(selectedEscrowId);
-  const mockCreate = useMockCreateEscrow(mockEscrows.refresh);
-  const mockTransition = useMockTransition(mockEscrows.refresh, mockEvents.refresh);
+  // Real hooks connected to API
+  const { data: escrows = [], isLoading, error } = useEscrows();
+  const { data: events = [] } = useEscrowEvents(selectedEscrowId);
 
-  // Real hooks (always constructed, only used when USE_MOCK = false)
-  const escrowRecord = useEscrows();
-  const escrowEvents = useEscrowEvents(USE_MOCK ? null : selectedEscrowId);
   const createEscrow = useCreateEscrow();
   const lockEscrow = useLockEscrow();
   const releaseEscrow = useReleaseEscrow();
   const refundEscrow = useRefundEscrow();
-
-  const escrows = USE_MOCK ? mockEscrows.data : (escrowRecord.data ?? []);
-  const events = USE_MOCK ? mockEvents.data : (escrowEvents.data ?? []);
-  const isLoading = USE_MOCK ? false : escrowRecord.isLoading;
-  const error = USE_MOCK ? null : escrowRecord.error;
 
   const selectedEscrow = selectedEscrowId
     ? (escrows.find((e) => e.id === selectedEscrowId) ?? null)
@@ -204,12 +77,11 @@ export function EscrowPage() {
     .filter((e) => e.state === "pending" || e.state === "locked")
     .reduce((s, e) => s + e.amount, 0);
 
-  const isMutating = USE_MOCK
-    ? mockCreate.isPending || mockTransition.isPending
-    : createEscrow.isPending ||
-      lockEscrow.isPending ||
-      releaseEscrow.isPending ||
-      refundEscrow.isPending;
+  const isMutating =
+    createEscrow.isPending ||
+    lockEscrow.isPending ||
+    releaseEscrow.isPending ||
+    refundEscrow.isPending;
 
   const resetForm = useCallback(() => {
     setFormData({
@@ -256,14 +128,10 @@ export function EscrowPage() {
       tokenSymbol: formData.token,
       description: formData.description,
       fixedFee: Number(formData.fixedFee || "0"),
-      state: "pending" as EscrowState,
-      updatedAt: new Date().toISOString(),
     };
 
     try {
-      const result = USE_MOCK
-        ? await mockCreate.mutateAsync(payload)
-        : await createEscrow.mutateAsync(payload);
+      const result = await createEscrow.mutateAsync(payload);
 
       toast.success("Escrow created successfully");
       setCreationSuccessData(result.escrow);
@@ -280,13 +148,9 @@ export function EscrowPage() {
     // Clear any prior error before attempting the transition
     setModalError(null);
     try {
-      if (USE_MOCK) {
-        await mockTransition.mutate(action, id);
-      } else {
-        if (action === "lock") await lockEscrow.mutateAsync({ id, payload: { actor } });
-        if (action === "release") await releaseEscrow.mutateAsync({ id, payload: { actor } });
-        if (action === "refund") await refundEscrow.mutateAsync({ id, payload: { actor } });
-      }
+      if (action === "lock") await lockEscrow.mutateAsync({ id, payload: { actor } });
+      if (action === "release") await releaseEscrow.mutateAsync({ id, payload: { actor } });
+      if (action === "refund") await refundEscrow.mutateAsync({ id, payload: { actor } });
       // Action Feedback
       toast.success(
         {
@@ -310,11 +174,6 @@ export function EscrowPage() {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-semibold text-foreground">Escrow</h1>
-              {USE_MOCK && (
-                <span className="text-xs px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20">
-                  Demo Mode
-                </span>
-              )}
             </div>
             <div className="min-h-10">
               {!isLoading ? (
@@ -339,6 +198,7 @@ export function EscrowPage() {
             onOpenChange={(open) => {
               setShowCreateDialog(open);
               if (!open) {
+                // UI NOTE: Delay reset to allow close animation to finish
                 setTimeout(resetForm, 300);
               }
             }}
@@ -705,7 +565,6 @@ export function EscrowPage() {
           events={events}
           isMutating={isMutating}
           error={modalError}
-          isMockMode={USE_MOCK}
           onLock={() => handleTransition("lock", selectedEscrow.id, selectedEscrow.buyer)}
           onRelease={() => handleTransition("release", selectedEscrow.id, selectedEscrow.buyer)}
           onRefund={() => handleTransition("refund", selectedEscrow.id, selectedEscrow.seller)}
