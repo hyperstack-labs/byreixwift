@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Card, Label } from "@/components/ui";
 import {
@@ -31,6 +31,22 @@ export function WalletDashboard() {
 
   // Data fetching from api/escrows
   const { data: escrows = [], isLoading: isLoadingEscrows } = useEscrows();
+
+  // Dynamically calculate live active escrow total value
+  const totalEscrowBalanceString = useMemo(() => {
+    const activeTotal = escrows
+      .filter((escrow) => escrow.state?.toUpperCase() === "PENDING")
+      .reduce((sum, escrow) => {
+        const rawAmount = escrow.amount !== undefined && escrow.amount !== null ? escrow.amount : 0;
+        const amount = typeof rawAmount === "string" ? parseFloat(rawAmount) : rawAmount;
+        return sum + (isNaN(amount) ? 0 : amount);
+      }, 0);
+
+    return activeTotal.toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  }, [escrows]);
 
   const tokens = [
     {
@@ -102,8 +118,6 @@ export function WalletDashboard() {
     },
   ] as const;
 
-  const totalBalance = "$44,976.00";
-
   const copyAddress = () => {
     if (identity) {
       navigator.clipboard.writeText(identity);
@@ -111,7 +125,6 @@ export function WalletDashboard() {
     }
   };
 
-  // Helper function to visually style the required escrow data types
   const getStatusStyles = (state: string) => {
     switch (state?.toUpperCase()) {
       case "PENDING":
@@ -169,11 +182,15 @@ export function WalletDashboard() {
           <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
             <div className="space-y-1">
               <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Total Portfolio Value
+                TOTAL PORTFOLIO VALUE
               </Label>
               <div className="flex items-center gap-4">
                 <h2 className="text-4xl md:text-6xl font-black tracking-tight">
-                  {balanceVisible ? totalBalance : "••••••••"}
+                  {balanceVisible
+                    ? isLoadingEscrows
+                      ? "Loading..."
+                      : `$${totalEscrowBalanceString}`
+                    : "••••••••"}
                 </h2>
                 <button
                   onClick={() => setBalanceVisible(!balanceVisible)}
@@ -312,8 +329,8 @@ export function WalletDashboard() {
                               {escrow.description || `Escrow #${escrow.id}`}
                             </p>
                             <p className="text-sm font-bold whitespace-nowrap">
-                              {escrow.amount}{" "}
-                              <span className="text-[10px] text-muted-foreground font-normal">
+                              {escrow.amount}
+                              <span className="text-[10px] text-muted-foreground font-normal ml-1">
                                 {escrow.tokenSymbol || "SDA"}
                               </span>
                             </p>
