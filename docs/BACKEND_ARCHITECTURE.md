@@ -71,3 +71,24 @@ erDiagram
 
 ## 3. The Escrow State Machine
 Escrow business logic depends strictly on state updates. The state field in both escrows and escrow_events tables must adhere to the following transition constraints: 
+```mermaid
+stateDiagram-v2
+    [*] --> pending
+
+    pending --> funded : Smart contract event listener confirms on-chain deposit
+    pending --> cancelled : Buyer cancels before funding. records are cleaned up/flagged
+
+    funded --> released : Buyer confirms delivery. smart contract releases funds to seller
+    funded --> disputed : Buyer or seller triggers a dispute lock
+
+    disputed --> resolved : Arbiter rules on the split, or parties reach mutual agreement
+    disputed --> refunded : Arbiter rules in favor of full return to the buyer
+
+    cancelled --> [*]
+    released --> [*]
+    resolved --> [*]
+    refunded --> [*]
+```
+
+## 4. Database Naming
+All future database column and attributes definition should follow the snake_case convention(user_id, escrow_events, created_at). On the other hand, CamelCase is handled inside the application layer via Drizzle ORM config properties.
