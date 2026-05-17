@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button, Card, Label } from "../ui";
+import { Button, Card, Label } from "@/components/ui";
 import {
   ArrowUpRight,
   ArrowDownLeft,
@@ -12,11 +12,15 @@ import {
   Copy,
   ExternalLink,
   ShieldCheck,
+  Clock,
+  Inbox,
+  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
 import { AdSlot, BannerAd, BannerAdSize } from "@/components/ads";
 import { useAuthStore } from "@/store";
+import { useEscrows } from "@/hooks";
 
 export function WalletDashboard() {
   const router = useRouter();
@@ -24,6 +28,9 @@ export function WalletDashboard() {
   const [balanceVisible, setBalanceVisible] = useState(true);
 
   const walletAddress = identity || "0x0000...0000";
+
+  // Data fetching from api/escrows
+  const { data: escrows = [], isLoading: isLoadingEscrows } = useEscrows();
 
   const tokens = [
     {
@@ -61,44 +68,6 @@ export function WalletDashboard() {
       change: "+0.01%",
       changePositive: true,
       icon: "/token_usdt.png",
-    },
-  ];
-
-  const transactions = [
-    {
-      type: "send",
-      token: "SDA",
-      amount: "-250.00",
-      usdValue: "-$500.00",
-      to: "0x742d...9aB8",
-      time: "2 hours ago",
-      status: "completed",
-    },
-    {
-      type: "receive",
-      token: "ETH",
-      amount: "+1.5",
-      usdValue: "+$3,750.00",
-      from: "0x9f3a...7cD2",
-      time: "5 hours ago",
-      status: "completed",
-    },
-    {
-      type: "swap",
-      token: "BTC -> SDA",
-      amount: "0.05 BTC",
-      usdValue: "$2,150.00",
-      time: "1 day ago",
-      status: "completed",
-    },
-    {
-      type: "send",
-      token: "USDT",
-      amount: "-1,000.00",
-      usdValue: "-$1,000.00",
-      to: "0x5e8b...4fA1",
-      time: "2 days ago",
-      status: "completed",
     },
   ];
 
@@ -142,6 +111,20 @@ export function WalletDashboard() {
     }
   };
 
+  // Helper function to visually style the required escrow data types
+  const getStatusStyles = (state: string) => {
+    switch (state?.toUpperCase()) {
+      case "PENDING":
+        return { text: "text-amber-500", bg: "bg-amber-500/10", label: "Pending" };
+      case "RELEASED":
+        return { text: "text-primary", bg: "bg-primary/10", label: "Released" };
+      case "REFUNDED":
+        return { text: "text-blue-500", bg: "bg-blue-500/10", label: "Refunded" };
+      default:
+        return { text: "text-muted-foreground", bg: "bg-muted", label: state };
+    }
+  };
+
   return (
     <div className="min-h-screen px-4 pt-20 pb-24 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl space-y-6 md:space-y-8">
@@ -152,7 +135,7 @@ export function WalletDashboard() {
               <Label className="mb-2 ml-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Your Wallet Address
               </Label>
-              <div className="group relative flex items-center rounded-xl border border-border bg-background/50 px-4 py-3">
+              <div className="group relative flex items-center rounded-xl border border-border bg-background/50 px-4 py-3 transition-colors hover:border-primary/30">
                 <code className="block flex-1 overflow-hidden text-ellipsis break-all font-mono text-sm text-foreground sm:text-base">
                   {walletAddress}
                 </code>
@@ -180,8 +163,10 @@ export function WalletDashboard() {
         </Card>
 
         {/* Portfolio Overview */}
-        <Card className="border-border bg-linear-to-br from-card via-card to-background/50 p-6 md:p-10 shadow-lg">
-          <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <Card className="border-border bg-linear-to-br from-card via-card to-background/50 p-6 md:p-10 shadow-lg relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-3xl -mr-32 -mt-32 rounded-full" />
+
+          <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
             <div className="space-y-1">
               <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Total Portfolio Value
@@ -205,7 +190,7 @@ export function WalletDashboard() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4 relative z-10">
             {routeActions.map((action) => (
               <div key={action.title} className="flex flex-col gap-2">
                 <Button
@@ -235,7 +220,11 @@ export function WalletDashboard() {
           <div className="space-y-4 lg:col-span-2">
             <div className="flex items-center justify-between px-1">
               <h3 className="text-lg font-bold tracking-tight">Your Assets</h3>
-              <Button variant="link" size="sm" className="font-semibold text-primary">
+              <Button
+                variant="link"
+                size="sm"
+                className="font-semibold text-primary cursor-pointer"
+              >
                 View All
               </Button>
             </div>
@@ -244,16 +233,18 @@ export function WalletDashboard() {
               {tokens.map((token) => (
                 <Card
                   key={token.symbol}
-                  className="group cursor-pointer border-border bg-card p-4 transition-all hover:border-primary/40"
+                  className="group cursor-pointer border-border bg-card p-4 transition-all hover:border-primary/40 active:scale-[0.99]"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className="relative h-12 w-12 overflow-hidden rounded-full border border-border bg-background">
+                      <div className="relative h-12 w-12 overflow-hidden rounded-full border border-border bg-background shadow-inner">
                         <Image src={token.icon} alt={token.name} fill className="object-cover" />
                       </div>
                       <div className="min-w-0">
-                        <p className="font-bold leading-none">{token.symbol}</p>
-                        <p className="mt-1 text-xs text-muted-foreground font-medium uppercase">
+                        <p className="font-bold leading-none group-hover:text-primary transition-colors">
+                          {token.symbol}
+                        </p>
+                        <p className="mt-1 text-xs text-muted-foreground font-medium uppercase tracking-tighter">
                           {token.name}
                         </p>
                       </div>
@@ -275,53 +266,96 @@ export function WalletDashboard() {
             </div>
           </div>
 
-          {/* Activity Sidebar */}
+          {/* Activity Sidebar, Calling /api/escrows */}
           <div className="space-y-4">
-            <h3 className="text-lg font-bold tracking-tight px-1">Recent Activity</h3>
+            <div className="flex items-center justify-between px-1">
+              <h3 className="text-lg font-bold tracking-tight">Recent Activity</h3>
+              {isLoadingEscrows && (
+                <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+              )}
+            </div>
 
             <div className="grid gap-3">
-              {transactions.map((tx, index) => (
-                <Card key={index} className="border-border bg-card/50 p-4">
-                  <div className="flex items-start gap-4">
-                    <div
-                      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
-                        tx.type === "send"
-                          ? "bg-red-500/10"
-                          : tx.type === "receive"
-                            ? "bg-primary/10"
-                            : "bg-amber-500/10"
-                      }`}
+              {/* Async Loading Animation */}
+              {isLoadingEscrows &&
+                [1, 2, 3].map((i) => (
+                  <Card key={i} className="border-border bg-card/40 p-4 animate-pulse">
+                    <div className="flex items-center gap-4">
+                      <div className="h-10 w-10 rounded-xl bg-muted" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-3 w-1/2 bg-muted rounded" />
+                        <div className="h-2 w-1/3 bg-muted/60 rounded" />
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+
+              {/* Dynamic Escrow Iteration */}
+              {!isLoadingEscrows &&
+                escrows.slice(0, 5).map((escrow) => {
+                  const statusStyles = getStatusStyles(escrow.state);
+                  return (
+                    <Card
+                      key={escrow.id}
+                      className="border-border bg-card/50 p-4 hover:border-primary/20 transition-all cursor-pointer group"
+                      onClick={() => router.push(`/app/escrow`)}
                     >
-                      {tx.type === "send" ? (
-                        <ArrowUpRight className="h-5 w-5 text-red-500" />
-                      ) : tx.type === "receive" ? (
-                        <ArrowDownLeft className="h-5 w-5 text-primary" />
-                      ) : (
-                        <TrendingUp className="h-5 w-5 text-amber-500" />
-                      )}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center justify-between">
-                        <p className="font-bold capitalize leading-none text-sm">{tx.type}</p>
-                        <p className="text-sm font-bold">{tx.amount}</p>
+                      <div className="flex items-start gap-4">
+                        <div
+                          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/5 text-primary group-hover:bg-primary/10 transition-colors`}
+                        >
+                          <ShieldCheck className="h-5 w-5" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="font-bold truncate text-sm leading-none capitalize">
+                              {escrow.description || `Escrow #${escrow.id}`}
+                            </p>
+                            <p className="text-sm font-bold whitespace-nowrap">
+                              {escrow.amount}{" "}
+                              <span className="text-[10px] text-muted-foreground font-normal">
+                                {escrow.tokenSymbol || "SDA"}
+                              </span>
+                            </p>
+                          </div>
+                          <div className="mt-2 flex items-center justify-between">
+                            <div className="flex items-center gap-1.5">
+                              <Clock className="w-3 h-3 text-muted-foreground" />
+                              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+                                {escrow.createdAt
+                                  ? new Date(escrow.createdAt).toLocaleDateString()
+                                  : "Recent"}
+                              </p>
+                            </div>
+                            <span
+                              className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${statusStyles.bg} ${statusStyles.text}`}
+                            >
+                              {statusStyles.label}
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                      <div className="mt-1 flex items-center justify-between gap-2">
-                        <p className="truncate text-xs text-muted-foreground font-medium">
-                          {tx.type === "send"
-                            ? `To ${tx.to}`
-                            : tx.type === "receive"
-                              ? `From ${tx.from}`
-                              : tx.token}
-                        </p>
-                        <p className="text-xs text-muted-foreground font-medium">{tx.usdValue}</p>
-                      </div>
-                      <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
-                        {tx.time}
-                      </p>
-                    </div>
-                  </div>
-                </Card>
-              ))}
+                    </Card>
+                  );
+                })}
+
+              {/* Empty State Component */}
+              {!isLoadingEscrows && escrows.length === 0 && (
+                <div className="flex flex-col items-center justify-center py-10 px-4 border border-dashed border-border rounded-2xl bg-muted/20">
+                  <Inbox className="w-8 h-8 text-muted-foreground/30 mb-3" />
+                  <p className="text-xs font-semibold text-muted-foreground text-center">
+                    No recent activity
+                  </p>
+                  <Button
+                    variant="link"
+                    size="sm"
+                    className="mt-1 text-primary h-auto p-0 text-[11px]"
+                    onClick={() => router.push("/app/escrow")}
+                  >
+                    Start an escrow transaction
+                  </Button>
+                </div>
+              )}
             </div>
 
             <AdSlot
