@@ -16,7 +16,6 @@ The backend handles the communication between the client, PostgreSQL as database
    API --> |RPC Provider| Blockchain((Blockchain Network))
    Worker[Event Listener / Indexer] -->|Polls / Listens| Blockchain
    Worker -->|Writes Events| DB
-
 ```
 ## 2. Database Schema and Entity Relationships
 
@@ -25,6 +24,7 @@ The data layer is managed using Drizzle ORM connected to PostgreSQL. All primary
    **NOTE**: relationships between escrows and users are tracked via the public cryptographic wallet string/address instead of the randomly generated internal database uuid. This allows direct, seamless  off-chain verficiation of on-chain entities without looking up surrogate IDs.
 
 ### ERD 
+```mermaid
 erDiagram
     users {
         uuid id PK
@@ -67,5 +67,7 @@ erDiagram
     users ||--o{ escrows : "acts as buyer"
     users ||--o{ escrows : "acts as seller"
     escrows ||--o{ escrow_events : "tracks history"
+```
 
 ## 3. The Escrow State Machine
+Escrow business logic depends strictly on state updates. The state field in both escrows and escrow_events tables must adhere to the following transition constraints: 
