@@ -138,6 +138,26 @@ export function WalletDashboard() {
     }
   };
 
+  // Helper function to cleanly format the full string date and exact time
+  const formatActivityDateTime = (dateString?: string) => {
+    if (!dateString) return "Recent";
+    const dateObj = new Date(dateString);
+
+    const datePart = dateObj.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+    });
+
+    const timePart = dateObj.toLocaleTimeString(undefined, {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    });
+
+    return `${datePart} • ${timePart}`;
+  };
+
   return (
     <div className="min-h-screen px-4 pt-20 pb-24 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl space-y-6 md:space-y-8">
@@ -339,9 +359,7 @@ export function WalletDashboard() {
                             <div className="flex items-center gap-1.5">
                               <Clock className="w-3 h-3 text-muted-foreground" />
                               <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
-                                {escrow.createdAt
-                                  ? new Date(escrow.createdAt).toLocaleDateString()
-                                  : "Recent"}
+                                {formatActivityDateTime(escrow.createdAt)}
                               </p>
                             </div>
                             <span
@@ -363,14 +381,6 @@ export function WalletDashboard() {
                   <p className="text-xs font-semibold text-muted-foreground text-center">
                     No recent activity
                   </p>
-                  <Button
-                    variant="link"
-                    size="sm"
-                    className="mt-1 text-primary h-auto p-0 text-[11px]"
-                    onClick={() => router.push("/app/escrow")}
-                  >
-                    Start an escrow transaction
-                  </Button>
                 </div>
               )}
             </div>
