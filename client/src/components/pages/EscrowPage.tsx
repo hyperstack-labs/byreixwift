@@ -13,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "../ui";
+} from "@/components/ui";
 import {
   Loader2,
   Plus,
@@ -40,7 +40,7 @@ import {
   STATE_CONFIG,
 } from "@/components/EscrowTransactionModal";
 
-// EscrowPage
+// EscrowPage Configurations
 const DEFAULT_BUYER = "0x742d35Cc6634C0532925a3b844Bc454e7595f9aB";
 const DEFAULT_SELLER = "0x9f3aD15A12e1F3514d8B8E9c6F16C2E8922A7cD2";
 const isValidAddress = (a: string) => /^0x[0-9a-fA-F]{40}$/.test(a);
@@ -60,23 +60,27 @@ export function EscrowPage() {
     fixedFee: "0",
   });
 
-  // Real hooks connected to API
+  // Real hooks connected to the /api/escrows endpoints
   const { data: escrows = [], isLoading, error } = useEscrows();
   const { data: events = [] } = useEscrowEvents(selectedEscrowId);
 
+  // Mutation hooks for state transitions
   const createEscrow = useCreateEscrow();
   const lockEscrow = useLockEscrow();
   const releaseEscrow = useReleaseEscrow();
   const refundEscrow = useRefundEscrow();
 
+  // Memoized selection of the current escrow object from the list
   const selectedEscrow = selectedEscrowId
     ? (escrows.find((e) => e.id === selectedEscrowId) ?? null)
     : null;
 
+  // Aggregate calculation for header stats
   const totalLocked = escrows
     .filter((e) => e.state === "pending" || e.state === "locked")
     .reduce((s, e) => s + e.amount, 0);
 
+  // Combined mutation state for UI disabling during active requests
   const isMutating =
     createEscrow.isPending ||
     lockEscrow.isPending ||
@@ -132,9 +136,9 @@ export function EscrowPage() {
 
     try {
       const result = await createEscrow.mutateAsync(payload);
-
       toast.success("Escrow created successfully");
-      setCreationSuccessData(result.escrow);
+      // Read wrapped object based on NestJS controller response payload mapping
+      setCreationSuccessData(result?.escrow || (result as unknown as EscrowRecord));
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to create escrow");
     }
@@ -198,7 +202,6 @@ export function EscrowPage() {
             onOpenChange={(open) => {
               setShowCreateDialog(open);
               if (!open) {
-                // UI NOTE: Delay reset to allow close animation to finish
                 setTimeout(resetForm, 300);
               }
             }}
@@ -412,7 +415,9 @@ export function EscrowPage() {
                     <div className="flex justify-between text-xs">
                       <span className="text-muted-foreground">Seller:</span>
                       <span className="font-mono">
-                        {creationSuccessData.seller.slice(0, 10)}...
+                        {creationSuccessData.seller
+                          ? `${creationSuccessData.seller.slice(0, 10)}...`
+                          : "0x..."}
                       </span>
                     </div>
                   </div>
@@ -423,7 +428,6 @@ export function EscrowPage() {
                       onClick={() => {
                         const id = creationSuccessData.id;
                         setShowCreateDialog(false);
-                        // Reset everything immediately after getting the ID
                         setTimeout(() => {
                           setSelectedEscrowId(id);
                           resetForm();
@@ -452,7 +456,7 @@ export function EscrowPage() {
 
         {/* Error State */}
         {error && (
-          <Card className="p-4 mb-4 border-red-500/40 bg-red-500/10 text-red-200">
+          <Card className="p-4 mb-4 border-red-500/40 bg-red-500/10 text-red-200 text-left">
             {error instanceof Error ? error.message : "Failed to load escrow records"}
           </Card>
         )}
@@ -463,75 +467,79 @@ export function EscrowPage() {
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="h-25 w-full rounded-xl border border-border bg-card/50 animate-none flex items-center px-4 justify-between"
+                className="h-25 w-full rounded-xl border border-border bg-card/50 flex items-center px-4 justify-between"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 rounded-full bg-muted" />
+                  <div className="w-3 h-3 rounded-full bg-muted animate-pulse" />
                   <div className="space-y-2">
-                    <div className="h-4 w-40 bg-muted rounded" />
-                    <div className="h-3 w-24 bg-muted/50 rounded" />
+                    <div className="h-4 w-40 bg-muted rounded animate-pulse" />
+                    <div className="h-3 w-24 bg-muted/50 rounded animate-pulse" />
                   </div>
                 </div>
                 <div className="space-y-2 flex flex-col items-end">
-                  <div className="h-4 w-16 bg-muted rounded" />
-                  <div className="h-5 w-20 bg-muted/50 rounded-full" />
+                  <div className="h-4 w-16 bg-muted rounded animate-pulse" />
+                  <div className="h-5 w-20 bg-muted/50 rounded-full animate-pulse" />
                 </div>
               </div>
             ))}
           </div>
         )}
 
-        {/* List View */}
+        {/* Dynamic Pipelines Grid */}
         <div className="space-y-3">
-          {escrows.map((escrow) => {
-            const cfg = STATE_CONFIG[escrow.state as keyof typeof STATE_CONFIG];
-            return (
-              <Card
-                key={escrow.id}
-                onClick={() => setSelectedEscrowId(escrow.id)}
-                className="p-4 bg-card border-border hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all cursor-pointer group active:scale-[0.98] duration-200"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex items-start gap-3 min-w-0 text-left">
-                    <div
-                      className={`w-2.5 h-2.5 rounded-full mt-1.5 shrink-0 shadow-[0_0_8px_rgba(0,0,0,0.1)] ${cfg.dotClass}`}
-                    />
-                    <div className="min-w-0">
-                      <p className="font-semibold truncate group-hover:text-primary transition-all duration-200 group-hover:translate-x-0.5">
-                        {escrow.description}
-                      </p>
-                      <div className="flex items-center gap-1.5 mt-1 text-xs text-muted-foreground/70 font-mono">
-                        <Wallet className="w-3 h-3 shrink-0 opacity-60" />
-                        <span>{escrow.buyer.slice(0, 6)}...</span>
-                        <ArrowRight className="w-2.5 h-2.5 opacity-30 shrink-0" />
-                        <span>{escrow.seller.slice(0, 6)}...</span>
+          {!isLoading &&
+            escrows.map((escrow) => {
+              // Safe casing translation to prevent lookups from returning undefined configurations
+              const lookupKey = escrow.state?.toUpperCase() as keyof typeof STATE_CONFIG;
+              const cfg = STATE_CONFIG[lookupKey] || { dotClass: "bg-muted" };
+
+              return (
+                <Card
+                  key={escrow.id}
+                  onClick={() => setSelectedEscrowId(escrow.id)}
+                  className="p-4 bg-card border-border hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all cursor-pointer group active:scale-[0.98] duration-200"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-start gap-3 min-w-0 text-left">
+                      <div
+                        className={`w-2.5 h-2.5 rounded-full mt-1.5 shrink-0 shadow-[0_0_8px_rgba(0,0,0,0.1)] ${cfg.dotClass}`}
+                      />
+                      <div className="min-w-0">
+                        <p className="font-semibold truncate group-hover:text-primary transition-all duration-200 group-hover:translate-x-0.5">
+                          {escrow.description}
+                        </p>
+                        <div className="flex items-center gap-1.5 mt-1 text-xs text-muted-foreground/70 font-mono">
+                          <Wallet className="w-3 h-3 shrink-0 opacity-60" />
+                          <span>{escrow.buyer ? escrow.buyer.slice(0, 6) : "0x000"}...</span>
+                          <ArrowRight className="w-2.5 h-2.5 opacity-30 shrink-0" />
+                          <span>{escrow.seller ? escrow.seller.slice(0, 6) : "0x000"}...</span>
+                        </div>
+                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground/40 mt-2 font-bold">
+                          {new Date(escrow.createdAt).toLocaleDateString(undefined, {
+                            month: "short",
+                            day: "numeric",
+                          })}{" "}
+                          •{" "}
+                          {new Date(escrow.createdAt).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </p>
                       </div>
-                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground/40 mt-2 font-bold">
-                        {new Date(escrow.createdAt).toLocaleDateString(undefined, {
-                          month: "short",
-                          day: "numeric",
-                        })}{" "}
-                        •{" "}
-                        {new Date(escrow.createdAt).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
+                    </div>
+                    <div className="flex flex-col items-end gap-2 shrink-0">
+                      <p className="font-bold text-xs tabular-nums text-right mr-2">
+                        {escrow.amount}{" "}
+                        <span className="text-[10px] text-muted-foreground/60 font-medium">
+                          {escrow.tokenSymbol}
+                        </span>
                       </p>
+                      <EscrowStatusBadge state={escrow.state} />
                     </div>
                   </div>
-                  <div className="flex flex-col items-end gap-2 shrink-0">
-                    <p className="font-bold text-xs tabular-nums text-right mr-2">
-                      {escrow.amount}{" "}
-                      <span className="text-[10px] text-muted-foreground/60 font-medium">
-                        {escrow.tokenSymbol}
-                      </span>
-                    </p>
-                    <EscrowStatusBadge state={escrow.state} />
-                  </div>
-                </div>
-              </Card>
-            );
-          })}
+                </Card>
+              );
+            })}
         </div>
 
         {/* Empty State */}
@@ -570,7 +578,6 @@ export function EscrowPage() {
           onRefund={() => handleTransition("refund", selectedEscrow.id, selectedEscrow.seller)}
           onClose={() => {
             setSelectedEscrowId(null);
-            // Clear error when the modal is dismissed
             setModalError(null);
           }}
         />
