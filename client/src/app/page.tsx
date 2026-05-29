@@ -65,7 +65,7 @@ export default function Home() {
         onConnect={() => router.push("/app")}
         onNavigate={handleNavigate}
         onSectionNavigate={scrollToHomeSection}
-        ctaLabel="Launch App"
+        ctaLabel="Open App"
       />
 
       <main className="relative">

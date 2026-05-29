@@ -44,7 +44,7 @@ async function request<T>(path: string, init?: { method?: string; body?: unknown
 export function useEscrows() {
   return useQuery({
     queryKey: ESCROW_QUERY_KEY,
-    queryFn: () => request<EscrowRecord[]>("/api/escrows"),
+    queryFn: () => request<EscrowRecord[]>("/escrows"),
     refetchInterval: 10_000,
   });
 }
@@ -52,7 +52,7 @@ export function useEscrows() {
 export function useEscrowEvents(id: string | null) {
   return useQuery({
     queryKey: [...ESCROW_QUERY_KEY, id, "events"],
-    queryFn: () => request<EscrowEventRecord[]>(`/api/escrows/${id}/events`),
+    queryFn: () => request<EscrowEventRecord[]>(`/escrows/${id}/events`),
     enabled: Boolean(id),
     refetchInterval: 10_000,
   });
@@ -63,7 +63,7 @@ export function useCreateEscrow() {
 
   return useMutation({
     mutationFn: (payload: CreateEscrowPayload) =>
-      request<EscrowDetailResponse>("/api/escrows", {
+      request<EscrowDetailResponse>("/escrows", {
         method: "POST",
         body: JSON.stringify(payload),
       }),
@@ -93,6 +93,6 @@ function createEscrowActionMutation(pathFactory: (id: string) => string) {
   };
 }
 
-export const useLockEscrow = createEscrowActionMutation((id) => `/api/escrows/${id}/lock`);
-export const useReleaseEscrow = createEscrowActionMutation((id) => `/api/escrows/${id}/release`);
-export const useRefundEscrow = createEscrowActionMutation((id) => `/api/escrows/${id}/refund`);
+export const useLockEscrow = createEscrowActionMutation((id) => `/escrows/${id}/lock`);
+export const useReleaseEscrow = createEscrowActionMutation((id) => `/escrows/${id}/release`);
+export const useRefundEscrow = createEscrowActionMutation((id) => `/escrows/${id}/refund`);

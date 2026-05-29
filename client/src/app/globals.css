@@ -8,18 +8,18 @@
 :root {
   --font-size: 16px;
 
-  /* Byreixwift Brand Colors - Emerald Reserve */
-  --byreix-bg: #06180f;
-  --byreix-bg-elevated: #0a2417;
-  --byreix-surface: #0f2b1d;
-  --byreix-surface-soft: #143624;
+  /* Byreixwift Brand Colors - Pure Black + Emerald/Gold Accents */
+  --byreix-bg: #050505;
+  --byreix-bg-elevated: #0a0a0a;
+  --byreix-surface: #111111;
+  --byreix-surface-soft: #181818;
   --byreix-green: #25c985;
   --byreix-green-deep: #11784d;
   --byreix-gold: #c5a059;
   --byreix-gold-soft: #dfc28d;
-  --byreix-text-primary: #f5f8f6;
-  --byreix-text-secondary: #afc1b7;
-  --byreix-border: rgba(214, 196, 133, 0.16);
+  --byreix-text-primary: #f5f5f5;
+  --byreix-text-secondary: #a1a1aa;
+  --byreix-border: rgba(255, 255, 255, 0.08);
 
   /* Font Variables */
   --font-heading: var(--font-manrope), sans-serif;
@@ -186,10 +186,10 @@
     @apply bg-background text-foreground;
     font-family: var(--font-body);
     background-image:
-      radial-gradient(circle at 14% 12%, rgba(37, 201, 133, 0.11), transparent 34%),
-      radial-gradient(circle at 88% 10%, rgba(212, 175, 55, 0.08), transparent 30%),
-      radial-gradient(circle at 52% 110%, rgba(17, 120, 77, 0.16), transparent 52%),
-      linear-gradient(180deg, #071e12 0%, #05140d 100%);
+      radial-gradient(circle at 14% 12%, rgba(37, 201, 133, 0.06), transparent 34%),
+      radial-gradient(circle at 88% 10%, rgba(212, 175, 55, 0.04), transparent 30%),
+      radial-gradient(circle at 52% 110%, rgba(17, 120, 77, 0.08), transparent 52%),
+      linear-gradient(180deg, #050505 0%, #000000 100%);
     background-attachment: scroll;
   }
 
@@ -232,24 +232,24 @@
    CUSTOM STYLES
    ============================================ */
 
-/* Scrollbar */
+/* Scrollbar - scoped to inner containers to keep viewport scrollbar default */
 
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+:not(html):not(body)::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
 
-::-webkit-scrollbar-track {
+:not(html):not(body)::-webkit-scrollbar-track {
   background: transparent;
 }
 
-::-webkit-scrollbar-thumb {
+:not(html):not(body)::-webkit-scrollbar-thumb {
   background: color-mix(in srgb, var(--byreix-green) 72%, var(--byreix-gold) 28%);
   border-radius: 999px;
-  border: 2px solid #071a11;
+  border: 1px solid #071a11;
 }
 
-::-webkit-scrollbar-thumb:hover {
+:not(html):not(body)::-webkit-scrollbar-thumb:hover {
   background: color-mix(in srgb, var(--byreix-green) 62%, var(--byreix-gold-soft) 38%);
 }
 
