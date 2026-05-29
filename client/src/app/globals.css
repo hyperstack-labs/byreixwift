@@ -232,24 +232,24 @@
    CUSTOM STYLES
    ============================================ */
 
-/* Scrollbar */
+/* Scrollbar - scoped to inner containers to keep viewport scrollbar default */
 
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+:not(html):not(body)::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
 
-::-webkit-scrollbar-track {
+:not(html):not(body)::-webkit-scrollbar-track {
   background: transparent;
 }
 
-::-webkit-scrollbar-thumb {
+:not(html):not(body)::-webkit-scrollbar-thumb {
   background: color-mix(in srgb, var(--byreix-green) 72%, var(--byreix-gold) 28%);
   border-radius: 999px;
-  border: 2px solid #071a11;
+  border: 1px solid #071a11;
 }
 
-::-webkit-scrollbar-thumb:hover {
+:not(html):not(body)::-webkit-scrollbar-thumb:hover {
   background: color-mix(in srgb, var(--byreix-green) 62%, var(--byreix-gold-soft) 38%);
 }
 

@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useRef, useSyncExternalStore } from "react";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
 import { motion, useAnimationControls, useInView, useReducedMotion } from "motion/react";
 import {
   ArrowRight,
@@ -40,21 +39,6 @@ function useIsMounted() {
     () => false
   );
 }
-
-const heroProofPoints = [
-  {
-    label: "Fees shown upfront",
-    value: "Before you confirm",
-  },
-  {
-    label: "Settlement visible",
-    value: "Direct payment or escrow",
-  },
-  {
-    label: "Approval required",
-    value: "No blind approval step",
-  },
-] as const;
 
 const problemPoints = [
   "You often see fees and settlement terms too late in the flow.",
@@ -625,16 +609,19 @@ export function LandingPage({ onConnect }: LandingPageProps) {
         <div className="absolute inset-0 z-0 pointer-events-none">
           <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,20,13,0.62)_0%,rgba(4,16,11,0.3)_38%,rgba(4,12,9,0.16)_100%)]" />
           <div className="absolute inset-x-0 top-0 h-[24rem] bg-[radial-gradient(ellipse_at_top,rgba(19,91,60,0.18),transparent_62%)]" />
-          <div className="absolute inset-x-0 bottom-[10%] h-[30rem] bg-[radial-gradient(ellipse_at_bottom,rgba(22,118,78,0.2),transparent_70%)]" />
           <div className="absolute inset-x-0 bottom-0 h-[26%] bg-linear-to-t from-[rgba(5,20,13,0.92)] via-[rgba(5,20,13,0.7)] to-transparent" />
         </div>
 
-        <div className="relative z-10 mx-auto flex min-h-svh w-full max-w-4xl items-center justify-center pt-20 sm:pt-24 lg:pt-28">
+        <div className="relative z-10 mx-auto flex min-h-svh w-full max-w-4xl flex-col items-center justify-start pt-32 pb-24 sm:pt-40 sm:pb-32 lg:pt-44 lg:pb-36">
           <motion.div
             initial={{ opacity: 0, scale: 1.02 }}
-            animate={{ opacity: 0.2, scale: 1 }}
+            animate={{ opacity: 0.5, scale: 1 }}
             transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1], delay: 0.08 }}
-            className="pointer-events-none absolute left-1/2 top-[56svh] h-[46svh] w-[210vw] max-w-none -translate-x-1/2 sm:top-[58svh] sm:h-[48svh] sm:w-[168vw] lg:w-[126vw]"
+            className="pointer-events-none absolute left-1/2 top-[44svh] h-[46svh] w-[210vw] max-w-none -translate-x-1/2 sm:top-[46svh] sm:h-[48svh] sm:w-[168vw] lg:w-[126vw]"
+            style={{
+              maskImage: "linear-gradient(to bottom, black 40%, transparent 90%)",
+              WebkitMaskImage: "linear-gradient(to bottom, black 40%, transparent 90%)",
+            }}
           >
             <Image
               src="/horizon_glow.png"
@@ -648,7 +635,7 @@ export function LandingPage({ onConnect }: LandingPageProps) {
             initial={{ opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
-            className="mx-auto flex max-w-160 flex-col items-center pt-6 text-center sm:pt-8 lg:pt-0"
+            className="mx-auto flex max-w-3xl flex-col items-center pt-6 text-center sm:pt-8 lg:pt-0"
           >
             <div className="flex max-w-[18rem] flex-col items-center gap-1 text-center sm:max-w-none sm:flex-row sm:gap-2">
               <span className="text-[9px] font-black tracking-[0.12em] text-primary sm:text-[10px]">
@@ -659,58 +646,30 @@ export function LandingPage({ onConnect }: LandingPageProps) {
               </span>
             </div>
 
-            <h1 className="mt-5 max-w-[12ch] text-[clamp(2.35rem,14vw,3.75rem)] font-extrabold leading-[0.92] tracking-[-0.05em] text-foreground sm:mt-6 sm:text-[clamp(2.8rem,6vw,4.3rem)] sm:leading-[0.96]">
-              Review payment
-              <span className="mt-2 block text-(--byreix-gold-soft)">before approval.</span>
+            <h1 className="mt-5 max-w-2xl text-[clamp(2.35rem,14vw,3.75rem)] font-extrabold leading-[0.92] tracking-[-0.05em] text-foreground sm:mt-6 sm:text-[clamp(2.8rem,6vw,4.3rem)] sm:leading-[0.96]">
+              Never sign a
+              <span className="mt-2 block text-(--byreix-gold-soft)">transaction blindly.</span>
             </h1>
 
-            <p className="mt-4 max-w-120 text-[0.98rem] leading-[1.72] text-muted-foreground sm:mt-5 sm:text-[1.03rem] lg:text-[1.08rem]">
-              See the merchant, amount, fees, and settlement path before you approve. Use escrow
-              only when the handoff needs a visible release step.
+            <p className="mt-4.5 max-w-xl text-[0.98rem] leading-[1.72] text-muted-foreground sm:mt-5.5 sm:text-[1.03rem] lg:text-[1.08rem]">
+              Preview every transaction, verify merchant identities, and reveal hidden fees before
+              you sign. Deploy escrow on-demand to protect your high-value peer-to-peer deals.
             </p>
 
             <div className="mt-6 flex w-full max-w-lg flex-col gap-3 sm:mt-7 sm:w-auto sm:max-w-none sm:flex-row sm:justify-center">
-              <Button
-                onClick={() => scrollToSection(HOME_SECTION_IDS.payments)}
-                className="h-12 w-full justify-center rounded-xl border border-white/10 bg-primary px-7 text-base font-semibold text-primary-foreground shadow-[0_16px_36px_rgba(3,13,8,0.34)] sm:w-auto"
-              >
-                See the Flow
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-              <Button
+              <button
                 onClick={onConnect}
-                variant="outline"
-                className="h-12 w-full justify-center rounded-xl border-[rgba(223,194,141,0.18)] bg-[rgba(223,194,141,0.06)] px-7 text-base font-semibold text-foreground/90 hover:border-[rgba(223,194,141,0.34)] hover:bg-[rgba(223,194,141,0.1)] sm:w-auto"
+                className="h-12 w-full justify-center rounded-xl bg-white px-7 text-base font-semibold text-black hover:bg-neutral-200 cursor-pointer flex items-center justify-center gap-2 sm:w-auto transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
               >
-                Launch App
-              </Button>
-            </div>
-
-            <div className="mt-5 grid w-full max-w-2xl gap-1.5 text-center sm:mt-6 sm:grid-cols-3 sm:gap-2">
-              {heroProofPoints.map((point, index) => (
-                <motion.div
-                  key={point.label}
-                  initial={{ opacity: 0, y: reducedMotion ? 0 : 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    duration: reducedMotion ? 0.2 : 0.45,
-                    delay: reducedMotion ? 0 : 0.35 + index * 0.08,
-                    ease: [0.22, 1, 0.36, 1],
-                  }}
-                  className="relative flex flex-col items-center px-3 py-2.5 sm:rounded-[1.15rem] sm:border sm:border-white/8 sm:bg-white/2 sm:px-4 sm:py-3"
-                >
-                  <div className="mb-2 flex items-center gap-2 sm:hidden">
-                    <span className="h-2 w-2 rounded-full bg-primary/80 shadow-[0_0_12px_rgba(37,201,133,0.22)]" />
-                    <span className="h-px w-10 bg-linear-to-r from-primary/34 to-transparent" />
-                  </div>
-                  <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-foreground/42 sm:text-[10px] sm:tracking-[0.2em]">
-                    {point.label}
-                  </p>
-                  <p className="mt-1 text-[0.96rem] font-medium leading-snug text-foreground/86 sm:mt-1.5 sm:text-[0.92rem]">
-                    {point.value}
-                  </p>
-                </motion.div>
-              ))}
+                Open App
+              </button>
+              <button
+                onClick={() => scrollToSection(HOME_SECTION_IDS.payments)}
+                className="h-12 w-full justify-center rounded-xl border border-white/10 bg-white/4 px-7 text-base font-semibold text-neutral-300 hover:bg-white/8 cursor-pointer flex items-center justify-center gap-2 sm:w-auto transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
+              >
+                How it works
+                <ArrowRight className="h-4 w-4 text-neutral-400" />
+              </button>
             </div>
           </motion.div>
         </div>
@@ -1043,22 +1002,19 @@ export function LandingPage({ onConnect }: LandingPageProps) {
               </p>
 
               <div className="mt-8 flex flex-col items-center justify-center gap-3.5 sm:mt-10 sm:flex-row sm:gap-4">
-                <Button
+                <button
                   onClick={onConnect}
-                  size="lg"
-                  className="h-12 w-full rounded-lg bg-primary px-7 text-base font-semibold text-primary-foreground shadow-[0_16px_38px_rgba(3,13,8,0.3)] sm:w-auto"
+                  className="h-12 w-full justify-center rounded-xl bg-white px-7 text-base font-semibold text-black hover:bg-neutral-200 cursor-pointer flex items-center justify-center gap-2 sm:w-auto transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
                 >
-                  Launch App
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-                <Button
+                  Open App
+                </button>
+                <button
                   onClick={() => scrollToSection(HOME_SECTION_IDS.payments)}
-                  variant="outline"
-                  size="lg"
-                  className="h-12 w-full rounded-lg border-[rgba(223,194,141,0.18)] bg-[rgba(223,194,141,0.05)] px-7 text-base font-semibold text-foreground/90 hover:border-[rgba(223,194,141,0.34)] hover:bg-[rgba(223,194,141,0.1)] sm:w-auto"
+                  className="h-12 w-full justify-center rounded-xl border border-white/10 bg-white/4 px-7 text-base font-semibold text-neutral-300 hover:bg-white/8 cursor-pointer flex items-center justify-center gap-2 sm:w-auto transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
                 >
-                  Explore the Flow
-                </Button>
+                  How it works
+                  <ArrowRight className="h-4 w-4 text-neutral-400" />
+                </button>
               </div>
             </div>
           </div>

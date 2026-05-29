@@ -2,10 +2,9 @@
 
 import Link from "next/link";
 import { ByreixLogo } from "./ByreixLogo";
-import { Button } from "./ui";
 import { Wallet, Menu, X, User, Settings, LogOut, ChevronDown } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import {
   PUBLIC_HOME_NAV_LINKS,
   HOME_SECTION_IDS,
@@ -38,22 +37,15 @@ export function Navbar({
   const [showAccountMenu, setShowAccountMenu] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const { scrollY } = useScroll();
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 18);
     };
     window.addEventListener("scroll", handleScroll);
-
-    requestAnimationFrame(handleScroll);
-
+    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    setScrolled(latest > 18);
-  });
 
   // Close menu on click outside
   useEffect(() => {
@@ -98,9 +90,6 @@ export function Navbar({
       : [];
   const hasDesktopNav =
     navLinks.length > 0 || publicHomeLinks.length > 0 || publicPageLinks.length > 0;
-  const useSolidChrome = scrolled || mobileMenuOpen || Boolean(isConnected);
-  const useQuietPublicCta = isPublicRoute && !useSolidChrome && !isConnected;
-  const desktopBarHeight = scrolled || mobileMenuOpen || Boolean(isConnected) ? 58 : 56;
 
   const handleNavClick = (link: { label: string; value: string; isGated: boolean }) => {
     if (link.isGated && !isConnected) {
@@ -112,423 +101,300 @@ export function Navbar({
 
   return (
     <nav
-      className={`fixed left-0 right-0 top-0 z-50 transition-[padding] duration-300 ${
-        useSolidChrome ? "px-0 pt-0" : "px-4 pt-4 sm:px-6 sm:pt-5 lg:px-8"
+      className={`fixed left-0 right-0 top-0 z-50 border-b px-4 sm:px-6 lg:px-8 transition-all duration-300 ${
+        scrolled || mobileMenuOpen
+          ? "h-14 bg-black/60 backdrop-blur-md border-white/5"
+          : "h-20 bg-transparent border-transparent"
       }`}
     >
-      <motion.div
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{
-          duration: 0.8,
-          ease: [0.23, 1, 0.32, 1],
-        }}
-        className="pointer-events-none block w-full"
-      >
-        <motion.div
-          layout
-          transition={{
-            duration: 0.35,
-            ease: [0.22, 1, 0.36, 1],
-          }}
-          className={`pointer-events-auto overflow-visible border transition-[background-color,border-color,box-shadow] duration-300 ${
-            useSolidChrome
-              ? "w-full min-w-full rounded-none border-x-0 border-t-0 border-b-[rgba(214,196,133,0.12)] bg-[linear-gradient(180deg,rgba(5,18,12,0.9)_0%,rgba(5,18,12,0.78)_100%)] backdrop-blur-xl shadow-none"
-              : "w-full min-w-full rounded-none border-transparent bg-transparent shadow-none"
-          }`}
-        >
-          <motion.div
-            layout
-            animate={{ height: desktopBarHeight }}
-            transition={{
-              duration: 0.35,
-              ease: [0.22, 1, 0.36, 1],
-            }}
-            className={`grid grid-cols-[auto_1fr_auto] items-center gap-3 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:gap-5 ${
-              useSolidChrome ? "px-5 sm:px-6 lg:px-8" : "px-6 sm:px-8 lg:px-12"
-            }`}
-          >
-            {/* Brand/Logo */}
-            <div className="flex items-center justify-start">
-              <button
-                onClick={() => {
-                  if (currentPage === "home") {
-                    onSectionNavigate?.(HOME_SECTION_IDS.hero);
-                    return;
-                  }
-                  if (isPublicRoute) {
-                    onNavigate?.("/");
-                    return;
-                  }
-                  onNavigate?.("home");
-                }}
-                className="relative z-10 shrink-0 cursor-pointer rounded-lg outline-none transition-all duration-300 hover:opacity-90 active:scale-95"
-                title="home"
-              >
-                <ByreixLogo variant="compact" />
-              </button>
-            </div>
+      <div className="mx-auto flex h-full max-w-7xl items-center justify-between">
+        <div className="grid h-full w-full grid-cols-[auto_1fr_auto] items-center gap-3 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:gap-5">
+          {/* Brand/Logo */}
+          <div className="flex items-center justify-start">
+            <button
+              onClick={() => {
+                if (currentPage === "home") {
+                  onSectionNavigate?.(HOME_SECTION_IDS.hero);
+                  return;
+                }
+                if (isPublicRoute) {
+                  onNavigate?.("/");
+                  return;
+                }
+                onNavigate?.("home");
+              }}
+              className="relative shrink-0 cursor-pointer outline-none transition-all duration-200 hover:opacity-90 active:scale-95"
+              title="home"
+            >
+              <ByreixLogo variant="compact" />
+            </button>
+          </div>
 
-            {/* Desktop Navigation */}
-            {hasDesktopNav && (
-              <div className="hidden min-w-0 items-center justify-center justify-self-center md:flex">
-                <motion.div
-                  layout
-                  transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                  className={`flex items-center ${useSolidChrome ? "gap-4 lg:gap-6" : "gap-5 lg:gap-7"}`}
-                >
-                  {navLinks.map((link) => {
-                    const isActive = currentPage === link.value;
-                    return (
-                      <button
-                        key={link.value}
-                        onClick={() => handleNavClick(link)}
-                        className={`relative cursor-pointer whitespace-nowrap rounded-full px-3 py-2 text-[0.95rem] font-medium tracking-[-0.01em] outline-none transition-[color,background-color,transform] duration-300 ${
-                          isActive
-                            ? "bg-white/5 text-foreground"
-                            : useSolidChrome
-                              ? "text-muted-foreground hover:bg-white/4 hover:text-foreground/88"
-                              : "text-foreground/72 hover:text-foreground"
-                        }`}
-                      >
-                        <span>{link.label}</span>
-                        <span
-                          className={`absolute left-1/2 bottom-1 h-px w-[60%] -translate-x-1/2 origin-center bg-primary/90 transition-transform duration-300 ${
-                            isActive ? "scale-x-100" : "scale-x-0"
-                          }`}
-                        />
-                      </button>
-                    );
-                  })}
-                  {publicHomeLinks.map((link) => (
-                    <button
-                      key={link.id}
-                      onClick={() => onSectionNavigate?.(link.id)}
-                      className={`relative whitespace-nowrap rounded-full px-3 py-2 text-[0.95rem] font-medium tracking-[-0.01em] outline-none transition-[color,background-color,transform] duration-300 ${
-                        useSolidChrome
-                          ? "text-muted-foreground hover:bg-white/4 hover:text-foreground/88"
-                          : "text-foreground/72 hover:text-foreground"
-                      }`}
-                    >
-                      <span>{link.label}</span>
-                    </button>
-                  ))}
-                  {publicPageLinks.map((link) => {
-                    const isActive = currentPage === link.value;
-
-                    return (
-                      <Link
-                        key={link.value}
-                        href={link.href}
-                        className={`relative whitespace-nowrap rounded-full px-3 py-2 text-[0.95rem] font-medium tracking-[-0.01em] outline-none transition-[color,background-color,transform] duration-300 ${
-                          isActive
-                            ? "bg-white/5 text-foreground"
-                            : useSolidChrome
-                              ? "text-muted-foreground hover:bg-white/4 hover:text-foreground/88"
-                              : "text-foreground/72 hover:text-foreground"
-                        }`}
-                      >
-                        <span>{link.label}</span>
-                        <span
-                          className={`absolute left-1/2 bottom-1 h-px w-[60%] -translate-x-1/2 origin-center bg-primary/90 transition-transform duration-300 ${
-                            isActive ? "scale-x-100" : "scale-x-0"
-                          }`}
-                        />
-                      </Link>
-                    );
-                  })}
-                </motion.div>
-              </div>
-            )}
-
-            {/* Action Area - Unified Auth Group */}
-            <div className="flex items-center justify-end">
-              <div
-                className={`hidden items-center md:flex ${useSolidChrome ? "gap-3 lg:gap-4" : "gap-4 lg:gap-5"}`}
-              >
-                {!isConnected && currentPage !== "login" && (
+          {/* Desktop Navigation */}
+          {hasDesktopNav && (
+            <div className="hidden min-w-0 items-center justify-center justify-self-center md:flex gap-4 lg:gap-6">
+              {navLinks.map((link) => {
+                const isActive = currentPage === link.value;
+                return (
                   <button
-                    onClick={() => onNavigate?.("login")}
-                    className={`cursor-pointer whitespace-nowrap rounded-full px-3 py-2 text-[0.95rem] font-medium tracking-[-0.01em] outline-none transition-[color,background-color,transform] duration-300 ${
-                      useQuietPublicCta
-                        ? "text-foreground/72 hover:text-foreground"
-                        : useSolidChrome
-                          ? "text-muted-foreground hover:bg-white/4 hover:text-foreground"
-                          : "text-foreground/72 hover:text-foreground"
+                    key={link.value}
+                    onClick={() => handleNavClick(link)}
+                    className={`cursor-pointer whitespace-nowrap px-3 py-1.5 text-[0.88rem] font-medium tracking-tight transition-colors duration-300 outline-none ${
+                      isActive ? "text-white" : "text-neutral-300 hover:text-white"
                     }`}
                   >
-                    Sign In
+                    {link.label}
                   </button>
-                )}
-
-                {isConnected ? (
-                  <div className="relative" ref={menuRef}>
-                    <motion.button
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      onClick={() => setShowAccountMenu(!showAccountMenu)}
-                      className="group flex items-center gap-3 rounded-xl border border-white/10 bg-white/4 px-3 py-2 transition-all duration-300 cursor-pointer outline-none hover:border-primary/20 hover:bg-white/6 active:scale-95"
-                    >
-                      <div className="flex flex-col items-end">
-                        <span className="text-[10px] uppercase tracking-widest text-(--byreix-gold-soft) font-bold">
-                          Connected
-                        </span>
-                        <div className="flex items-center gap-1">
-                          <span className="text-xs font-mono text-foreground/90">
-                            {connectedLabel}
-                          </span>
-                          <ChevronDown
-                            className={`w-3 h-3 text-muted-foreground transition-transform duration-300 ${showAccountMenu ? "rotate-180" : ""}`}
-                          />
-                        </div>
-                      </div>
-                    </motion.button>
-
-                    {/* Account Dropdown */}
-                    <AnimatePresence>
-                      {showAccountMenu && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                          transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
-                          className="absolute right-0 mt-3 w-64 bg-card/95 border border-border rounded-3xl overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.4)] z-50"
-                        >
-                          <div className="p-2 flex flex-col gap-1">
-                            <button
-                              onClick={() => {
-                                onNavigate?.("profile");
-                                setShowAccountMenu(false);
-                              }}
-                              className="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-primary/10 text-muted-foreground hover:text-foreground transition-all duration-500 group"
-                            >
-                              <User className="w-4 h-4 group-hover:text-primary transition-colors" />
-                              <span className="text-sm font-semibold">View Profile</span>
-                            </button>
-                            <button
-                              onClick={() => {
-                                onNavigate?.("cms");
-                                setShowAccountMenu(false);
-                              }}
-                              className="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-primary/10 text-muted-foreground hover:text-foreground transition-all duration-500 group"
-                            >
-                              <Settings className="w-4 h-4 group-hover:text-primary transition-colors" />
-                              <span className="text-sm font-semibold">CMS Dashboard</span>
-                            </button>
-                            <div className="h-px bg-border my-1 mx-2" />
-                            <button
-                              onClick={() => {
-                                onDisconnect?.();
-                                setShowAccountMenu(false);
-                              }}
-                              className="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-red-500/10 text-red-400 hover:text-red-300 transition-all duration-500 group"
-                            >
-                              <LogOut className="w-4 h-4" />
-                              <span className="text-sm font-bold">Disconnect</span>
-                            </button>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                ) : (
-                  <Button
-                    onClick={onConnect}
-                    className={`group relative h-9 rounded-lg px-4 text-[0.92rem] font-semibold transition-all duration-300 active:scale-95 sm:h-10 sm:rounded-lg sm:px-4.5 sm:text-[0.95rem] ${
-                      useQuietPublicCta
-                        ? "border border-white/0 bg-transparent text-foreground shadow-none hover:bg-white/[0.04]"
-                        : "border border-primary/25 bg-primary/92 text-primary-foreground hover:bg-primary hover:shadow-[0_8px_18px_rgba(37,201,133,0.16)]"
+                );
+              })}
+              {publicHomeLinks.map((link) => (
+                <button
+                  key={link.id}
+                  onClick={() => onSectionNavigate?.(link.id)}
+                  className="cursor-pointer whitespace-nowrap px-3 py-1.5 text-[0.88rem] font-medium tracking-tight text-neutral-300 hover:text-white transition-colors duration-300 outline-none"
+                >
+                  {link.label}
+                </button>
+              ))}
+              {publicPageLinks.map((link) => {
+                const isActive = currentPage === link.value;
+                return (
+                  <Link
+                    key={link.value}
+                    href={link.href}
+                    className={`whitespace-nowrap px-3 py-1.5 text-[0.88rem] font-medium tracking-tight transition-colors duration-300 outline-none ${
+                      isActive ? "text-white" : "text-neutral-300 hover:text-white"
                     }`}
                   >
-                    <span className="relative flex items-center gap-2.5">
-                      <Wallet
-                        className={`w-4 h-4 transition-transform duration-300 group-hover:scale-110 ${
-                          useQuietPublicCta ? "text-foreground/76" : "text-primary-foreground/90"
-                        }`}
-                      />
-                      {ctaLabel}
-                    </span>
-                  </Button>
-                )}
-              </div>
-
-              {/* Mobile Menu Toggle */}
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="relative z-10 ml-auto p-1.5 text-muted-foreground transition-colors duration-300 hover:text-foreground sm:p-2 md:hidden"
-                title="menu"
-              >
-                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-              </button>
+                    {link.label}
+                  </Link>
+                );
+              })}
             </div>
-          </motion.div>
+          )}
 
-          {/* Mobile Menu */}
-          <AnimatePresence>
-            {mobileMenuOpen && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
-                className="overflow-hidden border-t border-[rgba(214,196,133,0.12)] bg-[rgba(5,18,12,0.96)] backdrop-blur-xl md:hidden"
-              >
-                <div className="mx-auto flex max-w-6xl flex-col gap-3 px-3.5 py-4 sm:px-6 sm:py-5 lg:px-8">
-                  {navLinks.map((link, i) => (
-                    <motion.div
-                      initial={{ x: -20, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      transition={{ delay: i * 0.05 + 0.1 }}
-                      key={link.value}
-                    >
-                      <button
-                        onClick={() => {
-                          handleNavClick(link);
-                          setMobileMenuOpen(false);
-                        }}
-                        className={`w-full border-b px-0 py-3.5 text-left text-sm font-semibold transition-all duration-300 ${
-                          currentPage === link.value
-                            ? "border-primary/35 text-foreground"
-                            : "border-white/8 text-muted-foreground hover:border-primary/18 hover:text-foreground"
-                        }`}
+          {/* Action Area */}
+          <div className="flex items-center justify-end">
+            <div className="hidden items-center md:flex gap-4">
+              {!isConnected && currentPage !== "login" && currentPage !== "home" && (
+                <button
+                  onClick={() => onNavigate?.("login")}
+                  className="cursor-pointer whitespace-nowrap px-3 py-1.5 text-[0.88rem] font-medium tracking-tight text-neutral-400 hover:text-neutral-200 transition-colors duration-200 outline-none"
+                >
+                  Sign In
+                </button>
+              )}
+
+              {isConnected ? (
+                <div className="relative" ref={menuRef}>
+                  <button
+                    onClick={() => setShowAccountMenu(!showAccountMenu)}
+                    className="flex items-center gap-2 text-xs text-neutral-300 font-mono bg-white/5 hover:bg-white/8 border border-white/10 px-3 py-1.5 rounded-md transition duration-200 cursor-pointer outline-none"
+                  >
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]" />
+                    <span>{connectedLabel}</span>
+                    <ChevronDown
+                      className={`w-3.5 h-3.5 text-neutral-500 transition-transform duration-200 ${
+                        showAccountMenu ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {/* Account Dropdown */}
+                  <AnimatePresence>
+                    {showAccountMenu && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 8, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                        transition={{ duration: 0.15, ease: [0.23, 1, 0.32, 1] }}
+                        className="absolute right-0 mt-2 w-56 bg-neutral-950 border border-neutral-900 rounded-xl overflow-hidden shadow-[0_12px_30px_rgba(0,0,0,0.5)] z-50 p-1.5 flex flex-col gap-0.5"
                       >
-                        {link.label}
-                      </button>
-                    </motion.div>
-                  ))}
-
-                  {publicHomeLinks.map((link, i) => (
-                    <motion.div
-                      initial={{ x: -20, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      transition={{ delay: i * 0.05 + 0.1 }}
-                      key={link.id}
-                    >
-                      <button
-                        onClick={() => {
-                          onSectionNavigate?.(link.id);
-                          setMobileMenuOpen(false);
-                        }}
-                        className="w-full border-b border-white/8 px-0 py-3.5 text-left text-sm font-semibold text-muted-foreground transition-all duration-300 hover:border-primary/18 hover:text-foreground"
-                      >
-                        {link.label}
-                      </button>
-                    </motion.div>
-                  ))}
-
-                  {publicPageLinks.map((link, i) => (
-                    <motion.div
-                      initial={{ x: -20, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      transition={{ delay: i * 0.05 + 0.08 }}
-                      key={link.value}
-                    >
-                      <Link
-                        href={link.href}
-                        onClick={() => setMobileMenuOpen(false)}
-                        className={`block w-full border-b px-0 py-3.5 text-left text-sm font-semibold transition-all duration-300 ${
-                          currentPage === link.value
-                            ? "border-primary/35 text-foreground"
-                            : "border-white/8 text-muted-foreground hover:border-primary/18 hover:text-foreground"
-                        }`}
-                      >
-                        {link.label}
-                      </Link>
-                    </motion.div>
-                  ))}
-
-                  <div className="my-3 h-px bg-white/8" />
-
-                  {!isConnected ? (
-                    <motion.div
-                      initial={{ y: 20, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      transition={{ delay: 0.3 }}
-                      className="flex flex-col gap-3 pt-2"
-                    >
-                      {currentPage !== "login" && (
-                        <button
-                          onClick={() => {
-                            onNavigate?.("login");
-                            setMobileMenuOpen(false);
-                          }}
-                          className="w-full px-0 py-2.5 text-left text-sm font-semibold text-muted-foreground transition-colors duration-300 hover:text-foreground"
-                        >
-                          Sign In
-                        </button>
-                      )}
-                      <Button
-                        onClick={() => {
-                          onConnect?.();
-                          setMobileMenuOpen(false);
-                        }}
-                        className="h-11 w-full rounded-xl bg-primary text-sm font-semibold text-primary-foreground shadow-[0_10px_24px_rgba(37,201,133,0.16)] sm:h-12"
-                      >
-                        <Wallet className="w-5 h-5 mr-3" />
-                        {ctaLabel}
-                      </Button>
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      initial={{ y: 20, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      transition={{ delay: 0.3 }}
-                      className="flex flex-col gap-3"
-                    >
-                      <div className="mb-2 flex items-center justify-between rounded-2xl border border-white/10 bg-white/4 p-4">
-                        <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-xl border border-white/10 bg-linear-to-br from-primary to-(--byreix-green-deep)" />
-                          <div className="flex flex-col">
-                            <span className="text-[10px] uppercase font-bold text-primary">
-                              Connected
-                            </span>
-                            <span className="text-xs font-mono text-foreground/90">
-                              {connectedLabel}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 gap-2">
                         <button
                           onClick={() => {
                             onNavigate?.("profile");
-                            setMobileMenuOpen(false);
+                            setShowAccountMenu(false);
                           }}
-                          className="flex items-center gap-3 rounded-xl border border-white/8 bg-white/3 px-4 py-4 text-muted-foreground transition-all duration-300 hover:border-primary/18 hover:text-foreground"
+                          className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-white/5 text-neutral-400 hover:text-white text-left transition-colors duration-150 cursor-pointer"
                         >
-                          <User className="w-4 h-4 text-primary" />
-                          <span className="text-sm font-semibold">View Profile</span>
+                          <User className="w-3.5 h-3.5" />
+                          <span className="text-xs font-medium">View Profile</span>
                         </button>
                         <button
                           onClick={() => {
                             onNavigate?.("cms");
-                            setMobileMenuOpen(false);
+                            setShowAccountMenu(false);
                           }}
-                          className="flex items-center gap-3 rounded-xl border border-white/8 bg-white/3 px-4 py-4 text-muted-foreground transition-all duration-300 hover:border-primary/18 hover:text-foreground"
+                          className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-white/5 text-neutral-400 hover:text-white text-left transition-colors duration-150 cursor-pointer"
                         >
-                          <Settings className="w-4 h-4 text-primary" />
-                          <span className="text-sm font-semibold">CMS Dashboard</span>
+                          <Settings className="w-3.5 h-3.5" />
+                          <span className="text-xs font-medium">CMS Dashboard</span>
                         </button>
+                        <div className="h-px bg-white/5 my-1" />
                         <button
                           onClick={() => {
                             onDisconnect?.();
-                            setMobileMenuOpen(false);
+                            setShowAccountMenu(false);
                           }}
-                          className="mt-2 flex items-center gap-3 rounded-xl border border-red-500/18 bg-red-500/10 px-4 py-4 text-red-400 transition-all duration-300 hover:text-red-300"
+                          className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-red-500/10 text-red-400 hover:text-red-300 text-left transition-colors duration-150 cursor-pointer"
                         >
-                          <LogOut className="w-4 h-4" />
-                          <span className="text-sm font-bold">Disconnect</span>
+                          <LogOut className="w-3.5 h-3.5" />
+                          <span className="text-xs font-semibold">Disconnect</span>
                         </button>
-                      </div>
-                    </motion.div>
-                  )}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
-      </motion.div>
+              ) : (
+                <button
+                  onClick={onConnect}
+                  className={`h-9 rounded-full px-4 text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-all duration-300 transform hover:scale-[1.03] active:scale-[0.97] ${
+                    currentPage === "home" && !scrolled
+                      ? "border border-white/15 bg-white/4 text-neutral-200 hover:bg-white/10 hover:text-white hover:border-white/30"
+                      : "bg-white text-black hover:bg-neutral-200"
+                  }`}
+                >
+                  <Wallet className="w-3.5 h-3.5" />
+                  <span>{ctaLabel}</span>
+                </button>
+              )}
+            </div>
+
+            {/* Mobile Menu Toggle */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="ml-auto p-1.5 text-neutral-400 transition-colors duration-200 hover:text-white md:hidden cursor-pointer"
+              title="menu"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+            className="absolute left-0 right-0 top-14 overflow-hidden border-b border-white/5 bg-black/95 backdrop-blur-xl md:hidden"
+          >
+            <div className="flex flex-col gap-1 px-4 py-4">
+              {navLinks.map((link) => (
+                <button
+                  key={link.value}
+                  onClick={() => {
+                    handleNavClick(link);
+                    setMobileMenuOpen(false);
+                  }}
+                  className={`w-full py-2.5 text-left text-sm font-medium transition-colors ${
+                    currentPage === link.value ? "text-white" : "text-neutral-400 hover:text-white"
+                  }`}
+                >
+                  {link.label}
+                </button>
+              ))}
+
+              {publicHomeLinks.map((link) => (
+                <button
+                  key={link.id}
+                  onClick={() => {
+                    onSectionNavigate?.(link.id);
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full py-2.5 text-left text-sm font-medium text-neutral-400 hover:text-white transition-colors"
+                >
+                  {link.label}
+                </button>
+              ))}
+
+              {publicPageLinks.map((link) => (
+                <Link
+                  key={link.value}
+                  href={link.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`block w-full py-2.5 text-left text-sm font-medium transition-colors ${
+                    currentPage === link.value ? "text-white" : "text-neutral-400 hover:text-white"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+
+              <div className="h-px bg-white/5 my-2" />
+
+              {!isConnected ? (
+                <div className="flex flex-col gap-2.5">
+                  {currentPage !== "login" && currentPage !== "home" && (
+                    <button
+                      onClick={() => {
+                        onNavigate?.("login");
+                        setMobileMenuOpen(false);
+                      }}
+                      className="w-full py-2 text-left text-sm font-medium text-neutral-400 hover:text-white"
+                    >
+                      Sign In
+                    </button>
+                  )}
+                  <button
+                    onClick={() => {
+                      onConnect?.();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="h-10 w-full rounded-full bg-white text-xs font-semibold text-black flex items-center justify-center gap-2 transition duration-200 active:scale-95"
+                  >
+                    <Wallet className="w-4 h-4" />
+                    {ctaLabel}
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2.5">
+                  <div className="flex items-center gap-2 text-xs text-neutral-300 font-mono bg-white/5 border border-white/10 px-3 py-2 rounded-lg">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]" />
+                    <span>{connectedLabel}</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-1">
+                    <button
+                      onClick={() => {
+                        onNavigate?.("profile");
+                        setMobileMenuOpen(false);
+                      }}
+                      className="flex items-center gap-2.5 py-2.5 text-neutral-400 hover:text-white transition-colors cursor-pointer"
+                    >
+                      <User className="w-4 h-4" />
+                      <span className="text-sm font-medium">View Profile</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        onNavigate?.("cms");
+                        setMobileMenuOpen(false);
+                      }}
+                      className="flex items-center gap-2.5 py-2.5 text-neutral-400 hover:text-white transition-colors cursor-pointer"
+                    >
+                      <Settings className="w-4 h-4" />
+                      <span className="text-sm font-medium">CMS Dashboard</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        onDisconnect?.();
+                        setMobileMenuOpen(false);
+                      }}
+                      className="flex items-center gap-2.5 py-2.5 text-red-400 hover:text-red-300 transition-colors cursor-pointer"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span className="text-sm font-medium">Disconnect</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 }
