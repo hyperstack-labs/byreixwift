@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { LoginPage } from "@/components/pages";
@@ -21,6 +21,14 @@ export function LoginRouteClient() {
   const { signMessageAsync } = useSignMessage();
   const { disconnect } = useDisconnect();
 
+  const hasAttemptedRef = useRef(false);
+
+  useEffect(() => {
+    if (!isConnected) {
+      hasAttemptedRef.current = false;
+    }
+  }, [isConnected]);
+
   const nextPath = useMemo(() => {
     const requestedPath = searchParams.get("next");
     if (requestedPath && requestedPath.startsWith("/")) {
@@ -36,10 +44,11 @@ export function LoginRouteClient() {
   }, [isAuthenticated, nextPath, router]);
 
   const handleWalletConnect = useCallback(async () => {
-    if (!isConnected || !address || isAuthenticated || isLoading) {
+    if (!isConnected || !address || isAuthenticated || isLoading || hasAttemptedRef.current) {
       return;
     }
 
+    hasAttemptedRef.current = true;
     setIsLoading(true);
     try {
       // 1. Get Nonce
