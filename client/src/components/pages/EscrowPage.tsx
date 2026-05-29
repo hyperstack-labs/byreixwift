@@ -200,6 +200,8 @@ export function EscrowPage() {
           <Dialog
             open={showCreateDialog}
             onOpenChange={(open) => {
+              // Prevent modal cancellation while network calls are processing
+              if (isMutating) return;
               setShowCreateDialog(open);
               if (!open) {
                 setTimeout(resetForm, 300);
@@ -241,6 +243,7 @@ export function EscrowPage() {
                       <Input
                         id="buyer"
                         placeholder="0x..."
+                        disabled={isMutating}
                         value={formData.buyer}
                         onChange={(e) => setFormData({ ...formData, buyer: e.target.value })}
                         className={`bg-background font-mono text-sm transition-colors ${
@@ -265,6 +268,7 @@ export function EscrowPage() {
                       <Input
                         id="seller"
                         placeholder="0x..."
+                        disabled={isMutating}
                         value={formData.seller}
                         onChange={(e) => setFormData({ ...formData, seller: e.target.value })}
                         className={`bg-background font-mono text-sm transition-colors ${
@@ -289,6 +293,7 @@ export function EscrowPage() {
                           id="amount"
                           type="number"
                           placeholder="0.00"
+                          disabled={isMutating}
                           value={formData.amount}
                           onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
                           className={`bg-background transition-colors ${
@@ -311,6 +316,7 @@ export function EscrowPage() {
                           id="fixedFee"
                           type="number"
                           placeholder="0.00"
+                          disabled={isMutating}
                           value={formData.fixedFee}
                           onChange={(e) => setFormData({ ...formData, fixedFee: e.target.value })}
                           className={`bg-background transition-colors ${
@@ -331,6 +337,7 @@ export function EscrowPage() {
                         </div>
                         <Input
                           id="token"
+                          disabled={isMutating}
                           value={formData.token}
                           onChange={(e) => setFormData({ ...formData, token: e.target.value })}
                           className={`bg-background transition-colors ${
@@ -356,6 +363,7 @@ export function EscrowPage() {
                       <Textarea
                         id="description"
                         placeholder="Purpose of transaction"
+                        disabled={isMutating}
                         value={formData.description}
                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                         className={`bg-background min-h-20 transition-colors ${
@@ -370,6 +378,7 @@ export function EscrowPage() {
                   <div className="p-6 border-t border-border bg-card flex gap-2 shrink-0">
                     <Button
                       variant="outline"
+                      disabled={isMutating}
                       onClick={() => {
                         setShowCreateDialog(false);
                         setTimeout(resetForm, 300);
@@ -463,22 +472,22 @@ export function EscrowPage() {
 
         {/* Loading State */}
         {isLoading && (
-          <div className="space-y-3">
+          <div className="space-y-3" aria-hidden="true">
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="h-25 w-full rounded-xl border border-border bg-card/50 flex items-center px-4 justify-between"
+                className="h-24 w-full rounded-xl border border-border bg-card/50 flex items-center px-4 justify-between animate-pulse"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 rounded-full bg-muted animate-pulse" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-muted" />
                   <div className="space-y-2">
-                    <div className="h-4 w-40 bg-muted rounded animate-pulse" />
-                    <div className="h-3 w-24 bg-muted/50 rounded animate-pulse" />
+                    <div className="h-4 w-48 bg-muted rounded" />
+                    <div className="h-3 w-32 bg-muted/60 rounded" />
                   </div>
                 </div>
                 <div className="space-y-2 flex flex-col items-end">
-                  <div className="h-4 w-16 bg-muted rounded animate-pulse" />
-                  <div className="h-5 w-20 bg-muted/50 rounded-full animate-pulse" />
+                  <div className="h-4 w-16 bg-muted rounded" />
+                  <div className="h-5 w-20 bg-muted/40 rounded-full" />
                 </div>
               </div>
             ))}
@@ -496,8 +505,10 @@ export function EscrowPage() {
               return (
                 <Card
                   key={escrow.id}
-                  onClick={() => setSelectedEscrowId(escrow.id)}
-                  className="p-4 bg-card border-border hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all cursor-pointer group active:scale-[0.98] duration-200"
+                  onClick={() => !isMutating && setSelectedEscrowId(escrow.id)}
+                  className={`p-4 bg-card border-border hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all cursor-pointer group active:scale-[0.98] duration-200 ${
+                    isMutating ? "opacity-60 cursor-not-allowed pointer-events-none" : ""
+                  }`}
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-start gap-3 min-w-0 text-left">
@@ -577,6 +588,8 @@ export function EscrowPage() {
           onRelease={() => handleTransition("release", selectedEscrow.id, selectedEscrow.buyer)}
           onRefund={() => handleTransition("refund", selectedEscrow.id, selectedEscrow.seller)}
           onClose={() => {
+            // Prevent closing modal during active background updates
+            if (isMutating) return;
             setSelectedEscrowId(null);
             setModalError(null);
           }}
