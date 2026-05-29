@@ -7,35 +7,38 @@ import {
   EscrowRecord,
 } from "@/types/escrow";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+import axios from "axios";
+import { api } from "@/lib/api";
+
 const ESCROW_QUERY_KEY = ["escrows"];
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...init?.headers,
-    },
-    cache: "no-store",
-  });
+async function request<T>(path: string, init?: { method?: string; body?: unknown }): Promise<T> {
+  const method = init?.method?.toLowerCase() || "get";
+  const requestData = typeof init?.body === "string" ? JSON.parse(init.body) : init?.body;
 
-  if (!response.ok) {
+  try {
+    const response = await api.request<T>({
+      url: path,
+      method,
+      data: requestData,
+    });
+    return response.data;
+  } catch (error: unknown) {
     let message = "Request failed";
-    try {
-      const body = (await response.json()) as { message?: string | string[] };
-      if (Array.isArray(body.message)) {
-        message = body.message.join(", ");
-      } else if (body.message) {
-        message = body.message;
+    if (axios.isAxiosError(error)) {
+      const bodyMessage = error.response?.data?.message;
+      if (Array.isArray(bodyMessage)) {
+        message = bodyMessage.join(", ");
+      } else if (typeof bodyMessage === "string") {
+        message = bodyMessage;
+      } else if (error.message) {
+        message = error.message;
       }
-    } catch {
-      // Fall back to the default error when the response body is not JSON.
+    } else if (error instanceof Error) {
+      message = error.message;
     }
     throw new Error(message);
   }
-
-  return response.json() as Promise<T>;
 }
 
 export function useEscrows() {

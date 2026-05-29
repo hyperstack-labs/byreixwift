@@ -37,8 +37,8 @@ export class EscrowsService {
     const now = new Date().toISOString();
     const escrow: EscrowRecord = {
       id: randomUUID(),
-      buyer: dto.buyer,
-      seller: dto.seller,
+      buyer: dto.buyer.toLowerCase(),
+      seller: dto.seller.toLowerCase(),
       amount: Number(dto.amount.toFixed(8)),
       tokenSymbol: dto.tokenSymbol.trim().toUpperCase(),
       description: dto.description.trim(),

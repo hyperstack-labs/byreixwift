@@ -19,12 +19,13 @@ export class AuthService {
     try {
       const siweMessage = new SiweMessage(message);
       const { data: fields } = await siweMessage.verify({ signature });
+      const normalizedAddress = fields.address.toLowerCase();
 
       // 1. Find or create user
-      let [user] = await db.select().from(users).where(eq(users.address, fields.address));
+      let [user] = await db.select().from(users).where(eq(users.address, normalizedAddress));
       
       if (!user) {
-        [user] = await db.insert(users).values({ address: fields.address }).returning();
+        [user] = await db.insert(users).values({ address: normalizedAddress }).returning();
       }
 
       // 2. Generate tokens
@@ -77,14 +78,37 @@ export class AuthService {
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
 
+    // 1. Revoke the old refresh token immediately!
+    await db
+      .update(refreshTokens)
+      .set({ revoked: true })
+      .where(eq(refreshTokens.id, storedToken.id));
+
+    // 2. Get user
     const [user] = await db.select().from(users).where(eq(users.id, storedToken.userId));
     
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
 
+    // 3. Issue a new access token AND a new rotated refresh token!
+    const newAccessToken = this.generateAccessToken(user.id, user.address);
+    const newRefreshToken = this.generateRefreshToken();
+
+    // 4. Store new refresh token
+    const newHashedToken = crypto.createHash('sha256').update(newRefreshToken).digest('hex');
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7); // 7 days
+
+    await db.insert(refreshTokens).values({
+      userId: user.id,
+      token: newHashedToken,
+      expiresAt,
+    });
+
     return {
-      accessToken: this.generateAccessToken(user.id, user.address),
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
     };
   }
 
