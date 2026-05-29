@@ -284,13 +284,13 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 const sectionWrapClass =
-  "rounded-[2.1rem] bg-[linear-gradient(180deg,rgba(9,13,11,0.56)_0%,rgba(7,10,8,0.28)_100%)] sm:rounded-[2.75rem]";
+  "rounded-[2.1rem] bg-[linear-gradient(180deg,rgba(10,10,10,0.56)_0%,rgba(8,8,8,0.28)_100%)] sm:rounded-[2.75rem]";
 
 const contentCardClass =
-  "rounded-[1.7rem] border border-white/8 bg-[linear-gradient(180deg,rgba(10,15,12,0.94)_0%,rgba(7,11,9,0.9)_100%)] sm:rounded-[2rem]";
+  "rounded-[1.7rem] border border-white/8 bg-[linear-gradient(180deg,rgba(12,12,12,0.94)_0%,rgba(8,8,8,0.9)_100%)] sm:rounded-[2rem]";
 
 const insetCardClass =
-  "rounded-[1.5rem] border border-white/8 bg-[linear-gradient(180deg,rgba(12,17,14,0.82)_0%,rgba(8,12,10,0.68)_100%)]";
+  "rounded-[1.5rem] border border-white/8 bg-[linear-gradient(180deg,rgba(14,14,14,0.82)_0%,rgba(10,10,10,0.68)_100%)]";
 
 function LiveDot({ reducedMotion }: { reducedMotion: boolean }) {
   return (
@@ -345,7 +345,7 @@ function PreviewShell({
       className="relative"
     >
       <div className="absolute inset-0 rounded-4xl bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.04),transparent_58%),radial-gradient(circle_at_bottom,rgba(37,201,133,0.08),transparent_46%)] blur-2xl sm:rounded-[2.4rem]" />
-      <div className="relative overflow-hidden rounded-4xl border border-white/8 bg-[linear-gradient(180deg,rgba(10,15,12,0.98)_0%,rgba(6,9,7,1)_100%)] p-4 shadow-[0_26px_80px_rgba(0,0,0,0.34)] sm:rounded-[2.4rem] sm:p-5 lg:p-6">
+      <div className="relative overflow-hidden rounded-4xl border border-white/8 bg-[linear-gradient(180deg,rgba(10,10,10,0.98)_0%,rgba(6,6,6,1)_100%)] p-4 shadow-[0_26px_80px_rgba(0,0,0,0.34)] sm:rounded-[2.4rem] sm:p-5 lg:p-6">
         <motion.div
           variants={previewItem(reducedMotion)}
           className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/16 to-transparent"
@@ -635,9 +635,9 @@ export function LandingPage({ onConnect }: LandingPageProps) {
         className="relative min-h-svh overflow-hidden px-4 sm:px-6 lg:px-8 noise-overlay"
       >
         <div className="absolute inset-0 z-0 pointer-events-none">
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,20,13,0.62)_0%,rgba(4,16,11,0.3)_38%,rgba(4,12,9,0.16)_100%)]" />
-          <div className="absolute inset-x-0 top-0 h-[24rem] bg-[radial-gradient(ellipse_at_top,rgba(19,91,60,0.18),transparent_62%)]" />
-          <div className="absolute inset-x-0 bottom-0 h-[26%] bg-linear-to-t from-[rgba(5,20,13,0.92)] via-[rgba(5,20,13,0.7)] to-transparent" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,5,5,0.62)_0%,rgba(3,3,3,0.3)_38%,rgba(2,2,2,0.16)_100%)]" />
+          <div className="absolute inset-x-0 top-0 h-[24rem] bg-[radial-gradient(ellipse_at_top,rgba(37,201,133,0.1),transparent_62%)]" />
+          <div className="absolute inset-x-0 bottom-0 h-[26%] bg-linear-to-t from-[rgba(5,5,5,0.92)] via-[rgba(5,5,5,0.7)] to-transparent" />
         </div>
 
         <div className="relative z-10 mx-auto flex min-h-svh w-full max-w-4xl flex-col items-center justify-start pt-32 pb-24 sm:pt-40 sm:pb-32 lg:pt-44 lg:pb-36">
@@ -707,8 +707,9 @@ export function LandingPage({ onConnect }: LandingPageProps) {
         id={HOME_SECTION_IDS.why}
         className="relative z-10 px-4 pb-12 pt-9 sm:px-6 sm:pb-16 sm:pt-12 lg:px-8 lg:pb-20 lg:pt-16"
       >
-        <div className="mx-auto grid max-w-6xl gap-6 sm:gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:gap-12">
-          <motion.div {...sectionReveal(reducedMotion)} className="max-w-xl flex flex-col justify-start gap-10 lg:gap-14">
+        <div className="mx-auto grid max-w-6xl gap-8 sm:gap-10 lg:grid-cols-[1fr_1.15fr] lg:gap-14">
+          {/* Left Column: Copy + Nested Comparison Lists */}
+          <motion.div {...sectionReveal(reducedMotion)} className="flex flex-col gap-8 lg:gap-10">
             <div>
               <SectionLabel>Why ByReiXwift Exists</SectionLabel>
               <h2 className="mt-4 text-[1.82rem] font-bold leading-[1.04] tracking-tight text-foreground sm:mt-6 sm:text-[2.55rem] lg:text-[3.25rem]">
@@ -720,54 +721,116 @@ export function LandingPage({ onConnect }: LandingPageProps) {
               </p>
             </div>
 
-            <div className="mt-8 sm:mt-12">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-neutral-500">
-                What users still face
-              </p>
-              <div className="mt-4.5 space-y-4 sm:space-y-5">
-                {problemPoints.map((point) => {
-                  const Icon = point.icon;
-                  return (
-                    <div key={point.text} className="flex gap-3 group">
-                      <Icon className="mt-0.5 h-4.5 w-4.5 shrink-0 text-neutral-500/80 transition-transform duration-300 group-hover:scale-110" />
-                      <p className="text-sm leading-relaxed text-neutral-400 group-hover:text-neutral-300 transition-colors duration-300">
-                        {point.text}
-                      </p>
-                    </div>
-                  );
-                })}
+            {/* Nested Side-by-Side Comparison Lists */}
+            <div className="grid gap-6 sm:grid-cols-2 sm:gap-8">
+              {/* Problems */}
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-neutral-500">
+                  What users still face
+                </p>
+                <div className="mt-4 space-y-3.5">
+                  {problemPoints.map((point) => {
+                    const Icon = point.icon;
+                    return (
+                      <div key={point.text} className="flex gap-2.5 group">
+                        <Icon className="mt-0.5 h-4 w-4 shrink-0 text-neutral-500/80 transition-transform duration-300 group-hover:scale-110" />
+                        <p className="text-[0.82rem] leading-relaxed text-neutral-400 group-hover:text-neutral-300 transition-colors duration-300">
+                          {point.text}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Solutions */}
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-(--byreix-gold-soft)">
+                  What ByReiXwift changes
+                </p>
+                <div className="mt-4 space-y-3.5">
+                  {responsePoints.map((point) => {
+                    const Icon = point.icon;
+                    return (
+                      <div key={point.text} className="flex gap-2.5 group">
+                        <Icon className="mt-0.5 h-4 w-4 shrink-0 text-(--byreix-gold-soft) transition-transform duration-300 group-hover:scale-110" />
+                        <div className="space-y-0.5">
+                          <p className="text-[0.82rem] font-semibold text-neutral-200 transition-colors duration-300 group-hover:text-white">
+                            {point.text.split(":")[0]}
+                          </p>
+                          <p className="text-[0.78rem] leading-relaxed text-neutral-400 transition-colors duration-300 group-hover:text-neutral-300">
+                            {point.text.split(":")[1]?.trim()}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           </motion.div>
 
+          {/* Right Column: Clean Floating Product Preview */}
           <motion.div
-            {...sectionReveal(reducedMotion, 0.08)}
-            className="relative flex items-center group/card"
+            {...sectionReveal(reducedMotion, 0.1)}
+            className="flex flex-col gap-3 sm:gap-4"
           >
-            {/* Ambient gold glow behind the card on hover */}
-            <div className="absolute -inset-6 rounded-[2.5rem] bg-[radial-gradient(circle_at_center,rgba(223,194,141,0.035)_0%,transparent_70%)] blur-2xl opacity-0 group-hover/card:opacity-100 transition-opacity duration-700 pointer-events-none" />
+            {/* Raw Transaction Block */}
+            <div className="rounded-2xl border border-white/[0.05] bg-white/[0.02] p-4 sm:p-5">
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-500">
+                  What you normally see
+                </p>
+                <EyeOff className="h-3.5 w-3.5 text-neutral-600" />
+              </div>
+              <div className="mt-3 overflow-hidden rounded-xl bg-black/30 p-3">
+                <p className="truncate font-mono text-[10px] leading-relaxed text-neutral-500 sm:text-[11px]">
+                  0xa9059cbb000000000000000000000000abf4d
+                </p>
+                <p className="truncate font-mono text-[10px] leading-relaxed text-neutral-600 sm:text-[11px]">
+                  0x00000000000000000000000000000000004e20
+                </p>
+              </div>
+            </div>
 
-            <div className="relative w-full rounded-[2rem] border border-transparent bg-[linear-gradient(180deg,rgba(255,255,255,0.015)_0%,rgba(255,255,255,0.005)_100%)] p-6 backdrop-blur-[12px] shadow-[inset_0_1px_1px_rgba(255,255,255,0.02),0_24px_48px_-12px_rgba(0,0,0,0.5)] transition-all duration-500 hover:border-[rgba(223,194,141,0.12)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.4),inset_0_1px_1px_rgba(255,255,255,0.04)] sm:p-8 lg:p-10 group">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-(--byreix-gold-soft)">
-                What ByReiXwift changes
-              </p>
-              <div className="mt-6 space-y-5 sm:space-y-6 lg:space-y-7">
-                {responsePoints.map((point) => {
-                  const Icon = point.icon;
-                  return (
-                    <div key={point.text} className="flex gap-4 group/item">
-                      <Icon className="mt-0.5 h-5 w-5 shrink-0 text-(--byreix-gold-soft) transition-transform duration-300 group-hover/item:scale-110" />
-                      <div className="space-y-1">
-                        <p className="text-sm font-semibold text-neutral-200 transition-colors duration-300 group-hover/item:text-white">
-                          {point.text.split(":")[0]}
-                        </p>
-                        <p className="text-[0.85rem] leading-relaxed text-neutral-400 transition-colors duration-300 group-hover/item:text-neutral-300">
-                          {point.text.split(":")[1]?.trim()}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
+            {/* Minimal Arrow Divider */}
+            <div className="flex items-center gap-3 px-4">
+              <div className="h-px flex-1 bg-white/[0.04]" />
+              <ArrowRight className="h-3.5 w-3.5 text-neutral-600" />
+              <div className="h-px flex-1 bg-white/[0.04]" />
+            </div>
+
+            {/* Verified Pre-Flight Card */}
+            <div className="rounded-2xl border border-white/[0.05] bg-white/[0.02] p-4 sm:p-5">
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">
+                  ByReiXwift Pre-Flight
+                </p>
+                <ShieldCheck className="h-3.5 w-3.5 text-primary/60" />
+              </div>
+
+              <div className="mt-3.5 space-y-1.5">
+                <div className="flex items-center justify-between rounded-xl bg-white/[0.02] px-3.5 py-2.5">
+                  <span className="text-[11px] text-neutral-500">Recipient</span>
+                  <span className="text-[11px] font-medium text-neutral-200">Noor Market</span>
+                </div>
+                <div className="flex items-center justify-between rounded-xl bg-white/[0.02] px-3.5 py-2.5">
+                  <span className="text-[11px] text-neutral-500">Amount</span>
+                  <span className="text-[11px] font-medium text-neutral-200">1,250.00 SDA</span>
+                </div>
+                <div className="flex items-center justify-between rounded-xl bg-white/[0.02] px-3.5 py-2.5">
+                  <span className="text-[11px] text-neutral-500">Fee</span>
+                  <span className="text-[11px] font-medium text-neutral-400">25.00 SDA</span>
+                </div>
+                <div className="flex items-center justify-between rounded-xl bg-white/[0.02] px-3.5 py-2.5">
+                  <span className="text-[11px] text-neutral-500">Escrow</span>
+                  <span className="text-[11px] font-medium text-neutral-400">Holding</span>
+                </div>
+              </div>
+
+              <div className="mt-4 flex items-center justify-center gap-2 rounded-xl bg-primary/8 py-2.5 text-[11px] font-medium text-primary/80">
+                <Eye className="h-3.5 w-3.5" />
+                Review and Sign
               </div>
             </div>
           </motion.div>
@@ -1039,7 +1102,7 @@ export function LandingPage({ onConnect }: LandingPageProps) {
 
       <section className="px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
         <motion.div {...sectionReveal(reducedMotion)} className="mx-auto max-w-4xl text-center">
-          <div className="relative overflow-hidden rounded-[2.1rem] border border-white/8 bg-[linear-gradient(180deg,rgba(10,15,12,0.96)_0%,rgba(7,11,9,0.92)_100%)] p-6 sm:rounded-[2.5rem] sm:p-12 lg:p-16">
+          <div className="relative overflow-hidden rounded-[2.1rem] border border-white/8 bg-[linear-gradient(180deg,rgba(12,12,12,0.96)_0%,rgba(8,8,8,0.92)_100%)] p-6 sm:rounded-[2.5rem] sm:p-12 lg:p-16">
             <div className="absolute inset-0 bg-linear-to-b from-primary/8 via-transparent to-[rgba(223,194,141,0.05)]" />
 
             <div className="relative z-10">
