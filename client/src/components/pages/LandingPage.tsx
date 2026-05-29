@@ -3,13 +3,17 @@ import { useEffect, useRef, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { motion, useAnimationControls, useInView, useReducedMotion } from "motion/react";
 import {
+  AlertCircle,
   ArrowRight,
   CheckCircle2,
   Eye,
+  EyeOff,
+  FileText,
   LockKeyhole,
   Repeat,
   Scale,
   Send,
+  ShieldAlert,
   ShieldCheck,
   Wallet,
 } from "lucide-react";
@@ -41,15 +45,39 @@ function useIsMounted() {
 }
 
 const problemPoints = [
-  "You often see fees and settlement terms too late in the flow.",
-  "You should not have to trust a checkout you cannot properly review.",
-  "Some transactions need a visible release step, not just a payment confirmation.",
+  {
+    text: "Hidden fees and settlement terms surface only when it is too late.",
+    icon: AlertCircle,
+    iconColor: "text-amber-500/80 group-hover:text-amber-500",
+  },
+  {
+    text: "Blind trust is mandated: wallet checkouts hide underlying contract details.",
+    icon: EyeOff,
+    iconColor: "text-red-400/80 group-hover:text-red-400",
+  },
+  {
+    text: "High-value peer-to-peer deals lack smart escrow protection.",
+    icon: ShieldAlert,
+    iconColor: "text-red-400/80 group-hover:text-red-400",
+  },
 ];
 
 const responsePoints = [
-  "Put the amount, fees, recipient, and settlement mode in front of you before approval.",
-  "Make transfers and merchant payments feel readable, not like raw token actions.",
-  "Add escrow only when the transaction needs structure, then show its state clearly.",
+  {
+    text: "Granular Pre-Flight Reviews: Upfront breakdowns of exact amounts, network fees, and recipient addresses.",
+    icon: Eye,
+    iconColor: "text-(--byreix-gold-soft) group-hover:text-white",
+  },
+  {
+    text: "Human-Readable Intents: Confusing smart contract signatures are translated into plain English.",
+    icon: FileText,
+    iconColor: "text-(--byreix-gold-soft) group-hover:text-white",
+  },
+  {
+    text: "On-Demand Escrow: Funds are held in a secure vault and released only when terms are met.",
+    icon: ShieldCheck,
+    iconColor: "text-(--byreix-gold-soft) group-hover:text-white",
+  },
 ];
 
 const platformPillars: FeatureCard[] = [
@@ -680,45 +708,66 @@ export function LandingPage({ onConnect }: LandingPageProps) {
         className="relative z-10 px-4 pb-12 pt-9 sm:px-6 sm:pb-16 sm:pt-12 lg:px-8 lg:pb-20 lg:pt-16"
       >
         <div className="mx-auto grid max-w-6xl gap-6 sm:gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:gap-12">
-          <motion.div {...sectionReveal(reducedMotion)} className="max-w-xl">
-            <SectionLabel>Why ByReiXwift Exists</SectionLabel>
-            <h2 className="mt-4 text-[1.82rem] font-bold leading-[1.04] tracking-tight text-foreground sm:mt-6 sm:text-[2.55rem] lg:text-[3.25rem]">
-              Digital payments are easy to start and hard to verify.
-            </h2>
-            <p className="mt-4 max-w-[34rem] text-[0.98rem] leading-[1.68] text-muted-foreground sm:mt-6 sm:text-lg">
-              Fees, settlement terms, and trust gaps still show up too late. ByReiXwift is being
-              built so you can review the deal before money moves.
-            </p>
+          <motion.div {...sectionReveal(reducedMotion)} className="max-w-xl flex flex-col justify-start gap-10 lg:gap-14">
+            <div>
+              <SectionLabel>Why ByReiXwift Exists</SectionLabel>
+              <h2 className="mt-4 text-[1.82rem] font-bold leading-[1.04] tracking-tight text-foreground sm:mt-6 sm:text-[2.55rem] lg:text-[3.25rem]">
+                Digital payments are easy to start and hard to verify.
+              </h2>
+              <p className="mt-4 max-w-[34rem] text-[0.98rem] leading-[1.68] text-muted-foreground sm:mt-6 sm:text-lg">
+                Fees, settlement terms, and trust gaps still show up too late. ByReiXwift is being
+                built so you can review the deal before money moves.
+              </p>
+            </div>
+
+            <div className="mt-8 sm:mt-12">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-neutral-500">
+                What users still face
+              </p>
+              <div className="mt-4.5 space-y-4 sm:space-y-5">
+                {problemPoints.map((point) => {
+                  const Icon = point.icon;
+                  return (
+                    <div key={point.text} className="flex gap-3 group">
+                      <Icon className="mt-0.5 h-4.5 w-4.5 shrink-0 text-neutral-500/80 transition-transform duration-300 group-hover:scale-110" />
+                      <p className="text-sm leading-relaxed text-neutral-400 group-hover:text-neutral-300 transition-colors duration-300">
+                        {point.text}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </motion.div>
 
           <motion.div
             {...sectionReveal(reducedMotion, 0.08)}
-            className="grid gap-3 sm:gap-4 sm:grid-cols-2"
+            className="relative flex items-center group/card"
           >
-            <div className={`${contentCardClass} p-4.5 sm:p-6`}>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/85">
-                What users still face
-              </p>
-              <div className="mt-4 space-y-3.5 sm:mt-5 sm:space-y-4">
-                {problemPoints.map((point) => (
-                  <div key={point} className="flex gap-3">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                    <p className="text-sm leading-relaxed text-muted-foreground">{point}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className={`${contentCardClass} p-4.5 sm:p-6`}>
+            {/* Ambient gold glow behind the card on hover */}
+            <div className="absolute -inset-6 rounded-[2.5rem] bg-[radial-gradient(circle_at_center,rgba(223,194,141,0.035)_0%,transparent_70%)] blur-2xl opacity-0 group-hover/card:opacity-100 transition-opacity duration-700 pointer-events-none" />
+
+            <div className="relative w-full rounded-[2rem] border border-transparent bg-[linear-gradient(180deg,rgba(255,255,255,0.015)_0%,rgba(255,255,255,0.005)_100%)] p-6 backdrop-blur-[12px] shadow-[inset_0_1px_1px_rgba(255,255,255,0.02),0_24px_48px_-12px_rgba(0,0,0,0.5)] transition-all duration-500 hover:border-[rgba(223,194,141,0.12)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.4),inset_0_1px_1px_rgba(255,255,255,0.04)] sm:p-8 lg:p-10 group">
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-(--byreix-gold-soft)">
                 What ByReiXwift changes
               </p>
-              <div className="mt-4 space-y-3.5 sm:mt-5 sm:space-y-4">
-                {responsePoints.map((point) => (
-                  <div key={point} className="flex gap-3">
-                    <Scale className="mt-0.5 h-4 w-4 shrink-0 text-(--byreix-gold-soft)" />
-                    <p className="text-sm leading-relaxed text-muted-foreground">{point}</p>
-                  </div>
-                ))}
+              <div className="mt-6 space-y-5 sm:space-y-6 lg:space-y-7">
+                {responsePoints.map((point) => {
+                  const Icon = point.icon;
+                  return (
+                    <div key={point.text} className="flex gap-4 group/item">
+                      <Icon className="mt-0.5 h-5 w-5 shrink-0 text-(--byreix-gold-soft) transition-transform duration-300 group-hover/item:scale-110" />
+                      <div className="space-y-1">
+                        <p className="text-sm font-semibold text-neutral-200 transition-colors duration-300 group-hover/item:text-white">
+                          {point.text.split(":")[0]}
+                        </p>
+                        <p className="text-[0.85rem] leading-relaxed text-neutral-400 transition-colors duration-300 group-hover/item:text-neutral-300">
+                          {point.text.split(":")[1]?.trim()}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </motion.div>
