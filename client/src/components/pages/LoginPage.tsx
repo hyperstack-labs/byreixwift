@@ -38,17 +38,6 @@ export function LoginPage({ onWalletConnect, onNavigate, isLoading = false }: Lo
     <div className="flex min-h-screen flex-col pt-20 sm:pt-24 md:pt-28 lg:flex-row lg:pt-24">
       {/* Left Side - Login Form (Mobile First) */}
       <div className="relative flex flex-1 items-center justify-center px-4 py-10 sm:px-6 sm:py-12 lg:px-8 lg:py-0">
-        {/* Subtle background glow for mobile */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none lg:hidden">
-          <div
-            className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-150 rounded-full"
-            style={{
-              background: "radial-gradient(circle, rgba(6,95,70,0.08) 0%, transparent 50%)",
-              filter: "blur(80px)",
-            }}
-          />
-        </div>
-
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -128,31 +117,9 @@ export function LoginPage({ onWalletConnect, onNavigate, isLoading = false }: Lo
       </div>
 
       {/* Right Side - Branding (Desktop Only) */}
-      <div className="relative hidden flex-1 overflow-hidden bg-background lg:flex">
-        {/* Background Effects */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {/* Large ambient glow */}
-          <div
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-200 h-200 rounded-full"
-            style={{
-              background:
-                "radial-gradient(circle, rgba(6,95,70,0.15) 0%, rgba(6,95,70,0.05) 40%, transparent 70%)",
-              filter: "blur(100px)",
-            }}
-          />
-
-          {/* Accent glow */}
-          <div
-            className="absolute top-1/4 right-0 w-125 h-125 rounded-full"
-            style={{
-              background: "radial-gradient(circle, rgba(212,175,55,0.10) 0%, transparent 60%)",
-              filter: "blur(80px)",
-            }}
-          />
-        </div>
-
+      <div className="relative hidden flex-1 bg-background lg:flex">
         {/* Content */}
-        <div className="relative z-10 flex max-w-2xl flex-col justify-center px-10 xl:px-20">
+        <div className="flex max-w-2xl flex-col justify-center px-10 xl:px-20">
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
@@ -192,25 +159,7 @@ export function LoginPage({ onWalletConnect, onNavigate, isLoading = false }: Lo
               ))}
             </div>
 
-            {/* Access indicators */}
-            <div className="mt-10 border-t border-border pt-6">
-              <div className="flex flex-wrap gap-3">
-                {[
-                  { label: "Access", value: "Direct to app" },
-                  { label: "Wallet", value: "Sidra ready" },
-                ].map((item) => (
-                  <div
-                    key={item.label}
-                    className="rounded-full border border-white/8 bg-card/60 px-3.5 py-2"
-                  >
-                    <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-foreground/44">
-                      {item.label}
-                    </p>
-                    <p className="mt-1 text-sm font-semibold text-foreground/86">{item.value}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+
           </motion.div>
         </div>
       </div>

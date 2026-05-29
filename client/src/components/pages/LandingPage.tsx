@@ -11,7 +11,6 @@ import {
   FileText,
   LockKeyhole,
   Repeat,
-  Scale,
   Send,
   ShieldAlert,
   ShieldCheck,
@@ -38,7 +37,7 @@ interface DetailRow {
 
 function useIsMounted() {
   return useSyncExternalStore(
-    () => () => {},
+    () => () => { },
     () => true,
     () => false
   );
@@ -300,9 +299,9 @@ function LiveDot({ reducedMotion }: { reducedMotion: boolean }) {
         reducedMotion
           ? undefined
           : {
-              opacity: [0.4, 1, 0.4],
-              scale: [0.9, 1.15, 0.9],
-            }
+            opacity: [0.4, 1, 0.4],
+            scale: [0.9, 1.15, 0.9],
+          }
       }
       transition={
         reducedMotion ? undefined : { duration: 2.1, repeat: Infinity, ease: "easeInOut" }
@@ -632,38 +631,34 @@ export function LandingPage({ onConnect }: LandingPageProps) {
     <div className="min-h-screen bg-background selection:bg-primary/30 selection:text-foreground">
       <section
         id={HOME_SECTION_IDS.hero}
-        className="relative min-h-svh overflow-hidden px-4 sm:px-6 lg:px-8 noise-overlay"
+        className="relative min-h-dvh overflow-hidden px-4 sm:px-6 lg:px-8 noise-overlay"
       >
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,5,5,0.62)_0%,rgba(3,3,3,0.3)_38%,rgba(2,2,2,0.16)_100%)]" />
-          <div className="absolute inset-x-0 top-0 h-[24rem] bg-[radial-gradient(ellipse_at_top,rgba(37,201,133,0.1),transparent_62%)]" />
-          <div className="absolute inset-x-0 bottom-0 h-[26%] bg-linear-to-t from-[rgba(5,5,5,0.92)] via-[rgba(5,5,5,0.7)] to-transparent" />
-        </div>
+        <div className="absolute inset-0 z-0 pointer-events-none" />
 
-        <div className="relative z-10 mx-auto flex min-h-svh w-full max-w-4xl flex-col items-center justify-start pt-32 pb-24 sm:pt-40 sm:pb-32 lg:pt-44 lg:pb-36">
-          <motion.div
-            initial={{ opacity: 0, scale: 1.02 }}
-            animate={{ opacity: 0.5, scale: 1 }}
-            transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1], delay: 0.08 }}
-            className="pointer-events-none absolute left-1/2 top-[44svh] h-[46svh] w-[210vw] max-w-none -translate-x-1/2 sm:top-[46svh] sm:h-[48svh] sm:w-[168vw] lg:w-[126vw]"
-            style={{
-              maskImage: "linear-gradient(to bottom, black 40%, transparent 90%)",
-              WebkitMaskImage: "linear-gradient(to bottom, black 40%, transparent 90%)",
-            }}
-          >
-            <Image
-              src="/horizon_glow.png"
-              alt=""
-              fill
-              className="object-cover mix-blend-screen opacity-80"
-            />
-          </motion.div>
+        <motion.div
+          initial={{ opacity: 0, scale: 1.02 }}
+          animate={{ opacity: 0.5, scale: 1 }}
+          transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1], delay: 0.08 }}
+          className="pointer-events-none absolute left-0 right-0 bottom-0 h-[58svh] z-[5]"
+          style={{
+            maskImage: "linear-gradient(to bottom, black 40%, transparent 90%)",
+            WebkitMaskImage: "linear-gradient(to bottom, black 40%, transparent 90%)",
+          }}
+        >
+          <Image
+            src="/horizon_glow.png"
+            alt=""
+            fill
+            className="object-cover mix-blend-screen opacity-85"
+          />
+        </motion.div>
 
+        <div className="relative z-10 mx-auto flex min-h-svh w-full max-w-4xl flex-col items-center justify-center">
           <motion.div
             initial={{ opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
-            className="mx-auto flex max-w-3xl flex-col items-center pt-6 text-center sm:pt-8 lg:pt-0"
+            className="mx-auto flex max-w-3xl flex-col items-center text-center"
           >
             <div className="flex max-w-[18rem] flex-col items-center gap-1 text-center sm:max-w-none sm:flex-row sm:gap-2">
               <span className="text-[9px] font-black tracking-[0.12em] text-primary sm:text-[10px]">
