@@ -7,41 +7,44 @@ import {
   EscrowRecord,
 } from "@/types/escrow";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+import axios from "axios";
+import { api } from "@/lib/api";
+
 const ESCROW_QUERY_KEY = ["escrows"];
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...init?.headers,
-    },
-    cache: "no-store",
-  });
+async function request<T>(path: string, init?: { method?: string; body?: unknown }): Promise<T> {
+  const method = init?.method?.toLowerCase() || "get";
+  const requestData = typeof init?.body === "string" ? JSON.parse(init.body) : init?.body;
 
-  if (!response.ok) {
+  try {
+    const response = await api.request<T>({
+      url: path,
+      method,
+      data: requestData,
+    });
+    return response.data;
+  } catch (error: unknown) {
     let message = "Request failed";
-    try {
-      const body = (await response.json()) as { message?: string | string[] };
-      if (Array.isArray(body.message)) {
-        message = body.message.join(", ");
-      } else if (body.message) {
-        message = body.message;
+    if (axios.isAxiosError(error)) {
+      const bodyMessage = error.response?.data?.message;
+      if (Array.isArray(bodyMessage)) {
+        message = bodyMessage.join(", ");
+      } else if (typeof bodyMessage === "string") {
+        message = bodyMessage;
+      } else if (error.message) {
+        message = error.message;
       }
-    } catch {
-      // Fall back to the default error when the response body is not JSON.
+    } else if (error instanceof Error) {
+      message = error.message;
     }
     throw new Error(message);
   }
-
-  return response.json() as Promise<T>;
 }
 
 export function useEscrows() {
   return useQuery({
     queryKey: ESCROW_QUERY_KEY,
-    queryFn: () => request<EscrowRecord[]>("/api/escrows"),
+    queryFn: () => request<EscrowRecord[]>("/escrows"),
     refetchInterval: 10_000,
   });
 }
@@ -49,7 +52,7 @@ export function useEscrows() {
 export function useEscrowEvents(id: string | null) {
   return useQuery({
     queryKey: [...ESCROW_QUERY_KEY, id, "events"],
-    queryFn: () => request<EscrowEventRecord[]>(`/api/escrows/${id}/events`),
+    queryFn: () => request<EscrowEventRecord[]>(`/escrows/${id}/events`),
     enabled: Boolean(id),
     refetchInterval: 10_000,
   });
@@ -60,7 +63,7 @@ export function useCreateEscrow() {
 
   return useMutation({
     mutationFn: (payload: CreateEscrowPayload) =>
-      request<EscrowDetailResponse>("/api/escrows", {
+      request<EscrowDetailResponse>("/escrows", {
         method: "POST",
         body: JSON.stringify(payload),
       }),
@@ -90,6 +93,6 @@ function createEscrowActionMutation(pathFactory: (id: string) => string) {
   };
 }
 
-export const useLockEscrow = createEscrowActionMutation((id) => `/api/escrows/${id}/lock`);
-export const useReleaseEscrow = createEscrowActionMutation((id) => `/api/escrows/${id}/release`);
-export const useRefundEscrow = createEscrowActionMutation((id) => `/api/escrows/${id}/refund`);
+export const useLockEscrow = createEscrowActionMutation((id) => `/escrows/${id}/lock`);
+export const useReleaseEscrow = createEscrowActionMutation((id) => `/escrows/${id}/release`);
+export const useRefundEscrow = createEscrowActionMutation((id) => `/escrows/${id}/refund`);

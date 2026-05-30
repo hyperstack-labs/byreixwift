@@ -30,12 +30,24 @@ export class AuthController {
   }
 
   @Post('refresh')
-  async refresh(@Req() request: Request) {
+  async refresh(
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
+  ) {
     const refreshToken = request.cookies['refreshToken'];
     if (!refreshToken) {
       throw new UnauthorizedException('No refresh token provided');
     }
-    return this.authService.refresh(refreshToken);
+    const { accessToken, refreshToken: newRefreshToken } = await this.authService.refresh(refreshToken);
+
+    response.cookie('refreshToken', newRefreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    return { accessToken };
   }
 
   @Post('logout')

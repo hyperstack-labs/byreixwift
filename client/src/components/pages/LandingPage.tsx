@@ -1,16 +1,18 @@
 "use client";
 import { useEffect, useRef, useSyncExternalStore } from "react";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
 import { motion, useAnimationControls, useInView, useReducedMotion } from "motion/react";
 import {
+  AlertCircle,
   ArrowRight,
   CheckCircle2,
   Eye,
+  EyeOff,
+  FileText,
   LockKeyhole,
   Repeat,
-  Scale,
   Send,
+  ShieldAlert,
   ShieldCheck,
   Wallet,
 } from "lucide-react";
@@ -35,37 +37,46 @@ interface DetailRow {
 
 function useIsMounted() {
   return useSyncExternalStore(
-    () => () => {},
+    () => () => { },
     () => true,
     () => false
   );
 }
 
-const heroProofPoints = [
-  {
-    label: "Fees shown upfront",
-    value: "Before you confirm",
-  },
-  {
-    label: "Settlement visible",
-    value: "Direct payment or escrow",
-  },
-  {
-    label: "Approval required",
-    value: "No blind approval step",
-  },
-] as const;
-
 const problemPoints = [
-  "You often see fees and settlement terms too late in the flow.",
-  "You should not have to trust a checkout you cannot properly review.",
-  "Some transactions need a visible release step, not just a payment confirmation.",
+  {
+    text: "Hidden fees and settlement terms surface only when it is too late.",
+    icon: AlertCircle,
+    iconColor: "text-amber-500/80 group-hover:text-amber-500",
+  },
+  {
+    text: "Blind trust is mandated: wallet checkouts hide underlying contract details.",
+    icon: EyeOff,
+    iconColor: "text-red-400/80 group-hover:text-red-400",
+  },
+  {
+    text: "High-value peer-to-peer deals lack smart escrow protection.",
+    icon: ShieldAlert,
+    iconColor: "text-red-400/80 group-hover:text-red-400",
+  },
 ];
 
 const responsePoints = [
-  "Put the amount, fees, recipient, and settlement mode in front of you before approval.",
-  "Make transfers and merchant payments feel readable, not like raw token actions.",
-  "Add escrow only when the transaction needs structure, then show its state clearly.",
+  {
+    text: "Granular Pre-Flight Reviews: Upfront breakdowns of exact amounts, network fees, and recipient addresses.",
+    icon: Eye,
+    iconColor: "text-(--byreix-gold-soft) group-hover:text-white",
+  },
+  {
+    text: "Human-Readable Intents: Confusing smart contract signatures are translated into plain English.",
+    icon: FileText,
+    iconColor: "text-(--byreix-gold-soft) group-hover:text-white",
+  },
+  {
+    text: "On-Demand Escrow: Funds are held in a secure vault and released only when terms are met.",
+    icon: ShieldCheck,
+    iconColor: "text-(--byreix-gold-soft) group-hover:text-white",
+  },
 ];
 
 const platformPillars: FeatureCard[] = [
@@ -272,13 +283,13 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 const sectionWrapClass =
-  "rounded-[2.1rem] bg-[linear-gradient(180deg,rgba(9,13,11,0.56)_0%,rgba(7,10,8,0.28)_100%)] sm:rounded-[2.75rem]";
+  "rounded-[2.1rem] bg-[linear-gradient(180deg,rgba(10,10,10,0.56)_0%,rgba(8,8,8,0.28)_100%)] sm:rounded-[2.75rem]";
 
 const contentCardClass =
-  "rounded-[1.7rem] border border-white/8 bg-[linear-gradient(180deg,rgba(10,15,12,0.94)_0%,rgba(7,11,9,0.9)_100%)] sm:rounded-[2rem]";
+  "rounded-[1.7rem] border border-white/8 bg-[linear-gradient(180deg,rgba(12,12,12,0.94)_0%,rgba(8,8,8,0.9)_100%)] sm:rounded-[2rem]";
 
 const insetCardClass =
-  "rounded-[1.5rem] border border-white/8 bg-[linear-gradient(180deg,rgba(12,17,14,0.82)_0%,rgba(8,12,10,0.68)_100%)]";
+  "rounded-[1.5rem] border border-white/8 bg-[linear-gradient(180deg,rgba(14,14,14,0.82)_0%,rgba(10,10,10,0.68)_100%)]";
 
 function LiveDot({ reducedMotion }: { reducedMotion: boolean }) {
   return (
@@ -288,9 +299,9 @@ function LiveDot({ reducedMotion }: { reducedMotion: boolean }) {
         reducedMotion
           ? undefined
           : {
-              opacity: [0.4, 1, 0.4],
-              scale: [0.9, 1.15, 0.9],
-            }
+            opacity: [0.4, 1, 0.4],
+            scale: [0.9, 1.15, 0.9],
+          }
       }
       transition={
         reducedMotion ? undefined : { duration: 2.1, repeat: Infinity, ease: "easeInOut" }
@@ -333,7 +344,7 @@ function PreviewShell({
       className="relative"
     >
       <div className="absolute inset-0 rounded-4xl bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.04),transparent_58%),radial-gradient(circle_at_bottom,rgba(37,201,133,0.08),transparent_46%)] blur-2xl sm:rounded-[2.4rem]" />
-      <div className="relative overflow-hidden rounded-4xl border border-white/8 bg-[linear-gradient(180deg,rgba(10,15,12,0.98)_0%,rgba(6,9,7,1)_100%)] p-4 shadow-[0_26px_80px_rgba(0,0,0,0.34)] sm:rounded-[2.4rem] sm:p-5 lg:p-6">
+      <div className="relative overflow-hidden rounded-4xl border border-white/8 bg-[linear-gradient(180deg,rgba(10,10,10,0.98)_0%,rgba(6,6,6,1)_100%)] p-4 shadow-[0_26px_80px_rgba(0,0,0,0.34)] sm:rounded-[2.4rem] sm:p-5 lg:p-6">
         <motion.div
           variants={previewItem(reducedMotion)}
           className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/16 to-transparent"
@@ -620,35 +631,34 @@ export function LandingPage({ onConnect }: LandingPageProps) {
     <div className="min-h-screen bg-background selection:bg-primary/30 selection:text-foreground">
       <section
         id={HOME_SECTION_IDS.hero}
-        className="relative min-h-svh overflow-hidden px-4 sm:px-6 lg:px-8 noise-overlay"
+        className="relative min-h-dvh overflow-hidden px-4 sm:px-6 lg:px-8 noise-overlay"
       >
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,20,13,0.62)_0%,rgba(4,16,11,0.3)_38%,rgba(4,12,9,0.16)_100%)]" />
-          <div className="absolute inset-x-0 top-0 h-[24rem] bg-[radial-gradient(ellipse_at_top,rgba(19,91,60,0.18),transparent_62%)]" />
-          <div className="absolute inset-x-0 bottom-[10%] h-[30rem] bg-[radial-gradient(ellipse_at_bottom,rgba(22,118,78,0.2),transparent_70%)]" />
-          <div className="absolute inset-x-0 bottom-0 h-[26%] bg-linear-to-t from-[rgba(5,20,13,0.92)] via-[rgba(5,20,13,0.7)] to-transparent" />
-        </div>
+        <div className="absolute inset-0 z-0 pointer-events-none" />
 
-        <div className="relative z-10 mx-auto flex min-h-svh w-full max-w-4xl items-center justify-center pt-20 sm:pt-24 lg:pt-28">
-          <motion.div
-            initial={{ opacity: 0, scale: 1.02 }}
-            animate={{ opacity: 0.2, scale: 1 }}
-            transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1], delay: 0.08 }}
-            className="pointer-events-none absolute left-1/2 top-[56svh] h-[46svh] w-[210vw] max-w-none -translate-x-1/2 sm:top-[58svh] sm:h-[48svh] sm:w-[168vw] lg:w-[126vw]"
-          >
-            <Image
-              src="/horizon_glow.png"
-              alt=""
-              fill
-              className="object-cover mix-blend-screen opacity-80"
-            />
-          </motion.div>
+        <motion.div
+          initial={{ opacity: 0, scale: 1.02 }}
+          animate={{ opacity: 0.5, scale: 1 }}
+          transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1], delay: 0.08 }}
+          className="pointer-events-none absolute left-0 right-0 bottom-0 h-[58svh] z-[5]"
+          style={{
+            maskImage: "linear-gradient(to bottom, black 40%, transparent 90%)",
+            WebkitMaskImage: "linear-gradient(to bottom, black 40%, transparent 90%)",
+          }}
+        >
+          <Image
+            src="/horizon_glow.png"
+            alt=""
+            fill
+            className="object-cover mix-blend-screen opacity-85"
+          />
+        </motion.div>
 
+        <div className="relative z-10 mx-auto flex min-h-svh w-full max-w-4xl flex-col items-center justify-center">
           <motion.div
             initial={{ opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
-            className="mx-auto flex max-w-160 flex-col items-center pt-6 text-center sm:pt-8 lg:pt-0"
+            className="mx-auto flex max-w-3xl flex-col items-center text-center"
           >
             <div className="flex max-w-[18rem] flex-col items-center gap-1 text-center sm:max-w-none sm:flex-row sm:gap-2">
               <span className="text-[9px] font-black tracking-[0.12em] text-primary sm:text-[10px]">
@@ -659,58 +669,30 @@ export function LandingPage({ onConnect }: LandingPageProps) {
               </span>
             </div>
 
-            <h1 className="mt-5 max-w-[12ch] text-[clamp(2.35rem,14vw,3.75rem)] font-extrabold leading-[0.92] tracking-[-0.05em] text-foreground sm:mt-6 sm:text-[clamp(2.8rem,6vw,4.3rem)] sm:leading-[0.96]">
-              Review payment
-              <span className="mt-2 block text-(--byreix-gold-soft)">before approval.</span>
+            <h1 className="mt-5 max-w-2xl text-[clamp(2.35rem,14vw,3.75rem)] font-extrabold leading-[0.92] tracking-[-0.05em] text-foreground sm:mt-6 sm:text-[clamp(2.8rem,6vw,4.3rem)] sm:leading-[0.96]">
+              Never sign a
+              <span className="mt-2 block text-(--byreix-gold-soft)">transaction blindly.</span>
             </h1>
 
-            <p className="mt-4 max-w-120 text-[0.98rem] leading-[1.72] text-muted-foreground sm:mt-5 sm:text-[1.03rem] lg:text-[1.08rem]">
-              See the merchant, amount, fees, and settlement path before you approve. Use escrow
-              only when the handoff needs a visible release step.
+            <p className="mt-4.5 max-w-xl text-[0.98rem] leading-[1.72] text-muted-foreground sm:mt-5.5 sm:text-[1.03rem] lg:text-[1.08rem]">
+              Preview every transaction, verify merchant identities, and reveal hidden fees before
+              you sign. Deploy escrow on-demand to protect your high-value peer-to-peer deals.
             </p>
 
             <div className="mt-6 flex w-full max-w-lg flex-col gap-3 sm:mt-7 sm:w-auto sm:max-w-none sm:flex-row sm:justify-center">
-              <Button
-                onClick={() => scrollToSection(HOME_SECTION_IDS.payments)}
-                className="h-12 w-full justify-center rounded-xl border border-white/10 bg-primary px-7 text-base font-semibold text-primary-foreground shadow-[0_16px_36px_rgba(3,13,8,0.34)] sm:w-auto"
-              >
-                See the Flow
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-              <Button
+              <button
                 onClick={onConnect}
-                variant="outline"
-                className="h-12 w-full justify-center rounded-xl border-[rgba(223,194,141,0.18)] bg-[rgba(223,194,141,0.06)] px-7 text-base font-semibold text-foreground/90 hover:border-[rgba(223,194,141,0.34)] hover:bg-[rgba(223,194,141,0.1)] sm:w-auto"
+                className="h-12 w-full justify-center rounded-xl bg-white px-7 text-base font-semibold text-black hover:bg-neutral-200 cursor-pointer flex items-center justify-center gap-2 sm:w-auto transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
               >
-                Launch App
-              </Button>
-            </div>
-
-            <div className="mt-5 grid w-full max-w-2xl gap-1.5 text-center sm:mt-6 sm:grid-cols-3 sm:gap-2">
-              {heroProofPoints.map((point, index) => (
-                <motion.div
-                  key={point.label}
-                  initial={{ opacity: 0, y: reducedMotion ? 0 : 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    duration: reducedMotion ? 0.2 : 0.45,
-                    delay: reducedMotion ? 0 : 0.35 + index * 0.08,
-                    ease: [0.22, 1, 0.36, 1],
-                  }}
-                  className="relative flex flex-col items-center px-3 py-2.5 sm:rounded-[1.15rem] sm:border sm:border-white/8 sm:bg-white/2 sm:px-4 sm:py-3"
-                >
-                  <div className="mb-2 flex items-center gap-2 sm:hidden">
-                    <span className="h-2 w-2 rounded-full bg-primary/80 shadow-[0_0_12px_rgba(37,201,133,0.22)]" />
-                    <span className="h-px w-10 bg-linear-to-r from-primary/34 to-transparent" />
-                  </div>
-                  <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-foreground/42 sm:text-[10px] sm:tracking-[0.2em]">
-                    {point.label}
-                  </p>
-                  <p className="mt-1 text-[0.96rem] font-medium leading-snug text-foreground/86 sm:mt-1.5 sm:text-[0.92rem]">
-                    {point.value}
-                  </p>
-                </motion.div>
-              ))}
+                Open App
+              </button>
+              <button
+                onClick={() => scrollToSection(HOME_SECTION_IDS.payments)}
+                className="h-12 w-full justify-center rounded-xl border border-white/10 bg-white/4 px-7 text-base font-semibold text-neutral-300 hover:bg-white/8 cursor-pointer flex items-center justify-center gap-2 sm:w-auto transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
+              >
+                How it works
+                <ArrowRight className="h-4 w-4 text-neutral-400" />
+              </button>
             </div>
           </motion.div>
         </div>
@@ -720,46 +702,130 @@ export function LandingPage({ onConnect }: LandingPageProps) {
         id={HOME_SECTION_IDS.why}
         className="relative z-10 px-4 pb-12 pt-9 sm:px-6 sm:pb-16 sm:pt-12 lg:px-8 lg:pb-20 lg:pt-16"
       >
-        <div className="mx-auto grid max-w-6xl gap-6 sm:gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:gap-12">
-          <motion.div {...sectionReveal(reducedMotion)} className="max-w-xl">
-            <SectionLabel>Why ByReiXwift Exists</SectionLabel>
-            <h2 className="mt-4 text-[1.82rem] font-bold leading-[1.04] tracking-tight text-foreground sm:mt-6 sm:text-[2.55rem] lg:text-[3.25rem]">
-              Digital payments are easy to start and hard to verify.
-            </h2>
-            <p className="mt-4 max-w-[34rem] text-[0.98rem] leading-[1.68] text-muted-foreground sm:mt-6 sm:text-lg">
-              Fees, settlement terms, and trust gaps still show up too late. ByReiXwift is being
-              built so you can review the deal before money moves.
-            </p>
-          </motion.div>
-
-          <motion.div
-            {...sectionReveal(reducedMotion, 0.08)}
-            className="grid gap-3 sm:gap-4 sm:grid-cols-2"
-          >
-            <div className={`${contentCardClass} p-4.5 sm:p-6`}>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary/85">
-                What users still face
+        <div className="mx-auto grid max-w-6xl gap-8 sm:gap-10 lg:grid-cols-[1fr_1.15fr] lg:gap-14">
+          {/* Left Column: Copy + Nested Comparison Lists */}
+          <motion.div {...sectionReveal(reducedMotion)} className="flex flex-col gap-8 lg:gap-10">
+            <div>
+              <SectionLabel>Why ByReiXwift Exists</SectionLabel>
+              <h2 className="mt-4 text-[1.82rem] font-bold leading-[1.04] tracking-tight text-foreground sm:mt-6 sm:text-[2.55rem] lg:text-[3.25rem]">
+                Digital payments are easy to start and hard to verify.
+              </h2>
+              <p className="mt-4 max-w-[34rem] text-[0.98rem] leading-[1.68] text-muted-foreground sm:mt-6 sm:text-lg">
+                Fees, settlement terms, and trust gaps still show up too late. ByReiXwift is being
+                built so you can review the deal before money moves.
               </p>
-              <div className="mt-4 space-y-3.5 sm:mt-5 sm:space-y-4">
-                {problemPoints.map((point) => (
-                  <div key={point} className="flex gap-3">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                    <p className="text-sm leading-relaxed text-muted-foreground">{point}</p>
-                  </div>
-                ))}
+            </div>
+
+            {/* Nested Side-by-Side Comparison Lists */}
+            <div className="grid gap-6 sm:grid-cols-2 sm:gap-8">
+              {/* Problems */}
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-neutral-500">
+                  What users still face
+                </p>
+                <div className="mt-4 space-y-3.5">
+                  {problemPoints.map((point) => {
+                    const Icon = point.icon;
+                    return (
+                      <div key={point.text} className="flex gap-2.5 group">
+                        <Icon className="mt-0.5 h-4 w-4 shrink-0 text-neutral-500/80 transition-transform duration-300 group-hover:scale-110" />
+                        <p className="text-[0.82rem] leading-relaxed text-neutral-400 group-hover:text-neutral-300 transition-colors duration-300">
+                          {point.text}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Solutions */}
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-(--byreix-gold-soft)">
+                  What ByReiXwift changes
+                </p>
+                <div className="mt-4 space-y-3.5">
+                  {responsePoints.map((point) => {
+                    const Icon = point.icon;
+                    return (
+                      <div key={point.text} className="flex gap-2.5 group">
+                        <Icon className="mt-0.5 h-4 w-4 shrink-0 text-(--byreix-gold-soft) transition-transform duration-300 group-hover:scale-110" />
+                        <div className="space-y-0.5">
+                          <p className="text-[0.82rem] font-semibold text-neutral-200 transition-colors duration-300 group-hover:text-white">
+                            {point.text.split(":")[0]}
+                          </p>
+                          <p className="text-[0.78rem] leading-relaxed text-neutral-400 transition-colors duration-300 group-hover:text-neutral-300">
+                            {point.text.split(":")[1]?.trim()}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
-            <div className={`${contentCardClass} p-4.5 sm:p-6`}>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-(--byreix-gold-soft)">
-                What ByReiXwift changes
-              </p>
-              <div className="mt-4 space-y-3.5 sm:mt-5 sm:space-y-4">
-                {responsePoints.map((point) => (
-                  <div key={point} className="flex gap-3">
-                    <Scale className="mt-0.5 h-4 w-4 shrink-0 text-(--byreix-gold-soft)" />
-                    <p className="text-sm leading-relaxed text-muted-foreground">{point}</p>
-                  </div>
-                ))}
+          </motion.div>
+
+          {/* Right Column: Clean Floating Product Preview */}
+          <motion.div
+            {...sectionReveal(reducedMotion, 0.1)}
+            className="flex flex-col gap-3 sm:gap-4"
+          >
+            {/* Raw Transaction Block */}
+            <div className="rounded-2xl border border-white/[0.05] bg-white/[0.02] p-4 sm:p-5">
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-500">
+                  What you normally see
+                </p>
+                <EyeOff className="h-3.5 w-3.5 text-neutral-600" />
+              </div>
+              <div className="mt-3 overflow-hidden rounded-xl bg-black/30 p-3">
+                <p className="truncate font-mono text-[10px] leading-relaxed text-neutral-500 sm:text-[11px]">
+                  0xa9059cbb000000000000000000000000abf4d
+                </p>
+                <p className="truncate font-mono text-[10px] leading-relaxed text-neutral-600 sm:text-[11px]">
+                  0x00000000000000000000000000000000004e20
+                </p>
+              </div>
+            </div>
+
+            {/* Minimal Arrow Divider */}
+            <div className="flex items-center gap-3 px-4">
+              <div className="h-px flex-1 bg-white/[0.04]" />
+              <ArrowRight className="h-3.5 w-3.5 text-neutral-600" />
+              <div className="h-px flex-1 bg-white/[0.04]" />
+            </div>
+
+            {/* Verified Pre-Flight Card */}
+            <div className="rounded-2xl border border-white/[0.05] bg-white/[0.02] p-4 sm:p-5">
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">
+                  ByReiXwift Pre-Flight
+                </p>
+                <ShieldCheck className="h-3.5 w-3.5 text-primary/60" />
+              </div>
+
+              <div className="mt-3.5 space-y-1.5">
+                <div className="flex items-center justify-between rounded-xl bg-white/[0.02] px-3.5 py-2.5">
+                  <span className="text-[11px] text-neutral-500">Recipient</span>
+                  <span className="text-[11px] font-medium text-neutral-200">Noor Market</span>
+                </div>
+                <div className="flex items-center justify-between rounded-xl bg-white/[0.02] px-3.5 py-2.5">
+                  <span className="text-[11px] text-neutral-500">Amount</span>
+                  <span className="text-[11px] font-medium text-neutral-200">1,250.00 SDA</span>
+                </div>
+                <div className="flex items-center justify-between rounded-xl bg-white/[0.02] px-3.5 py-2.5">
+                  <span className="text-[11px] text-neutral-500">Fee</span>
+                  <span className="text-[11px] font-medium text-neutral-400">25.00 SDA</span>
+                </div>
+                <div className="flex items-center justify-between rounded-xl bg-white/[0.02] px-3.5 py-2.5">
+                  <span className="text-[11px] text-neutral-500">Escrow</span>
+                  <span className="text-[11px] font-medium text-neutral-400">Holding</span>
+                </div>
+              </div>
+
+              <div className="mt-4 flex items-center justify-center gap-2 rounded-xl bg-primary/8 py-2.5 text-[11px] font-medium text-primary/80">
+                <Eye className="h-3.5 w-3.5" />
+                Review and Sign
               </div>
             </div>
           </motion.div>
@@ -1031,7 +1097,7 @@ export function LandingPage({ onConnect }: LandingPageProps) {
 
       <section className="px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
         <motion.div {...sectionReveal(reducedMotion)} className="mx-auto max-w-4xl text-center">
-          <div className="relative overflow-hidden rounded-[2.1rem] border border-white/8 bg-[linear-gradient(180deg,rgba(10,15,12,0.96)_0%,rgba(7,11,9,0.92)_100%)] p-6 sm:rounded-[2.5rem] sm:p-12 lg:p-16">
+          <div className="relative overflow-hidden rounded-[2.1rem] border border-white/8 bg-[linear-gradient(180deg,rgba(12,12,12,0.96)_0%,rgba(8,8,8,0.92)_100%)] p-6 sm:rounded-[2.5rem] sm:p-12 lg:p-16">
             <div className="absolute inset-0 bg-linear-to-b from-primary/8 via-transparent to-[rgba(223,194,141,0.05)]" />
 
             <div className="relative z-10">
@@ -1043,22 +1109,19 @@ export function LandingPage({ onConnect }: LandingPageProps) {
               </p>
 
               <div className="mt-8 flex flex-col items-center justify-center gap-3.5 sm:mt-10 sm:flex-row sm:gap-4">
-                <Button
+                <button
                   onClick={onConnect}
-                  size="lg"
-                  className="h-12 w-full rounded-lg bg-primary px-7 text-base font-semibold text-primary-foreground shadow-[0_16px_38px_rgba(3,13,8,0.3)] sm:w-auto"
+                  className="h-12 w-full justify-center rounded-xl bg-white px-7 text-base font-semibold text-black hover:bg-neutral-200 cursor-pointer flex items-center justify-center gap-2 sm:w-auto transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
                 >
-                  Launch App
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-                <Button
+                  Open App
+                </button>
+                <button
                   onClick={() => scrollToSection(HOME_SECTION_IDS.payments)}
-                  variant="outline"
-                  size="lg"
-                  className="h-12 w-full rounded-lg border-[rgba(223,194,141,0.18)] bg-[rgba(223,194,141,0.05)] px-7 text-base font-semibold text-foreground/90 hover:border-[rgba(223,194,141,0.34)] hover:bg-[rgba(223,194,141,0.1)] sm:w-auto"
+                  className="h-12 w-full justify-center rounded-xl border border-white/10 bg-white/4 px-7 text-base font-semibold text-neutral-300 hover:bg-white/8 cursor-pointer flex items-center justify-center gap-2 sm:w-auto transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
                 >
-                  Explore the Flow
-                </Button>
+                  How it works
+                  <ArrowRight className="h-4 w-4 text-neutral-400" />
+                </button>
               </div>
             </div>
           </div>

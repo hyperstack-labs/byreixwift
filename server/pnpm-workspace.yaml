@@ -1,0 +1,7 @@
+packages:
+  - .
+allowBuilds:
+  "@nestjs/core": true
+  esbuild: true
+overrides:
+  esbuild: "^0.25.0"
