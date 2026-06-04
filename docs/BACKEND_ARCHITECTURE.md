@@ -8,11 +8,11 @@ This document serves as the 'Source of Truth' for the backend architecture.
 
 The backend handles the communication between the client, PostgreSQL as database layer, and the blockchain network.
 
-
-```mermaid 
-   graph TD
+```mermaid
+%%{init: {'theme': 'dark'}}%%
+graph TD
    Client[Frontend Client] --> |HTTPS| API[Backend API Service]
-   API --> |Drizzle ORM| DB[PostgreSQL Daatabase]
+   API --> |Drizzle ORM| DB[PostgreSQL Database]
    API --> |RPC Provider| Blockchain((Blockchain Network))
    Worker[Event Listener / Indexer] -->|Polls / Listens| Blockchain
    Worker -->|Writes Events| DB
@@ -29,22 +29,27 @@ The data layer is managed using Drizzle ORM connected to PostgreSQL. All primary
 ## 3. The Escrow State Machine
 Escrow business logic depends strictly on state updates. The state field in both escrows and escrow_events tables must adhere to the following transition constraints: 
 ```mermaid
+%%{init: {'theme': 'dark'}}%%
 stateDiagram-v2
-    [*] --> pending
+   [*] --> pending
 
-    pending --> funded : Smart contract event listener confirms on-chain deposit
-    pending --> cancelled : Buyer cancels before funding. records are cleaned up/flagged
+   pending --> locked : Smart contract event listener confirms<br/>on-chain deposit, initiate lock of funds
+   
+   locked --> released : Buyer confirms delivery.<br/>Smart contract releases funds to seller
+   released --> refunded : funds transfer to the buyer
 
-    funded --> released : Buyer confirms delivery. smart contract releases funds to seller
-    funded --> disputed : Buyer or seller triggers a dispute lock
+   refunded --> not funded : unsuccessful funding. <br/> Smart contract returns fund to buyer
 
-    disputed --> resolved : Arbiter rules on the split, or parties reach mutual agreement
-    disputed --> refunded : Arbiter rules in favor of full return to the buyer
+   
 
-    cancelled --> [*]
-    released --> [*]
-    resolved --> [*]
-    refunded --> [*]
+   disputed --> resolved : Arbiter rules on the split,<br/>or parties reach mutual agreement
+   disputed --> refunded : Arbiter rules in favor of<br/>full return to the buyer
+
+   pending --> cancelled : User cancels before funding
+   cancelled --> [*]
+   released --> [*]
+   resolved --> [*]
+   refunded --> [*]
 ```
 
 ## 4. Database Naming
