@@ -29,7 +29,6 @@ The data layer is managed using Drizzle ORM connected to PostgreSQL. All primary
 ## 3. The Escrow State Machine
 Escrow business logic depends strictly on state updates. The state field in both escrows and escrow_events tables must adhere to the following transition constraints: 
 ```mermaid
-%%{init: {'theme': 'dark'}}%%
 stateDiagram-v2
    [*] --> pending
 
@@ -38,16 +37,12 @@ stateDiagram-v2
    locked --> released : Buyer confirms delivery.<br/>Smart contract releases funds to seller
    released --> refunded : funds transfer to the buyer
 
-   refunded --> not funded : unsuccessful funding. <br/> Smart contract returns fund to buyer
+   released --> not_funded : unsuccessful funding.<br/> Smart contract returns fund to buyer
 
-   
+   not_funded --> disputed : Dispute raised over failure to fund the escrow within the agreed timeframe.
+   not_funded --> resolved : Both parties acknowledge the funding failure and mutually cancel.
 
-   disputed --> resolved : Arbiter rules on the split,<br/>or parties reach mutual agreement
-   disputed --> refunded : Arbiter rules in favor of<br/>full return to the buyer
-
-   pending --> cancelled : User cancels before funding
-   cancelled --> [*]
-   released --> [*]
+   disputed --> [*]
    resolved --> [*]
    refunded --> [*]
 ```
