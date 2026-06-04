@@ -16,7 +16,7 @@ The infrastructure is designed for scalability and secure data management.
 
 - **Node.js**: Primary runtime for the API layer and escrow lifecycle services.
 - **NestJS**: Structured TypeScript framework for building the backend cleanly as the product grows.
-- **PostgreSQL**: Planned system of record for escrow transactions, auth data, and audit-friendly state history.
+- **PostgreSQL**: Live system of record for escrow transactions, auth data, and audit-friendly state history.
 - **Solidity + Hardhat**: Contract development and testing for the escrow settlement layer.
 
 ## Development Tools
