@@ -64,6 +64,9 @@ export function Navbar({
   const navLinks = isConnected
     ? [
         { label: "Wallet", value: "wallet", isGated: true },
+        // { label: "Send", value: "send", isGated: true },
+        // { label: "Swap", value: "swap", isGated: true },
+        // { label: "Trends", value: "trends", isGated: true },
         { label: "Escrow", value: "escrow", isGated: true },
       ]
     : [];
