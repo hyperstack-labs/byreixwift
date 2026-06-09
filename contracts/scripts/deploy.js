@@ -1,11 +1,29 @@
 require("dotenv").config();
+const hre = require("hardhat");
 
 async function main() {
   console.log("ByReiXwift Escrow Deployment");
 
-  console.log("RPC URL:", process.env.RPC_URL);
+  const [deployer] = await hre.ethers.getSigners();
 
-  console.log("Deployment script ready.");
+  console.log("Deploying with:", deployer.address);
+
+  const ByReiXwiftEscrow = await hre.ethers.getContractFactory(
+    "ByReiXwiftEscrow"
+  );
+
+  const feeCollector = deployer.address;
+  const fixedFee = hre.ethers.parseEther("0.001");
+
+  const escrow = await ByReiXwiftEscrow.deploy(
+    feeCollector,
+    fixedFee
+  );
+
+  await escrow.waitForDeployment();
+
+  console.log("Contract deployed successfully!");
+  console.log("Contract Address:", await escrow.getAddress());
 }
 
 main().catch((error) => {
