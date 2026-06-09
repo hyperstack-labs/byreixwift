@@ -1,7 +1,7 @@
 "use client";
-
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { useSdaBalance } from "@/hooks/useSdaBalance";
 import Image from "next/image";
 import {
   ArrowUpRight,
@@ -23,16 +23,6 @@ import { AdSlot, BannerAd, BannerAdSize } from "@/components/ads";
 import { useAuthStore } from "@/store";
 import { useEscrows } from "@/hooks";
 
-interface TokenAsset {
-  symbol: string;
-  name: string;
-  amount: string;
-  usdValue: string;
-  change: string;
-  changePositive: boolean;
-  icon: string;
-}
-
 interface EscrowRecord {
   id: string | number;
   state: string;
@@ -42,11 +32,17 @@ interface EscrowRecord {
   createdAt?: string;
 }
 
+/** Placeholder SDA/USD rate, relpace with a live price feed when available */
+const SDA_USD_PRICE = 2.0;
+
+/** Placeholder 24h change, replace with a live price feed when available */
+const SDA_CHANGE = "+12.5%";
+const SDA_CHANGE_POSITIVE = true;
+
 export function WalletDashboard() {
   const router = useRouter();
   const { identity } = useAuthStore();
   const [balanceVisible, setBalanceVisible] = useState<boolean>(true);
-
   const walletAddress = identity || "0x0000...0000";
 
   // Data fetching from api/escrows
@@ -63,7 +59,6 @@ export function WalletDashboard() {
   // Dynamically calculate live active escrow total value
   const totalEscrowBalanceString = useMemo<string>(() => {
     if (!escrows || escrows.length === 0) return "0.00";
-
     const activeTotal = escrows
       .filter((escrow) => escrow.state?.toUpperCase() === "PENDING")
       .reduce((sum, escrow) => {
@@ -71,52 +66,32 @@ export function WalletDashboard() {
         const amount = typeof rawAmount === "string" ? parseFloat(rawAmount) : rawAmount;
         return sum + (isNaN(amount) ? 0 : amount);
       }, 0);
-
     return activeTotal.toLocaleString(undefined, {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
   }, [escrows]);
 
-  // Static assets tokens
-  const tokens: TokenAsset[] = [
-    {
-      symbol: "SDA",
-      name: "Sidra",
-      amount: "12,450.50",
-      usdValue: "$24,901.00",
-      change: "+12.5%",
-      changePositive: true,
-      icon: "/token_sdr.png",
-    },
-    {
-      symbol: "ETH",
-      name: "Ethereum",
-      amount: "3.45",
-      usdValue: "$8,625.00",
-      change: "+5.2%",
-      changePositive: true,
-      icon: "/token_eth.png",
-    },
-    {
-      symbol: "BTC",
-      name: "Bitcoin",
-      amount: "0.15",
-      usdValue: "$6,450.00",
-      change: "-2.1%",
-      changePositive: false,
-      icon: "/token_btc.png",
-    },
-    {
-      symbol: "USDT",
-      name: "Tether",
-      amount: "5,000.00",
-      usdValue: "$5,000.00",
-      change: "+0.01%",
-      changePositive: true,
-      icon: "/token_usdt.png",
-    },
-  ];
+  // Read SDA balance straight from Sidrachain RPC layers via custom hook
+  const {
+    balance: sdaBalance,
+    formatted: sdaFormatted,
+    symbol: sdaSymbol,
+    isLoading: isLoadingSda,
+    isError: isSdaError,
+  } = useSdaBalance();
+
+  // Derived USD value using placeholder SDA price
+  const sdaUsdValue = useMemo<string>(() => {
+    const usd = sdaBalance * SDA_USD_PRICE;
+    return (
+      "$" +
+      usd.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })
+    );
+  }, [sdaBalance]);
 
   const routeActions = [
     {
@@ -179,7 +154,11 @@ export function WalletDashboard() {
       case "REFUNDED":
         return { text: "text-blue-500", bg: "bg-blue-500/10", label: "Refunded" };
       default:
-        return { text: "text-muted-foreground", bg: "bg-muted", label: state || "Unknown" };
+        return {
+          text: "text-muted-foreground",
+          bg: "bg-muted",
+          label: state || "Unknown",
+        };
     }
   };
 
@@ -188,19 +167,16 @@ export function WalletDashboard() {
     if (!dateString) return "Recent";
     const dateObj = new Date(dateString);
     if (isNaN(dateObj.getTime())) return "Recent";
-
     const datePart = dateObj.toLocaleDateString(undefined, {
       year: "numeric",
       month: "numeric",
       day: "numeric",
     });
-
     const timePart = dateObj.toLocaleTimeString(undefined, {
       hour: "numeric",
       minute: "2-digit",
       hour12: true,
     });
-
     return `${datePart} • ${timePart}`;
   };
 
@@ -245,14 +221,13 @@ export function WalletDashboard() {
         {/* Portfolio Overview */}
         <Card className="border-border bg-linear-to-br from-card via-card to-background/50 p-6 md:p-10 shadow-lg relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-3xl -mr-32 -mt-32 rounded-full pointer-events-none" />
-
           <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
-            <div className="space-y-1">
+            <div className="space-y-1 min-w-0 flex-1">
               <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Total Portfolio Value
               </Label>
-              <div className="flex items-center gap-4 min-h-16">
-                <h2 className="text-4xl md:text-6xl font-black tracking-tight transition-all">
+              <div className="flex items-center gap-4 min-h-16 overflow-hidden">
+                <h2 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tight transition-all truncate">
                   {balanceVisible ? (
                     isLoadingEscrows ? (
                       <span className="text-2xl font-medium text-muted-foreground inline-flex items-center gap-2">
@@ -284,7 +259,6 @@ export function WalletDashboard() {
               </div>
             </div>
           </div>
-
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4 relative z-10">
             {routeActions.map((action) => (
               <div key={action.title} className="flex flex-col gap-2">
@@ -323,52 +297,55 @@ export function WalletDashboard() {
                 View All
               </Button>
             </div>
-
-            {/* Static Token Asset List Layout */}
+            {/* Tokens Row */}
             <div className="grid gap-3">
-              {tokens.map((token) => (
-                <Card
-                  key={token.symbol}
-                  className="group cursor-pointer border-border bg-card p-4 transition-all hover:border-primary/40 active:scale-[0.99]"
-                >
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-4 min-w-0">
-                      <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-border bg-background shadow-xs">
-                        <Image
-                          src={token.icon}
-                          alt={`${token.name} identity matrix graphical icon`}
-                          fill
-                          sizes="48px"
-                          className="object-cover"
-                        />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="font-bold leading-none group-hover:text-primary transition-colors truncate">
-                          {token.symbol}
-                        </p>
-                        <p className="mt-1.5 text-xs text-muted-foreground font-semibold uppercase tracking-wider truncate">
-                          {token.name}
-                        </p>
-                      </div>
+              <Card className="group cursor-pointer border-border bg-card p-4 transition-all hover:border-primary/40 active:scale-[0.99]">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-4 min-w-0">
+                    <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-border bg-background shadow-xs">
+                      <Image
+                        src="/token_sdr.png"
+                        alt="Sidra identity matrix graphical icon"
+                        fill
+                        sizes="48px"
+                        className="object-cover"
+                      />
                     </div>
 
-                    <div className="text-right shrink-0">
-                      <p className="font-bold text-foreground">{token.amount}</p>
-                      <p className="text-xs text-muted-foreground font-medium mt-0.5">
-                        {token.usdValue}
+                    <div className="min-w-0">
+                      <p className="font-bold leading-none group-hover:text-primary transition-colors truncate">
+                        {sdaSymbol}
                       </p>
-                    </div>
-
-                    <div className="hidden sm:block text-right min-w-20 shrink-0">
-                      <p
-                        className={`text-sm font-bold ${token.changePositive ? "text-primary" : "text-red-500"}`}
-                      >
-                        {token.change}
+                      <p className="mt-1.5 text-xs text-muted-foreground font-semibold uppercase tracking-wider truncate">
+                        Sidra
                       </p>
                     </div>
                   </div>
-                </Card>
-              ))}
+                  <div className="text-right shrink-0">
+                    {isLoadingSda ? (
+                      <Loader2 className="h-4 w-4 animate-spin text-muted-foreground ml-auto" />
+                    ) : isSdaError ? (
+                      <AlertCircle className="h-4 w-4 text-red-500 ml-auto" />
+                    ) : (
+                      <>
+                        <p className="font-bold text-foreground">{sdaFormatted}</p>
+                        <p className="text-xs text-muted-foreground font-medium mt-0.5">
+                          {sdaUsdValue}
+                        </p>
+                      </>
+                    )}
+                  </div>
+                  <div className="hidden sm:block text-right min-w-20 shrink-0">
+                    <p
+                      className={`text-sm font-bold ${
+                        SDA_CHANGE_POSITIVE ? "text-primary" : "text-red-500"
+                      }`}
+                    >
+                      {SDA_CHANGE}
+                    </p>
+                  </div>
+                </div>
+              </Card>
             </div>
           </div>
 
@@ -380,7 +357,6 @@ export function WalletDashboard() {
                 <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
               )}
             </div>
-
             <div className="grid gap-3">
               {/* Async Loading Animation */}
               {isLoadingEscrows &&
@@ -395,7 +371,6 @@ export function WalletDashboard() {
                     </div>
                   </Card>
                 ))}
-
               {/* Dynamic Escrow Iteration */}
               {!isLoadingEscrows && escrowsError && (
                 <div className="flex flex-col items-center justify-center py-8 px-4 border border-red-500/20 rounded-2xl bg-red-500/5">
@@ -408,7 +383,6 @@ export function WalletDashboard() {
                   </p>
                 </div>
               )}
-
               {/* Dynamic Ingested Active Escrows Render Target Loop */}
               {!isLoadingEscrows &&
                 !escrowsError &&
@@ -436,7 +410,6 @@ export function WalletDashboard() {
                               </span>
                             </p>
                           </div>
-
                           <div className="mt-3 flex items-center justify-between gap-2">
                             <div className="flex items-center gap-1.5 min-w-0">
                               <Clock className="w-3 h-3 text-muted-foreground shrink-0" />
@@ -455,7 +428,6 @@ export function WalletDashboard() {
                     </Card>
                   );
                 })}
-
               {/* Empty State Component */}
               {!isLoadingEscrows && !escrowsError && escrows.length === 0 && (
                 <div className="flex flex-col items-center justify-center py-10 px-4 border border-dashed border-border rounded-2xl bg-muted/20">
@@ -466,7 +438,6 @@ export function WalletDashboard() {
                 </div>
               )}
             </div>
-
             {/* Media/Advertisement Banner */}
             <AdSlot
               adId="wallet-sidebar-ad"
