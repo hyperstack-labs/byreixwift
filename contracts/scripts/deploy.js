@@ -13,7 +13,7 @@ async function main() {
   );
 
   const feeCollector = deployer.address;
-  const fixedFee = hre.ethers.parseEther("0.001");
+  const fixedFee = 0;
 
   const escrow = await ByReiXwiftEscrow.deploy(
     feeCollector,
