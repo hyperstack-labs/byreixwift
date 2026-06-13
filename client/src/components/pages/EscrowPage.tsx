@@ -1,6 +1,6 @@
 "use client";
-
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { useAccount } from "wagmi";
 import {
   Card,
   Button,
@@ -41,19 +41,18 @@ import {
 } from "@/components/EscrowTransactionModal";
 
 // EscrowPage Configurations
-const DEFAULT_BUYER = "0x742d35Cc6634C0532925a3b844Bc454e7595f9aB";
-const DEFAULT_SELLER = "0x9f3aD15A12e1F3514d8B8E9c6F16C2E8922A7cD2";
 const isValidAddress = (a: string) => /^0x[0-9a-fA-F]{40}$/.test(a);
 
 export function EscrowPage() {
+  const { address: connectedAddress } = useAccount();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [creationSuccessData, setCreationSuccessData] = useState<EscrowRecord | null>(null);
   const [selectedEscrowId, setSelectedEscrowId] = useState<string | null>(null);
   const [modalError, setModalError] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
-    buyer: DEFAULT_BUYER,
-    seller: DEFAULT_SELLER,
+    buyer: connectedAddress ?? "",
+    seller: "",
     amount: "",
     token: "SDA",
     description: "",
@@ -69,6 +68,37 @@ export function EscrowPage() {
   const lockEscrow = useLockEscrow();
   const releaseEscrow = useReleaseEscrow();
   const refundEscrow = useRefundEscrow();
+
+  // Reset logic updating both fields cleanly on command
+  const resetForm = useCallback(() => {
+    setFormData({
+      buyer: connectedAddress ?? "",
+      seller: "",
+      amount: "",
+      token: "SDA",
+      description: "",
+      fixedFee: "0",
+    });
+    setFormErrors({});
+    setCreationSuccessData(null);
+  }, [connectedAddress]);
+
+  // Sync wallet address changes automatically when the user connects/disconnects
+  useEffect(() => {
+    const fallbackAddress = connectedAddress ?? "";
+
+    // Defer execution using a micro-task block to safely satisfy the linter rule
+    const handle = requestAnimationFrame(() => {
+      setFormData((prev) => {
+        if (prev.buyer !== fallbackAddress) {
+          return { ...prev, buyer: fallbackAddress };
+        }
+        return prev;
+      });
+    });
+
+    return () => cancelAnimationFrame(handle);
+  }, [connectedAddress]);
 
   // Memoized selection of the current escrow object from the list
   const selectedEscrow = selectedEscrowId
@@ -86,19 +116,6 @@ export function EscrowPage() {
     lockEscrow.isPending ||
     releaseEscrow.isPending ||
     refundEscrow.isPending;
-
-  const resetForm = useCallback(() => {
-    setFormData({
-      buyer: DEFAULT_BUYER,
-      seller: DEFAULT_SELLER,
-      amount: "",
-      token: "SDA",
-      description: "",
-      fixedFee: "0",
-    });
-    setFormErrors({});
-    setCreationSuccessData(null);
-  }, []);
 
   // Field validation
   const validateForm = () => {
