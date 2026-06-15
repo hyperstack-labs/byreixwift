@@ -32,8 +32,8 @@ For detailed information on project operations and technical specifications, ref
 git clone <repository-url>
 cd byreixwift
 cd server && pnpm install
-cd ..\client && pnpm install
-cd ..\contracts && pnpm install
+cd ../client && pnpm install
+cd ../contracts && pnpm install
 ```
 
 ### Environment Variables
