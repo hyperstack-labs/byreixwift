@@ -12,7 +12,7 @@ export const sidrachain = defineChain({
   name: "Sidrachain",
   nativeCurrency: {
     name: "Sidra",
-    symbol: "SDRA", // Standard fallback symbol
+    symbol: "SDA", // Standard fallback symbol
     decimals: 18,
   },
   rpcUrls: {
