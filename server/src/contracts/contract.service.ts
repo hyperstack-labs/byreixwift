@@ -25,7 +25,7 @@ export class ContractService {
     "function transactions(uint256) view returns (address,address,uint256,uint256,bytes32,uint8,uint64,uint64,uint64,bool)",
   ]);
 
-  // ✅ FIXED: BigInt → string
+  
   async getNextTransactionId() {
     const result = await this.client.readContract({
       address: this.address,
@@ -36,7 +36,7 @@ export class ContractService {
     return result.toString();
   }
 
-  // ✅ FIXED: safe serialization
+  
   async getEscrow(id: number) {
     const data = await this.client.readContract({
       address: this.address,
@@ -48,7 +48,7 @@ export class ContractService {
     return this.serialize(data);
   }
 
-  // 🔥 helper: convert BigInt recursively
+ 
   private serialize(data: any) {
     return JSON.parse(
       JSON.stringify(data, (_, value) =>
