@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ByreixLogo } from "./ByreixLogo";
-import { Wallet, Menu, X, User, Settings, LogOut, ChevronDown } from "lucide-react";
+import { Wallet, Menu, X, User, Settings, LogOut, ChevronDown, Loader2 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -11,6 +11,7 @@ import {
   type HomeSectionId,
 } from "@/constants/homeSections";
 import { PUBLIC_SITE_PAGES } from "@/constants/publicSite";
+import { useSdaBalance } from "@/hooks";
 
 interface NavbarProps {
   onConnect?: () => void;
@@ -38,10 +39,11 @@ export function Navbar({
   const [scrolled, setScrolled] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
+  // Read Sda Balance from sidrachain
+  const { formatted: sdaFormatted, isLoading: isLoadingSda, isError: isSdaError } = useSdaBalance();
+
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 18);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 18);
     window.addEventListener("scroll", handleScroll);
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
@@ -60,12 +62,13 @@ export function Navbar({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showAccountMenu]);
 
+  // send, swap, trends routes are currently hidden
   const navLinks = isConnected
     ? [
         { label: "Wallet", value: "wallet", isGated: true },
-        { label: "Send", value: "send", isGated: true },
-        { label: "Swap", value: "swap", isGated: true },
-        { label: "Trends", value: "trends", isGated: true },
+        // { label: "Send", value: "send", isGated: true },
+        // { label: "Swap", value: "swap", isGated: true },
+        // { label: "Trends", value: "trends", isGated: true },
         { label: "Escrow", value: "escrow", isGated: true },
       ]
     : [];
@@ -80,6 +83,7 @@ export function Navbar({
     "privacy",
     "terms",
   ].includes(currentPage ?? "");
+
   const isHomeRoute = currentPage === "home";
   const publicHomeLinks = !isConnected && isHomeRoute ? PUBLIC_HOME_NAV_LINKS : [];
   const publicPageLinks =
@@ -88,6 +92,7 @@ export function Navbar({
         ? PUBLIC_SITE_PAGES.filter((link) => link.value !== "principles")
         : PUBLIC_SITE_PAGES
       : [];
+
   const hasDesktopNav =
     navLinks.length > 0 || publicHomeLinks.length > 0 || publicPageLinks.length > 0;
 
@@ -184,15 +189,25 @@ export function Navbar({
                   Sign In
                 </button>
               )}
-
               {isConnected ? (
                 <div className="relative" ref={menuRef}>
                   <button
                     onClick={() => setShowAccountMenu(!showAccountMenu)}
-                    className="flex items-center gap-2 text-xs text-neutral-300 font-mono bg-white/5 hover:bg-white/8 border border-white/10 px-3 py-1.5 rounded-md transition duration-200 cursor-pointer outline-none"
+                    className="flex items-center gap-2 text-xs text-neutral-300 font-mono bg-white/5 hover:bg-white/8 border border-white/10 px-3 py-1.5 rounded-md transition duration-200 cursor-pointer outline-none select-none"
+                    aria-label="Toggle user account profile menu options"
                   >
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]" />
-                    <span>{connectedLabel}</span>
+                    <span className="whitespace-nowrap">{connectedLabel}</span>
+                    {/* SDA Wallet Display */}
+                    <span className="ml-1 text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded-full font-sans flex items-center min-w-10 justify-center whitespace-nowrap">
+                      {isLoadingSda ? (
+                        <Loader2 className="w-2.5 h-2.5 animate-spin text-emerald-400" />
+                      ) : isSdaError ? (
+                        "Err"
+                      ) : (
+                        `${sdaFormatted} SDA`
+                      )}
+                    </span>
                     <ChevronDown
                       className={`w-3.5 h-3.5 text-neutral-500 transition-transform duration-200 ${
                         showAccountMenu ? "rotate-180" : ""
@@ -297,7 +312,6 @@ export function Navbar({
                   {link.label}
                 </button>
               ))}
-
               {publicHomeLinks.map((link) => (
                 <button
                   key={link.id}
@@ -310,7 +324,6 @@ export function Navbar({
                   {link.label}
                 </button>
               ))}
-
               {publicPageLinks.map((link) => (
                 <Link
                   key={link.value}
@@ -323,9 +336,7 @@ export function Navbar({
                   {link.label}
                 </Link>
               ))}
-
               <div className="h-px bg-white/5 my-2" />
-
               {!isConnected ? (
                 <div className="flex flex-col gap-2.5">
                   {currentPage !== "login" && currentPage !== "home" && (
@@ -352,11 +363,22 @@ export function Navbar({
                 </div>
               ) : (
                 <div className="flex flex-col gap-2.5">
-                  <div className="flex items-center gap-2 text-xs text-neutral-300 font-mono bg-white/5 border border-white/10 px-3 py-2 rounded-lg">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]" />
-                    <span>{connectedLabel}</span>
+                  <div className="flex items-center justify-between gap-2 text-xs text-neutral-300 font-mono bg-white/5 border border-white/10 px-3 py-2 rounded-lg">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]" />
+                      <span className="truncate">{connectedLabel}</span>
+                    </div>
+                    {/* Mobile SDA Balance Display */}
+                    <span className="shrink-0 text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded-full font-sans flex items-center min-w-10 justify-center whitespace-nowrap">
+                      {isLoadingSda ? (
+                        <Loader2 className="w-2.5 h-2.5 animate-spin text-emerald-400" />
+                      ) : isSdaError ? (
+                        "Err"
+                      ) : (
+                        `${sdaFormatted} SDA`
+                      )}
+                    </span>
                   </div>
-
                   <div className="grid grid-cols-1 gap-1">
                     <button
                       onClick={() => {

@@ -21,9 +21,10 @@ yarn-error.log*
 # env files
 .env*
 
-# EXCEPTION .env.example files
-!server/.env.example
-!contracts/.env.example
+# Hardhat cache
+contracts/cache/
+contracts/artifacts/
+
 
 # vercel
 **/.vercel

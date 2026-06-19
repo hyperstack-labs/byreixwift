@@ -158,8 +158,6 @@ export function LoginPage({ onWalletConnect, onNavigate, isLoading = false }: Lo
                 </motion.div>
               ))}
             </div>
-
-
           </motion.div>
         </div>
       </div>
