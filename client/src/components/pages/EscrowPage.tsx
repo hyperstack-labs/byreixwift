@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useAccount } from "wagmi";
 import {
   Card,
   Button,
@@ -41,19 +42,17 @@ import {
 } from "@/components/EscrowTransactionModal";
 
 // EscrowPage Configurations
-const DEFAULT_BUYER = "0x742d35Cc6634C0532925a3b844Bc454e7595f9aB";
-const DEFAULT_SELLER = "0x9f3aD15A12e1F3514d8B8E9c6F16C2E8922A7cD2";
 const isValidAddress = (a: string) => /^0x[0-9a-fA-F]{40}$/.test(a);
 
 export function EscrowPage() {
+  const { address: connectedAddress } = useAccount(); // Connected wallet address from wagmi
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [creationSuccessData, setCreationSuccessData] = useState<EscrowRecord | null>(null);
   const [selectedEscrowId, setSelectedEscrowId] = useState<string | null>(null);
   const [modalError, setModalError] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
-    buyer: DEFAULT_BUYER,
-    seller: DEFAULT_SELLER,
+    seller: "",
     amount: "",
     token: "SDA",
     description: "",
@@ -69,6 +68,19 @@ export function EscrowPage() {
   const lockEscrow = useLockEscrow();
   const releaseEscrow = useReleaseEscrow();
   const refundEscrow = useRefundEscrow();
+
+  // Reset logic updating both fields cleanly on command
+  const resetForm = useCallback(() => {
+    setFormData({
+      seller: "",
+      amount: "",
+      token: "SDA",
+      description: "",
+      fixedFee: "0",
+    });
+    setFormErrors({});
+    setCreationSuccessData(null);
+  }, []);
 
   // Memoized selection of the current escrow object from the list
   const selectedEscrow = selectedEscrowId
@@ -87,34 +99,17 @@ export function EscrowPage() {
     releaseEscrow.isPending ||
     refundEscrow.isPending;
 
-  const resetForm = useCallback(() => {
-    setFormData({
-      buyer: DEFAULT_BUYER,
-      seller: DEFAULT_SELLER,
-      amount: "",
-      token: "SDA",
-      description: "",
-      fixedFee: "0",
-    });
-    setFormErrors({});
-    setCreationSuccessData(null);
-  }, []);
-
   // Field validation
   const validateForm = () => {
     const errors: Record<string, string> = {};
-    if (!formData.buyer) errors.buyer = "Required";
-    else if (!isValidAddress(formData.buyer)) errors.buyer = "Invalid address";
-
+    if (!connectedAddress) errors.buyer = "No wallet connected";
+    else if (!isValidAddress(connectedAddress)) errors.buyer = "Invalid address";
     if (!formData.seller) errors.seller = "Required";
     else if (!isValidAddress(formData.seller)) errors.seller = "Invalid address";
-
     if (!formData.amount || Number(formData.amount) <= 0) errors.amount = "Invalid";
     if (!formData.description) errors.description = "Required";
-
     if (!formData.token) errors.token = "Required";
     if (formData.fixedFee === "" || Number(formData.fixedFee) < 0) errors.fixedFee = "Invalid";
-
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -126,7 +121,7 @@ export function EscrowPage() {
     }
 
     const payload = {
-      buyer: formData.buyer,
+      buyer: connectedAddress as string, // Buyer is read directly from connectedAddress
       seller: formData.seller,
       amount: Number(formData.amount),
       tokenSymbol: formData.token,
@@ -242,15 +237,10 @@ export function EscrowPage() {
                       </div>
                       <Input
                         id="buyer"
-                        placeholder="0x..."
-                        disabled={isMutating}
-                        value={formData.buyer}
-                        onChange={(e) => setFormData({ ...formData, buyer: e.target.value })}
-                        className={`bg-background font-mono text-sm transition-colors ${
-                          formErrors.buyer
-                            ? "border-red-500 ring-1 ring-red-500/20"
-                            : "border-border"
-                        }`}
+                        readOnly
+                        value={connectedAddress ?? ""}
+                        placeholder="Connect wallet to auto-fill"
+                        className="bg-muted/40 font-mono text-sm border-border text-muted-foreground cursor-default select-all"
                       />
                     </div>
 
