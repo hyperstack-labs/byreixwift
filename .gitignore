@@ -21,6 +21,11 @@ yarn-error.log*
 # env files
 .env*
 
+# Hardhat cache
+contracts/cache/
+contracts/artifacts/
+
+
 # vercel
 **/.vercel
 

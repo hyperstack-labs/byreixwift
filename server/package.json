@@ -23,6 +23,7 @@
     "rxjs": "^7.8.2",
     "siwe": "^3.0.0",
     "viem": "^2.52.0"
+    
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.10",
