@@ -39,8 +39,13 @@ export function Navbar({
   const [scrolled, setScrolled] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Read Sda Balance from sidrachain
-  const { formatted: sdaFormatted, isLoading: isLoadingSda, isError: isSdaError } = useSdaBalance();
+  // Read SDA balance from Sidrachain
+  const {
+    formatted: sdaFormatted,
+    isLoading: isLoadingSda,
+    isError: isSdaError,
+    hasValue: isSidrachainLive,
+  } = useSdaBalance();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 18);
@@ -190,14 +195,26 @@ export function Navbar({
                 </button>
               )}
               {isConnected ? (
-                <div className="relative" ref={menuRef}>
+                <div className="relative flex items-center gap-3" ref={menuRef}>
                   <button
                     onClick={() => setShowAccountMenu(!showAccountMenu)}
                     className="flex items-center gap-2 text-xs text-neutral-300 font-mono bg-white/5 hover:bg-white/8 border border-white/10 px-3 py-1.5 rounded-md transition duration-200 cursor-pointer outline-none select-none"
                     aria-label="Toggle user account profile menu options"
                   >
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]" />
+                    <span className="text-[10px] font-semibold tracking-wide text-neutral-400 font-sans whitespace-nowrap">
+                      Sidrachain
+                    </span>
+                    {/* Connected dot, glows when Sidrachain RPC is live */}
+                    <span
+                      className={`h-1.5 w-1.5 rounded-full transition-colors duration-500 ${
+                        isSidrachainLive
+                          ? "bg-emerald-500 shadow-[0_0_8px_#10b981]"
+                          : "bg-neutral-500"
+                      }`}
+                    />
+                    <span className="w-px h-3 bg-white/15 rounded-full mx-0.5 shrink-0" />
                     <span className="whitespace-nowrap">{connectedLabel}</span>
+                    <span className="w-px h-3 bg-white/15 rounded-full mx-0.5 shrink-0" />
                     {/* SDA Wallet Display */}
                     <span className="ml-1 text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded-full font-sans flex items-center min-w-10 justify-center whitespace-nowrap">
                       {isLoadingSda ? (
@@ -365,7 +382,14 @@ export function Navbar({
                 <div className="flex flex-col gap-2.5">
                   <div className="flex items-center justify-between gap-2 text-xs text-neutral-300 font-mono bg-white/5 border border-white/10 px-3 py-2 rounded-lg">
                     <div className="flex items-center gap-2 min-w-0">
-                      <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]" />
+                      {/* Connected dot, glows when Sidrachain RPC is live for mobile view */}
+                      <span
+                        className={`h-1.5 w-1.5 shrink-0 rounded-full transition-colors duration-500 ${
+                          isSidrachainLive
+                            ? "bg-emerald-500 shadow-[0_0_8px_#10b981]"
+                            : "bg-neutral-500"
+                        }`}
+                      />
                       <span className="truncate">{connectedLabel}</span>
                     </div>
                     {/* Mobile SDA Balance Display */}
@@ -379,6 +403,7 @@ export function Navbar({
                       )}
                     </span>
                   </div>
+
                   <div className="grid grid-cols-1 gap-1">
                     <button
                       onClick={() => {
