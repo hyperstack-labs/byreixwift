@@ -9,6 +9,7 @@ The user interface is built for speed and responsiveness, ensuring a professiona
 - **Next.js**: React framework providing optimized routing and server-side capabilities.
 - **TypeScript**: Ensuring type safety and reducing runtime errors during development.
 - **Tailwind CSS**: Utility-first styling used to implement the current visual system.
+- **useSdaBalance**: Custom React hook that fetches and subscribes to the connected wallet's SDA token balance.
 
 ## Backend and Data
 
@@ -18,6 +19,7 @@ The infrastructure is designed for scalability and secure data management.
 - **NestJS**: Structured TypeScript framework for building the backend cleanly as the product grows.
 - **PostgreSQL**: Live system of record for escrow transactions, auth data, and audit-friendly state history.
 - **Solidity + Hardhat**: Contract development and testing for the escrow settlement layer.
+- **ContractService**: NestJS injectable service that encapsulates all smart contract interactions.
 
 ## Development Tools
 
