@@ -27,7 +27,7 @@ interface TransactionModalProps {
   isMutating: boolean;
   error?: string | null;
   mode: "simulation" | "live"; // mode prop to indicate the environment
-  contractEscrow?: any;
+  contractEscrow?: unknown[] | null;
   onLock: () => void;
   onRelease: () => void;
   onRefund: () => void;

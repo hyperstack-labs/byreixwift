@@ -50,7 +50,9 @@ export function EscrowPage() {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [creationSuccessData, setCreationSuccessData] = useState<EscrowRecord | null>(null);
   const [selectedEscrowId, setSelectedEscrowId] = useState<string | null>(null);
-  const [contractEscrow, setContractEscrow] = useState<any>(null);
+  const [contractEscrow, setContractEscrow] = useState<
+  (string | number | boolean)[] | null
+  >(null);
   const [modalError, setModalError] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
@@ -91,7 +93,6 @@ export function EscrowPage() {
 
   useEffect(() => {
   if (mode !== "live") {
-    setContractEscrow(null);
     return;
   }
 
