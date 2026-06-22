@@ -17,6 +17,7 @@ import {
   Inbox,
   Check,
   ShieldCheck,
+  ExternalLink,
 } from "lucide-react";
 import { EscrowState, EscrowRecord, EscrowEventRecord } from "@/types/escrow";
 
@@ -25,7 +26,7 @@ interface TransactionModalProps {
   events: EscrowEventRecord[];
   isMutating: boolean;
   error?: string | null;
-  isMockMode?: boolean; // Passed from EscrowPage.tsx controls the "mock" badge visibility
+  mode: "simulation" | "live"; // mode prop to indicate the environment
   onLock: () => void;
   onRelease: () => void;
   onRefund: () => void;
@@ -120,7 +121,6 @@ export function StateStepper({ state }: { state: EscrowState }) {
         const isDone = i < currentIdx;
         const isCurrent = i === currentIdx;
         const isLast = i === STATE_STEPS.length - 1;
-
         return (
           <div key={step} className={`flex items-center min-w-0 ${isLast ? "" : "flex-1"}`}>
             <div className="flex flex-col items-center gap-1.5 shrink-0">
@@ -193,7 +193,7 @@ export function EscrowTransactionModal({
   events,
   isMutating,
   error,
-  isMockMode,
+  mode,
   onLock,
   onRelease,
   onRefund,
@@ -218,17 +218,22 @@ export function EscrowTransactionModal({
 
         {/* Header */}
         <div className="flex items-start justify-between p-5 border-b border-border shrink-0">
-          <div className="space-y-3 min-w-0 pr-4">
+          <div className="space-y-3 min-w-0 pr-4 text-left">
             <p className="font-bold truncate">{escrow.description}</p>
             <div className="flex items-center gap-2 flex-wrap">
               <EscrowStatusBadge state={escrow.state} />
               <span className="text-xs text-muted-foreground">
                 {new Date(escrow.createdAt).toLocaleDateString()}
               </span>
-              {/* Mock badge driven by parent's USE_MOCK flag */}
-              {isMockMode && (
-                <span className="text-xs px-2 py-0.5 rounded-full bg-violet-500/10 text-violet-400 border border-violet-500/20">
-                  mock
+
+              {/* Dynamic state environment mode indicators */}
+              {mode === "simulation" ? (
+                <span className="text-[10px] px-2 py-0.5 uppercase tracking-wider font-bold rounded-full bg-violet-500/10 text-white-400 border border-gray-500/20">
+                  Simulation
+                </span>
+              ) : (
+                <span className="text-[10px] px-2 py-0.5 uppercase tracking-wider font-bold rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  Live Ledger
                 </span>
               )}
             </div>
@@ -244,7 +249,7 @@ export function EscrowTransactionModal({
         </div>
 
         {/* Scrollable body */}
-        <div className="overflow-y-auto flex-1 p-5 space-y-6">
+        <div className="overflow-y-auto flex-1 p-5 space-y-6 text-left">
           {/* ERROR STATE */}
           {error && !isMutating && (
             <div className="group relative flex items-start gap-3 p-4 rounded-xl border border-red-500/20 bg-red-500/5 text-red-400 animate-in fade-in slide-in-from-top-2 duration-300">
@@ -307,6 +312,18 @@ export function EscrowTransactionModal({
                     </span>
                   </div>
                 ))}
+                {/* View on Ledger link — only shown in live mode */}
+                {mode === "live" && (
+                  <a
+                    href={`https://explorer.sidrachainPlaceholder.com/tx/${escrow.id}`} // placeholder ledger explorer URL
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 text-xs text-primary hover:underline mt-1"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+                    View on Ledger
+                  </a>
+                )}
               </div>
             </div>
           </div>
@@ -366,7 +383,6 @@ export function EscrowTransactionModal({
                 Lock funds
               </Button>
             )}
-
             {escrow.state === "locked" && (
               <Button
                 size="lg"
