@@ -27,6 +27,7 @@ interface TransactionModalProps {
   isMutating: boolean;
   error?: string | null;
   mode: "simulation" | "live"; // mode prop to indicate the environment
+  contractEscrow?: any;
   onLock: () => void;
   onRelease: () => void;
   onRefund: () => void;
@@ -190,6 +191,7 @@ export function TrustlessIndicators() {
 
 export function EscrowTransactionModal({
   escrow,
+  contractEscrow,
   events,
   isMutating,
   error,
@@ -315,7 +317,7 @@ export function EscrowTransactionModal({
                 {/* View on Ledger link — only shown in live mode */}
                 {mode === "live" && (
                   <a
-                    href={`https://explorer.sidrachainPlaceholder.com/tx/${escrow.id}`} // placeholder ledger explorer URL
+                    href={"https://ledger.sidrachain.com"} // placeholder ledger explorer URL
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-1.5 text-xs text-primary hover:underline mt-1"
@@ -327,6 +329,22 @@ export function EscrowTransactionModal({
               </div>
             </div>
           </div>
+          {mode === "live" && contractEscrow && (
+           <div className="rounded-xl border border-border bg-background/40 p-4">
+               <p className="text-[10px] text-muted-foreground font-medium mb-3 uppercase tracking-wider">
+                  On-chain Data
+               </p>
+
+                 {contractEscrow?.[9] === false ? (
+                <p className="text-sm text-muted-foreground">
+                  No on-chain escrow found.
+                </p>
+              ) : (
+                <pre>{JSON.stringify(contractEscrow, null, 2)}</pre>
+              )}
+                </div>
+              )}
+
 
           <TrustlessIndicators />
           {/* Event log */}

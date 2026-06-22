@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useAccount } from "wagmi";
+import { getContractEscrow } from "@/lib/contract";
 import {
   Card,
   Button,
@@ -49,6 +50,7 @@ export function EscrowPage() {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [creationSuccessData, setCreationSuccessData] = useState<EscrowRecord | null>(null);
   const [selectedEscrowId, setSelectedEscrowId] = useState<string | null>(null);
+  const [contractEscrow, setContractEscrow] = useState<any>(null);
   const [modalError, setModalError] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
@@ -86,6 +88,18 @@ export function EscrowPage() {
   const selectedEscrow = selectedEscrowId
     ? (escrows.find((e) => e.id === selectedEscrowId) ?? null)
     : null;
+
+  useEffect(() => {
+  if (mode !== "live") {
+    setContractEscrow(null);
+    return;
+  }
+
+  getContractEscrow("0")
+    .then(setContractEscrow)
+    .catch(console.error);
+}, [mode]);
+
 
   // Aggregate calculation for header stats
   const totalLocked = escrows
@@ -602,6 +616,7 @@ export function EscrowPage() {
           escrow={selectedEscrow}
           events={events}
           isMutating={isMutating}
+          contractEscrow={contractEscrow}
           error={modalError}
           mode={mode} // Pass the current mode to the modal
           onLock={() => handleTransition("lock", selectedEscrow.id, selectedEscrow.buyer)}
