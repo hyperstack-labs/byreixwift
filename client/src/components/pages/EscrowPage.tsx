@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useAccount } from "wagmi";
+import { getContractEscrow } from "@/lib/contract";
 import {
   Card,
   Button,
@@ -31,8 +32,8 @@ import {
   useEscrowEvents,
   useEscrows,
   useLockEscrow,
-  useRefundEscrow,
   useReleaseEscrow,
+  useRefundEscrow,
 } from "@/hooks";
 import { EscrowRecord } from "@/types/escrow";
 import {
@@ -41,14 +42,17 @@ import {
   STATE_CONFIG,
 } from "@/components/EscrowTransactionModal";
 
-// EscrowPage Configurations
 const isValidAddress = (a: string) => /^0x[0-9a-fA-F]{40}$/.test(a);
 
 export function EscrowPage() {
-  const { address: connectedAddress } = useAccount(); // Connected wallet address from wagmi
+  const { address: connectedAddress } = useAccount();
+  const [mode, setMode] = useState<"simulation" | "live">("simulation"); // For toggling between simulation and live modes
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [creationSuccessData, setCreationSuccessData] = useState<EscrowRecord | null>(null);
   const [selectedEscrowId, setSelectedEscrowId] = useState<string | null>(null);
+  const [contractEscrow, setContractEscrow] = useState<
+  (string | number | boolean)[] | null
+  >(null);
   const [modalError, setModalError] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
@@ -86,6 +90,17 @@ export function EscrowPage() {
   const selectedEscrow = selectedEscrowId
     ? (escrows.find((e) => e.id === selectedEscrowId) ?? null)
     : null;
+
+  useEffect(() => {
+  if (mode !== "live") {
+    return;
+  }
+
+  getContractEscrow("0")
+    .then(setContractEscrow)
+    .catch(console.error);
+}, [mode]);
+
 
   // Aggregate calculation for header stats
   const totalLocked = escrows
@@ -169,14 +184,14 @@ export function EscrowPage() {
     <div className="min-h-screen pt-24 pb-32 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8 gap-4">
-          <div>
-            <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4 border-b border-border/40 pb-6">
+          <div className="space-y-1">
+            <div className="flex items-center gap-4">
               <h1 className="text-2xl font-semibold text-foreground">Escrow</h1>
             </div>
-            <div className="min-h-10">
+            <div className="min-h-6">
               {!isLoading ? (
-                <p className="text-sm text-muted-foreground mt-1 animate-in fade-in duration-500">
+                <p className="text-sm text-muted-foreground animate-in fade-in duration-500">
                   {escrows.length} records —{" "}
                   <span className="font-medium text-foreground">
                     {totalLocked.toLocaleString(undefined, {
@@ -203,15 +218,44 @@ export function EscrowPage() {
               }
             }}
           >
-            <DialogTrigger asChild>
-              <Button
-                size="sm"
-                className="bg-primary hover:bg-primary/90 text-primary-foreground cursor-pointer font-bold"
-              >
-                <Plus className="w-4 h-4 " />
-                New
-              </Button>
-            </DialogTrigger>
+            <div className="flex flex-col gap-4 self-start sm:self-center sm:flex-row sm:items-center">
+              {/* Live Mode Toggle */}
+              <div className="flex items-center p-1 rounded-xl bg-neutral-900/90 border border-neutral-800 text-xs font-semibold shadow-inner">
+                <button
+                  type="button"
+                  onClick={() => setMode("simulation")}
+                  className={`px-3 py-1.5 rounded-lg border transition-all duration-200 cursor-pointer ${
+                    mode === "simulation"
+                      ? "bg-neutral-800 text-white-400 border-neutral-700/50 shadow-md font-bold"
+                      : "bg-transparent text-neutral-500 border-transparent hover:text-neutral-300 font-bold"
+                  }`}
+                >
+                  Simulation
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMode("live")}
+                  className={`px-3 py-1.5 rounded-lg border transition-all duration-200 cursor-pointer ${
+                    mode === "live"
+                      ? "bg-primary text-primary-foreground border-transparent shadow-lg shadow-primary/20 font-bold"
+                      : "bg-transparent text-neutral-500 border-transparent hover:text-neutral-300 font-bold"
+                  }`}
+                >
+                  Live
+                </button>
+              </div>
+              <div className="w-fit">
+                <DialogTrigger asChild>
+                  <Button
+                    size="sm"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground cursor-pointer font-bold"
+                  >
+                    <Plus className="w-4 h-4 " />
+                    New
+                  </Button>
+                </DialogTrigger>
+              </div>
+            </div>
 
             <DialogContent className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] max-w-md bg-card border-border p-0 overflow-hidden flex flex-col max-h-[90vh]">
               {!creationSuccessData ? (
@@ -573,7 +617,9 @@ export function EscrowPage() {
           escrow={selectedEscrow}
           events={events}
           isMutating={isMutating}
+          contractEscrow={contractEscrow}
           error={modalError}
+          mode={mode} // Pass the current mode to the modal
           onLock={() => handleTransition("lock", selectedEscrow.id, selectedEscrow.buyer)}
           onRelease={() => handleTransition("release", selectedEscrow.id, selectedEscrow.buyer)}
           onRefund={() => handleTransition("refund", selectedEscrow.id, selectedEscrow.seller)}
