@@ -40,5 +40,11 @@
   },
   "overrides": {
     "esbuild": "^0.25.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@nestjs/core",
+      "esbuild"
+    ]
   }
 }
