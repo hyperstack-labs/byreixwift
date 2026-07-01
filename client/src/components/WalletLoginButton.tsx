@@ -66,6 +66,27 @@ export function WalletLoginButton({ disabled = false }: WalletLoginButtonProps) 
           <p>{connectError.message}</p>
         </div>
       )}
+
+      {/* No Wallet Detected Warning */}
+      {connectors.length === 0 && (
+        <div className="flex flex-col gap-2 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-500 text-sm mt-3">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span className="font-bold">No Web3 Wallet Detected</span>
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Please install or enable a browser wallet extension (like MetaMask, Coinbase Wallet, or Trust Wallet) to sign in to Sidrachain.
+          </p>
+          <a
+            href="https://metamask.io/download/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-primary hover:underline font-bold mt-1 inline-flex items-center"
+          >
+            Get MetaMask extension &rarr;
+          </a>
+        </div>
+      )}
     </motion.div>
   );
 }
