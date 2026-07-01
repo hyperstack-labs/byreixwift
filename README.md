@@ -32,9 +32,15 @@ For detailed information on project operations and technical specifications, ref
 git clone <repository-url>
 cd byreixwift
 cd server && pnpm install
-cd ..\client && pnpm install
-cd ..\contracts && pnpm install
+cd ../client && pnpm install
+cd ../contracts && pnpm install
 ```
+
+### Environment Variables
+Each Workspace has its own .env.example file 
+/server/.env.example
+/contracts/.env.example
+
 
 
 ## Node.js & Hardhat Setup
@@ -69,6 +75,36 @@ pnpm hardhat compile
 pnpm hardhat test
 ```
 
+### Deploy to SidraChain Network
+
+**Details**
+Ensure that the following environment variables are inside the .env.example of both /server and /contracts
+
+| KEY | VALUE | 
+| -------- | -------- |
+| CHAIN | SIDRA |
+| CHAIN_ID | 97453 |
+| NETWORK_ID | 97453 |
+| SIDRACHAIN_RPC_URL | https://node.sidrachain.com |
+| INFO_URL | https://www.sidrachain.com |
+| EXPLORER_NAME | Sidra Chain Explorer |
+| EXPLORER_URL | https://ledger.sidrachain.com |
+| EXPLORER_STANDARD | EIP3091 |
+| DEPLOYER_WALLET_PRIVATE_KEY | private key of the wallet to be used for deploying | 
+
+Deploy Commands
+```bash
+cd contracts
+# For deploying locally 
+pnpm deploy:local
+
+# For deploying to SidraChain mainnet
+pnpm deploy:sidrachain
+```
+**Key note** 
+
+Make sure that the DEPLOYER_WALLET_PRIVATE_KEY is set on the environment variables and has enough SDA for the gas fees
+
 ### Run The App
 
 ```bash
@@ -82,6 +118,8 @@ pnpm dev
 ```
 
 The client runs at `http://localhost:3000` and the API runs at `http://localhost:3001/api`.
+
+
 
 
 

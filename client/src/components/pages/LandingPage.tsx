@@ -37,7 +37,7 @@ interface DetailRow {
 
 function useIsMounted() {
   return useSyncExternalStore(
-    () => () => { },
+    () => () => {},
     () => true,
     () => false
   );
@@ -299,9 +299,9 @@ function LiveDot({ reducedMotion }: { reducedMotion: boolean }) {
         reducedMotion
           ? undefined
           : {
-            opacity: [0.4, 1, 0.4],
-            scale: [0.9, 1.15, 0.9],
-          }
+              opacity: [0.4, 1, 0.4],
+              scale: [0.9, 1.15, 0.9],
+            }
       }
       transition={
         reducedMotion ? undefined : { duration: 2.1, repeat: Infinity, ease: "easeInOut" }
