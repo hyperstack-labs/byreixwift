@@ -14,8 +14,14 @@ export class ContractService {
     const rpc = process.env.RPC_URL;
     const contractAddress = process.env.CONTRACT_ADDRESS;
 
-    if (!rpc || !contractAddress || contractAddress === "0x0000000000000000000000000000000000000000") {
-      console.warn("⚠️ RPC_URL or CONTRACT_ADDRESS is missing/placeholder. Blockchain integration will run in mock mode.");
+    if (
+      !rpc ||
+      !contractAddress ||
+      contractAddress === "0x0000000000000000000000000000000000000000"
+    ) {
+      console.warn(
+        "⚠️ RPC_URL or CONTRACT_ADDRESS is missing/placeholder. Blockchain integration will run in mock mode.",
+      );
       this.client = null;
       this.address = "0x0000000000000000000000000000000000000000";
       return;
@@ -42,8 +48,13 @@ export class ContractService {
    * If the contract client is not initialized, returns "0" to prevent runtime crashes.
    */
   async getNextTransactionId() {
-    if (!this.client || this.address === "0x0000000000000000000000000000000000000000") {
-      console.warn("getNextTransactionId: Client not initialized or zero address. Returning fallback/mock value.");
+    if (
+      !this.client ||
+      this.address === "0x0000000000000000000000000000000000000000"
+    ) {
+      console.warn(
+        "getNextTransactionId: Client not initialized or zero address. Returning fallback/mock value.",
+      );
       return "0";
     }
     try {
@@ -64,8 +75,13 @@ export class ContractService {
    * If the contract client is not initialized, returns a mock transaction tuple representation.
    */
   async getEscrow(id: number) {
-    if (!this.client || this.address === "0x0000000000000000000000000000000000000000") {
-      console.warn("getEscrow: Client not initialized or zero address. Returning mock escrow details.");
+    if (
+      !this.client ||
+      this.address === "0x0000000000000000000000000000000000000000"
+    ) {
+      console.warn(
+        "getEscrow: Client not initialized or zero address. Returning mock escrow details.",
+      );
       return [
         "0x0000000000000000000000000000000000000000",
         "0x0000000000000000000000000000000000000000",
@@ -76,7 +92,7 @@ export class ContractService {
         "0",
         "0",
         "0",
-        false
+        false,
       ];
     }
     try {
@@ -99,7 +115,7 @@ export class ContractService {
         "0",
         "0",
         "0",
-        false
+        false,
       ];
     }
   }
@@ -111,8 +127,8 @@ export class ContractService {
   private serialize(data: any) {
     return JSON.parse(
       JSON.stringify(data, (_, value) =>
-        typeof value === "bigint" ? value.toString() : value
-      )
+        typeof value === "bigint" ? value.toString() : value,
+      ),
     );
   }
 }

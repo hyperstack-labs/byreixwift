@@ -1,15 +1,16 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { SiweMessage, generateNonce } from 'siwe';
-import * as jwt from 'jsonwebtoken';
-import { db } from '../db';
-import { users, refreshTokens } from '../db/schema';
-import { eq, and } from 'drizzle-orm';
-import * as crypto from 'crypto';
+import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { SiweMessage, generateNonce } from "siwe";
+import * as jwt from "jsonwebtoken";
+import { db } from "../db";
+import { users, refreshTokens } from "../db/schema";
+import { eq, and } from "drizzle-orm";
+import * as crypto from "crypto";
 
 @Injectable()
 export class AuthService {
-  private readonly JWT_SECRET = process.env.JWT_SECRET || 'secret';
-  private readonly REFRESH_SECRET = process.env.REFRESH_SECRET || 'refresh-secret';
+  private readonly JWT_SECRET = process.env.JWT_SECRET || "secret";
+  private readonly REFRESH_SECRET =
+    process.env.REFRESH_SECRET || "refresh-secret";
 
   getNonce(): string {
     return generateNonce();
@@ -22,10 +23,16 @@ export class AuthService {
       const normalizedAddress = fields.address.toLowerCase();
 
       // 1. Find or create user
-      let [user] = await db.select().from(users).where(eq(users.address, normalizedAddress));
-      
+      let [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.address, normalizedAddress));
+
       if (!user) {
-        [user] = await db.insert(users).values({ address: normalizedAddress }).returning();
+        [user] = await db
+          .insert(users)
+          .values({ address: normalizedAddress })
+          .returning();
       }
 
       // 2. Generate tokens
@@ -33,7 +40,10 @@ export class AuthService {
       const refreshToken = this.generateRefreshToken();
 
       // 3. Store refresh token (hashed)
-      const hashedToken = crypto.createHash('sha256').update(refreshToken).digest('hex');
+      const hashedToken = crypto
+        .createHash("sha256")
+        .update(refreshToken)
+        .digest("hex");
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 7); // 7 days
 
@@ -49,33 +59,35 @@ export class AuthService {
         user: { id: user.id, address: user.address },
       };
     } catch (e) {
-      throw new UnauthorizedException('Invalid signature');
+      throw new UnauthorizedException("Invalid signature");
     }
   }
 
   private generateAccessToken(userId: string, address: string): string {
-    return jwt.sign({ sub: userId, address }, this.JWT_SECRET, { expiresIn: '15m' });
+    return jwt.sign({ sub: userId, address }, this.JWT_SECRET, {
+      expiresIn: "15m",
+    });
   }
 
   private generateRefreshToken(): string {
-    return crypto.randomBytes(40).toString('hex');
+    return crypto.randomBytes(40).toString("hex");
   }
 
   async refresh(token: string) {
-    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
-    
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
     const [storedToken] = await db
       .select()
       .from(refreshTokens)
       .where(
         and(
           eq(refreshTokens.token, hashedToken),
-          eq(refreshTokens.revoked, false)
-        )
+          eq(refreshTokens.revoked, false),
+        ),
       );
 
     if (!storedToken || storedToken.expiresAt < new Date()) {
-      throw new UnauthorizedException('Invalid or expired refresh token');
+      throw new UnauthorizedException("Invalid or expired refresh token");
     }
 
     // 1. Revoke the old refresh token immediately!
@@ -85,10 +97,13 @@ export class AuthService {
       .where(eq(refreshTokens.id, storedToken.id));
 
     // 2. Get user
-    const [user] = await db.select().from(users).where(eq(users.id, storedToken.userId));
-    
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, storedToken.userId));
+
     if (!user) {
-      throw new UnauthorizedException('User not found');
+      throw new UnauthorizedException("User not found");
     }
 
     // 3. Issue a new access token AND a new rotated refresh token!
@@ -96,7 +111,10 @@ export class AuthService {
     const newRefreshToken = this.generateRefreshToken();
 
     // 4. Store new refresh token
-    const newHashedToken = crypto.createHash('sha256').update(newRefreshToken).digest('hex');
+    const newHashedToken = crypto
+      .createHash("sha256")
+      .update(newRefreshToken)
+      .digest("hex");
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 7); // 7 days
 
@@ -113,7 +131,7 @@ export class AuthService {
   }
 
   async logout(token: string) {
-    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
     await db
       .update(refreshTokens)
       .set({ revoked: true })

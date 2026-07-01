@@ -1,4 +1,9 @@
-export const ESCROW_STATES = ["pending", "locked", "released", "refunded"] as const;
+export const ESCROW_STATES = [
+  "pending",
+  "locked",
+  "released",
+  "refunded",
+] as const;
 export type EscrowState = (typeof ESCROW_STATES)[number];
 
 export const ESCROW_EVENT_TYPES = [

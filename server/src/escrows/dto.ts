@@ -1,4 +1,12 @@
-import { IsNumber, IsOptional, IsPositive, IsString, Matches, Max, Min } from "class-validator";
+import {
+  IsNumber,
+  IsOptional,
+  IsPositive,
+  IsString,
+  Matches,
+  Max,
+  Min,
+} from "class-validator";
 
 const walletPattern = /^0x[a-fA-F0-9]{40}$/;
 

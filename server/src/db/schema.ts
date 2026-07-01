@@ -1,4 +1,11 @@
-import { pgTable, text, timestamp, uuid, boolean, numeric } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+  boolean,
+  numeric,
+} from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -8,7 +15,9 @@ export const users = pgTable("users", {
 
 export const refreshTokens = pgTable("refresh_tokens", {
   id: uuid("id").primaryKey().defaultRandom(),
-  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  userId: uuid("user_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
   token: text("token").notNull(), // Hashed refresh token
   expiresAt: timestamp("expires_at").notNull(),
   revoked: boolean("revoked").default(false).notNull(),
@@ -36,7 +45,6 @@ export const escrows = pgTable("escrows", {
 
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
-
 
 export const escrowEvents = pgTable("escrow_events", {
   id: uuid("id").primaryKey().defaultRandom(),

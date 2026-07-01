@@ -4,6 +4,6 @@ import { EscrowsModule } from "./escrows/escrows.module";
 import { DbModule } from "./db/db.module";
 import { ContractModule } from "./contracts/contract.module";
 @Module({
-  imports:[AuthModule,EscrowsModule,ContractModule,DbModule],
+  imports: [AuthModule, EscrowsModule, ContractModule, DbModule],
 })
 export class AppModule {}

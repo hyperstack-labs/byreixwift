@@ -87,7 +87,6 @@ export function WalletDashboard() {
     });
   }, [sdaBalance, totalEscrowBalanceNum]);
 
-
   // Derived USD value using placeholder SDA price
   const sdaUsdValue = useMemo<string>(() => {
     const usd = sdaBalance * SDA_USD_PRICE;
@@ -266,7 +265,12 @@ export function WalletDashboard() {
                 </span>
                 <span className="inline-flex items-center gap-1.5 text-amber-500">
                   <span className="h-2 w-2 rounded-full bg-amber-500" />
-                  Locked in Escrow: {totalEscrowBalanceNum.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} SDA
+                  Locked in Escrow:{" "}
+                  {totalEscrowBalanceNum.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}{" "}
+                  SDA
                 </span>
               </div>
               <div className="flex items-center gap-2 text-sm font-medium text-primary mt-3">

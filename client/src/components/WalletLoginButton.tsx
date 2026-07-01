@@ -75,7 +75,8 @@ export function WalletLoginButton({ disabled = false }: WalletLoginButtonProps) 
             <span className="font-bold">No Web3 Wallet Detected</span>
           </div>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            Please install or enable a browser wallet extension (like MetaMask, Coinbase Wallet, or Trust Wallet) to sign in to Sidrachain.
+            Please install or enable a browser wallet extension (like MetaMask, Coinbase Wallet, or
+            Trust Wallet) to sign in to Sidrachain.
           </p>
           <a
             href="https://metamask.io/download/"

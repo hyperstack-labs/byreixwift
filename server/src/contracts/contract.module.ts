@@ -4,7 +4,7 @@ import { ContractController } from "./contract.controller";
 
 @Module({
   providers: [ContractService],
-   controllers: [ContractController],
+  controllers: [ContractController],
   exports: [ContractService],
 })
 export class ContractModule {}

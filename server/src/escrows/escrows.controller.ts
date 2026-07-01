@@ -44,4 +44,3 @@ export class EscrowsController {
     return this.escrowsService.refundEscrow(id, { actor: user.address });
   }
 }
-
