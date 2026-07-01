@@ -15,7 +15,7 @@ export class AuthController {
   async verify(
     @Body('message') message: string,
     @Body('signature') signature: string,
-    @Res({ passthrough: true }) response: Response,
+    @Res({ passthrough: true }) response: any,
   ) {
     const { accessToken, refreshToken, user } = await this.authService.verifySignature(message, signature);
 
@@ -32,7 +32,7 @@ export class AuthController {
   @Post('refresh')
   async refresh(
     @Req() request: Request,
-    @Res({ passthrough: true }) response: Response,
+    @Res({ passthrough: true }) response: any,
   ) {
     const refreshToken = request.cookies['refreshToken'];
     if (!refreshToken) {
@@ -51,7 +51,7 @@ export class AuthController {
   }
 
   @Post('logout')
-  async logout(@Req() request: Request, @Res({ passthrough: true }) response: Response) {
+  async logout(@Req() request: Request, @Res({ passthrough: true }) response: any) {
     const refreshToken = request.cookies['refreshToken'];
     if (refreshToken) {
       await this.authService.logout(refreshToken);

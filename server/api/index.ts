@@ -6,9 +6,9 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import { ValidationPipe } from "@nestjs/common";
 
-let cachedServer: Express;
+let cachedServer: any;
 
-async function bootstrapServer(): Promise<Express> {
+async function bootstrapServer(): Promise<any> {
   if (!cachedServer) {
     const expressApp = express();
     const app = await NestFactory.create(
