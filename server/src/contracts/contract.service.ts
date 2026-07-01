@@ -6,18 +6,30 @@ export class ContractService {
   private client;
   private address: `0x${string}`;
 
+  /**
+   * Initializes the blockchain client if environment variables are provided.
+   * If missing, defaults to mock mode to prevent NestJS eagerly crashing on startup.
+   */
   constructor() {
     const rpc = process.env.RPC_URL;
     const contractAddress = process.env.CONTRACT_ADDRESS;
 
-    if (!rpc) throw new Error("RPC_URL missing in .env");
-    if (!contractAddress) throw new Error("CONTRACT_ADDRESS missing in .env");
+    if (!rpc || !contractAddress) {
+      console.warn("⚠️ RPC_URL or CONTRACT_ADDRESS is missing in the environment. Blockchain integration will run in mock mode.");
+      this.client = null;
+      this.address = "0x0000000000000000000000000000000000000000";
+      return;
+    }
 
     this.address = contractAddress as `0x${string}`;
-
-    this.client = createPublicClient({
-      transport: http(rpc),
-    });
+    try {
+      this.client = createPublicClient({
+        transport: http(rpc),
+      });
+    } catch (error) {
+      console.error("❌ Failed to initialize blockchain client:", error);
+      this.client = null;
+    }
   }
 
   private abi = parseAbi([
@@ -25,8 +37,15 @@ export class ContractService {
     "function transactions(uint256) view returns (address,address,uint256,uint256,bytes32,uint8,uint64,uint64,uint64,bool)",
   ]);
 
-  
+  /**
+   * Retrieves the next transaction ID from the contract.
+   * If the contract client is not initialized, returns "0" to prevent runtime crashes.
+   */
   async getNextTransactionId() {
+    if (!this.client) {
+      console.warn("getNextTransactionId: Client not initialized. Returning fallback/mock value.");
+      return "0";
+    }
     const result = await this.client.readContract({
       address: this.address,
       abi: this.abi,
@@ -36,8 +55,26 @@ export class ContractService {
     return result.toString();
   }
 
-  
+  /**
+   * Fetches escrow details from the contract for a given transaction ID.
+   * If the contract client is not initialized, returns a mock transaction tuple representation.
+   */
   async getEscrow(id: number) {
+    if (!this.client) {
+      console.warn("getEscrow: Client not initialized. Returning mock escrow details.");
+      return [
+        "0x0000000000000000000000000000000000000000",
+        "0x0000000000000000000000000000000000000000",
+        "0",
+        "0",
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        0,
+        "0",
+        "0",
+        "0",
+        false
+      ];
+    }
     const data = await this.client.readContract({
       address: this.address,
       abi: this.abi,
@@ -48,7 +85,10 @@ export class ContractService {
     return this.serialize(data);
   }
 
- 
+  /**
+   * Serializes the contract response, transforming any BigInts recursively.
+   * Needed because JSON.stringify throws errors on bigint values.
+   */
   private serialize(data: any) {
     return JSON.parse(
       JSON.stringify(data, (_, value) =>
