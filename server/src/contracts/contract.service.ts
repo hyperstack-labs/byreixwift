@@ -14,8 +14,8 @@ export class ContractService {
     const rpc = process.env.RPC_URL;
     const contractAddress = process.env.CONTRACT_ADDRESS;
 
-    if (!rpc || !contractAddress) {
-      console.warn("⚠️ RPC_URL or CONTRACT_ADDRESS is missing in the environment. Blockchain integration will run in mock mode.");
+    if (!rpc || !contractAddress || contractAddress === "0x0000000000000000000000000000000000000000") {
+      console.warn("⚠️ RPC_URL or CONTRACT_ADDRESS is missing/placeholder. Blockchain integration will run in mock mode.");
       this.client = null;
       this.address = "0x0000000000000000000000000000000000000000";
       return;
@@ -42,17 +42,21 @@ export class ContractService {
    * If the contract client is not initialized, returns "0" to prevent runtime crashes.
    */
   async getNextTransactionId() {
-    if (!this.client) {
-      console.warn("getNextTransactionId: Client not initialized. Returning fallback/mock value.");
+    if (!this.client || this.address === "0x0000000000000000000000000000000000000000") {
+      console.warn("getNextTransactionId: Client not initialized or zero address. Returning fallback/mock value.");
       return "0";
     }
-    const result = await this.client.readContract({
-      address: this.address,
-      abi: this.abi,
-      functionName: "nextTransactionId",
-    });
-
-    return result.toString();
+    try {
+      const result = await this.client.readContract({
+        address: this.address,
+        abi: this.abi,
+        functionName: "nextTransactionId",
+      });
+      return result.toString();
+    } catch (error) {
+      console.warn("getNextTransactionId failed, falling back to mock:", error);
+      return "0";
+    }
   }
 
   /**
@@ -60,8 +64,8 @@ export class ContractService {
    * If the contract client is not initialized, returns a mock transaction tuple representation.
    */
   async getEscrow(id: number) {
-    if (!this.client) {
-      console.warn("getEscrow: Client not initialized. Returning mock escrow details.");
+    if (!this.client || this.address === "0x0000000000000000000000000000000000000000") {
+      console.warn("getEscrow: Client not initialized or zero address. Returning mock escrow details.");
       return [
         "0x0000000000000000000000000000000000000000",
         "0x0000000000000000000000000000000000000000",
@@ -75,14 +79,29 @@ export class ContractService {
         false
       ];
     }
-    const data = await this.client.readContract({
-      address: this.address,
-      abi: this.abi,
-      functionName: "transactions",
-      args: [BigInt(id)],
-    });
-
-    return this.serialize(data);
+    try {
+      const data = await this.client.readContract({
+        address: this.address,
+        abi: this.abi,
+        functionName: "transactions",
+        args: [BigInt(id)],
+      });
+      return this.serialize(data);
+    } catch (error) {
+      console.warn(`getEscrow(${id}) failed, falling back to mock:`, error);
+      return [
+        "0x0000000000000000000000000000000000000000",
+        "0x0000000000000000000000000000000000000000",
+        "0",
+        "0",
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        0,
+        "0",
+        "0",
+        "0",
+        false
+      ];
+    }
   }
 
   /**
