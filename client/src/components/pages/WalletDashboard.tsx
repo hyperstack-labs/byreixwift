@@ -57,19 +57,15 @@ export function WalletDashboard() {
   };
 
   // Dynamically calculate live active escrow total value
-  const totalEscrowBalanceString = useMemo<string>(() => {
-    if (!escrows || escrows.length === 0) return "0.00";
-    const activeTotal = escrows
+  const totalEscrowBalanceNum = useMemo<number>(() => {
+    if (!escrows || escrows.length === 0) return 0;
+    return escrows
       .filter((escrow) => escrow.state?.toUpperCase() === "PENDING")
       .reduce((sum, escrow) => {
         const rawAmount = escrow.amount !== undefined && escrow.amount !== null ? escrow.amount : 0;
         const amount = typeof rawAmount === "string" ? parseFloat(rawAmount) : rawAmount;
         return sum + (isNaN(amount) ? 0 : amount);
       }, 0);
-    return activeTotal.toLocaleString(undefined, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
   }, [escrows]);
 
   // Read SDA balance straight from Sidrachain RPC layers via custom hook
@@ -80,6 +76,17 @@ export function WalletDashboard() {
     isLoading: isLoadingSda,
     isError: isSdaError,
   } = useSdaBalance();
+
+  // Compute total portfolio value in USD (Available + Locked in Escrows)
+  const totalPortfolioUsdString = useMemo<string>(() => {
+    const totalSda = sdaBalance + totalEscrowBalanceNum;
+    const usdValue = totalSda * SDA_USD_PRICE;
+    return usdValue.toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  }, [sdaBalance, totalEscrowBalanceNum]);
+
 
   // Derived USD value using placeholder SDA price
   const sdaUsdValue = useMemo<string>(() => {
@@ -238,7 +245,7 @@ export function WalletDashboard() {
                         <AlertCircle className="h-5 w-5" /> Value unavailable
                       </span>
                     ) : (
-                      `$${totalEscrowBalanceString}`
+                      `$${totalPortfolioUsdString}`
                     )
                   ) : (
                     "••••••••"
@@ -252,7 +259,17 @@ export function WalletDashboard() {
                   {balanceVisible ? <Eye className="h-6 w-6" /> : <EyeOff className="h-5 w-5" />}
                 </button>
               </div>
-              <div className="flex items-center gap-2 text-sm font-medium text-primary mt-1">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-semibold text-muted-foreground mt-2">
+                <span className="inline-flex items-center gap-1.5 text-primary">
+                  <span className="h-2 w-2 rounded-full bg-primary" />
+                  Available: {sdaFormatted}
+                </span>
+                <span className="inline-flex items-center gap-1.5 text-amber-500">
+                  <span className="h-2 w-2 rounded-full bg-amber-500" />
+                  Locked in Escrow: {totalEscrowBalanceNum.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} SDA
+                </span>
+              </div>
+              <div className="flex items-center gap-2 text-sm font-medium text-primary mt-3">
                 <TrendingUp className="h-4 w-4" />
                 <span>+$2,345.50 (5.5%)</span>
                 <span className="text-muted-foreground font-normal">last 24h</span>
