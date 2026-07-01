@@ -50,9 +50,7 @@ export function EscrowPage() {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [creationSuccessData, setCreationSuccessData] = useState<EscrowRecord | null>(null);
   const [selectedEscrowId, setSelectedEscrowId] = useState<string | null>(null);
-  const [contractEscrow, setContractEscrow] = useState<
-  (string | number | boolean)[] | null
-  >(null);
+  const [contractEscrow, setContractEscrow] = useState<(string | number | boolean)[] | null>(null);
   const [modalError, setModalError] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
@@ -92,15 +90,12 @@ export function EscrowPage() {
     : null;
 
   useEffect(() => {
-  if (mode !== "live") {
-    return;
-  }
+    if (mode !== "live") {
+      return;
+    }
 
-  getContractEscrow("0")
-    .then(setContractEscrow)
-    .catch(console.error);
-}, [mode]);
-
+    getContractEscrow("0").then(setContractEscrow).catch(console.error);
+  }, [mode]);
 
   // Aggregate calculation for header stats
   const totalLocked = escrows

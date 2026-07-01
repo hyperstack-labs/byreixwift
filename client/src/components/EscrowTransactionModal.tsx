@@ -330,21 +330,18 @@ export function EscrowTransactionModal({
             </div>
           </div>
           {mode === "live" && contractEscrow && (
-           <div className="rounded-xl border border-border bg-background/40 p-4">
-               <p className="text-[10px] text-muted-foreground font-medium mb-3 uppercase tracking-wider">
-                  On-chain Data
-               </p>
+            <div className="rounded-xl border border-border bg-background/40 p-4">
+              <p className="text-[10px] text-muted-foreground font-medium mb-3 uppercase tracking-wider">
+                On-chain Data
+              </p>
 
-                 {contractEscrow?.[9] === false ? (
-                <p className="text-sm text-muted-foreground">
-                  No on-chain escrow found.
-                </p>
+              {contractEscrow?.[9] === false ? (
+                <p className="text-sm text-muted-foreground">No on-chain escrow found.</p>
               ) : (
                 <pre>{JSON.stringify(contractEscrow, null, 2)}</pre>
               )}
-                </div>
-              )}
-
+            </div>
+          )}
 
           <TrustlessIndicators />
           {/* Event log */}
