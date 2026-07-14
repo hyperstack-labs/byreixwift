@@ -2,8 +2,8 @@
   "name": "byreixwift-root",
   "private": true,
   "scripts": {
-    "dev:client": "pnpm --filter byreixwift dev",
-    "dev:server": "pnpm --filter byreixwift-server dev",
+    "dev:client": "envrepair doctor -e client/.env.local -x client/.env.example && pnpm --filter byreixwift dev",
+    "dev:server": "envrepair doctor -e server/.env -x server/.env.example && pnpm --filter byreixwift-server dev",
     "dev:all": "pnpm dev:client & pnpm dev:server",
     "fix": "pnpm -r fix",
     "lint": "pnpm -r lint",
@@ -16,5 +16,8 @@
       "unrs-resolver",
       "keccak"
     ]
+  },
+  "devDependencies": {
+    "envrepair": "^0.2.1"
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   createPublicClient,
@@ -10,6 +10,7 @@ import {
 
 @Injectable()
 export class ContractService {
+  private readonly logger = new Logger(ContractService.name);
   private client;
   private address: `0x${string}`;
 
@@ -26,8 +27,8 @@ export class ContractService {
       !contractAddress ||
       contractAddress === '0x0000000000000000000000000000000000000000'
     ) {
-      console.warn(
-        '⚠️ RPC_URL or CONTRACT_ADDRESS is missing/placeholder. Blockchain integration will run in mock mode.',
+      this.logger.warn(
+        'RPC_URL or CONTRACT_ADDRESS is missing/placeholder. Blockchain integration will run in mock mode.',
       );
       this.client = null;
       this.address = '0x0000000000000000000000000000000000000000';
@@ -40,7 +41,7 @@ export class ContractService {
         transport: http(rpc),
       });
     } catch (error) {
-      console.error('❌ Failed to initialize blockchain client:', error);
+      this.logger.error('Failed to initialize blockchain client:', error);
       this.client = null;
     }
   }
@@ -63,7 +64,7 @@ export class ContractService {
       !this.client ||
       this.address === '0x0000000000000000000000000000000000000000'
     ) {
-      console.warn(
+      this.logger.warn(
         'getNextTransactionId: Client not initialized or zero address. Returning fallback/mock value.',
       );
       return '0';
@@ -76,7 +77,9 @@ export class ContractService {
       });
       return result.toString();
     } catch (error) {
-      console.warn('getNextTransactionId failed, falling back to mock:', error);
+      this.logger.warn(
+        `getNextTransactionId failed, falling back to mock: ${error}`,
+      );
       return '0';
     }
   }
@@ -90,7 +93,7 @@ export class ContractService {
       !this.client ||
       this.address === '0x0000000000000000000000000000000000000000'
     ) {
-      console.warn(
+      this.logger.warn(
         'getEscrow: Client not initialized or zero address. Returning mock escrow details.',
       );
       return [
@@ -115,7 +118,9 @@ export class ContractService {
       });
       return this.serialize(data);
     } catch (error) {
-      console.warn(`getEscrow(${id}) failed, falling back to mock:`, error);
+      this.logger.warn(
+        `getEscrow(${id}) failed, falling back to mock: ${error}`,
+      );
       return [
         '0x0000000000000000000000000000000000000000',
         '0x0000000000000000000000000000000000000000',
@@ -147,7 +152,7 @@ export class ContractService {
       !this.client ||
       this.address === '0x0000000000000000000000000000000000000000'
     ) {
-      console.warn(
+      this.logger.warn(
         'verifyOnChainCreation: Running in mock mode. Automatically verifying creation.',
       );
       return true;
@@ -193,7 +198,7 @@ export class ContractService {
 
       return !!matchingLog;
     } catch (error) {
-      console.error(
+      this.logger.error(
         `Failed to verify on-chain creation for tx ${txHash}:`,
         error,
       );
@@ -215,7 +220,7 @@ export class ContractService {
       !this.client ||
       this.address === '0x0000000000000000000000000000000000000000'
     ) {
-      console.warn(
+      this.logger.warn(
         `verifyOnChainTransition(${eventName}): Running in mock mode. Automatically verifying transition.`,
       );
       return true;
@@ -249,7 +254,7 @@ export class ContractService {
 
       return !!matchingLog;
     } catch (error) {
-      console.error(
+      this.logger.error(
         `Failed to verify on-chain transition ${eventName} for tx ${txHash}:`,
         error,
       );

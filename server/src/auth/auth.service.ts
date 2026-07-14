@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SiweMessage, generateNonce } from 'siwe';
 import * as jwt from 'jsonwebtoken';
@@ -9,6 +9,7 @@ import * as crypto from 'crypto';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
   private readonly jwtSecret: string;
   private readonly refreshSecret: string;
 
@@ -75,9 +76,8 @@ export class AuthService {
         },
       };
     } catch (e) {
-      console.error(
-        'SIWE verify failed:',
-        (e as Error).message,
+      this.logger.error(
+        `SIWE verify failed: ${(e as Error).message}`,
         (e as Error).stack,
       );
       throw new UnauthorizedException('Invalid signature');

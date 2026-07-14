@@ -1,22 +1,27 @@
 import 'reflect-metadata';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import cookieParser from 'cookie-parser';
+import * as path from 'path';
+import { migrate } from 'drizzle-orm/node-postgres/migrator';
 
 import { db } from './db';
 import { escrows } from './db/schema';
 
 async function bootstrap() {
+  const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule);
 
   try {
-    await db.select().from(escrows).limit(1);
+    logger.log('Running database migrations...');
+    await migrate(db, { migrationsFolder: path.join(__dirname, '../drizzle') });
+    logger.log('Database migrations completed successfully');
 
-    console.log('PostgreSQL connected');
-    console.log('Escrows table verified');
+    await db.select().from(escrows).limit(1);
+    logger.log('PostgreSQL connected & Escrows table verified');
   } catch (error) {
-    console.error('Database validation failed', error);
+    logger.error('Database validation/migration failed:', error);
   }
 
   app.use(cookieParser());
@@ -37,7 +42,7 @@ async function bootstrap() {
 
   const port = Number(process.env.PORT || 3001);
   await app.listen(port);
-  console.log(`Byreixwift server listening on http://localhost:${port}/api`);
+  logger.log(`Byreixwift server listening on http://localhost:${port}/api`);
 }
 
 bootstrap();
