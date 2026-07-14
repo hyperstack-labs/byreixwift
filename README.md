@@ -1,5 +1,17 @@
 # ByReiXwift
 
+<p align="center">
+  <img src="client/public/logo_transparent.png" alt="ByReiXwift Logo" width="250" />
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Network-Sidra%20Chain%20(97453)-4CAF50" alt="Sidra Chain Network" />
+  <img src="https://img.shields.io/badge/Solidity-%5E0.8.20-363636" alt="Solidity Version" />
+  <img src="https://img.shields.io/badge/Next.js-15-000000" alt="Next.js" />
+  <img src="https://img.shields.io/badge/NestJS-11-E0234E" alt="NestJS" />
+  <img src="https://img.shields.io/badge/License-MIT-2196F3" alt="License" />
+</p>
+
 ByReiXwift is a decentralized escrow service built on Sidra Chain. The application implements a fixed-fee billing mechanism, smart-contract-level dispute arbitration, and a deterministic escrow state machine.
 
 ---
