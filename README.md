@@ -33,19 +33,38 @@ cd ../client && pnpm install
 
 ### Configure Environment Variables
 
-Copy `.env.example` to `.env` in `/contracts` and `/server`. Copy or create `client/.env.local` based on the env vars expected by the client.
+Copy `.env.example` to `.env` in each workspace:
 
-**Key configuration values:**
+```bash
+cp server/.env.example server/.env
+cp client/.env.example client/.env.local
+cp contracts/.env.example contracts/.env
+```
 
-| Key | Default | Description |
-| :--- | :--- | :--- |
-| `CHAIN` | `SIDRA` | Target blockchain network |
-| `CHAIN_ID` | `97453` | Sidrachain Chain ID |
-| `RPC_URL` | `https://node.sidrachain.com` | RPC Endpoint URL |
-| `CONTRACT_ADDRESS` | — | Deployed escrow contract address |
-| `NEXT_PUBLIC_CONTRACT_ADDRESS` | — | Same address, exposed to the frontend |
-| `DATABASE_URL` | — | PostgreSQL connection string |
-| `JWT_SECRET` | — | Secret for JWT token signing |
+**Server (`server/.env`):**
+
+| Key | Required | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `DATABASE_URL` | Yes | — | PostgreSQL connection string |
+| `JWT_SECRET` | Yes | — | Secret for signing JWT access tokens |
+| `PORT` | No | `3001` | HTTP listen port |
+| `RPC_URL` | Only for on-chain | — | Sidrachain JSON-RPC endpoint |
+| `CONTRACT_ADDRESS` | Only for on-chain | — | Deployed `ByReiXwiftEscrow` contract address |
+
+**Client (`client/.env.local`):**
+
+| Key | Required | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `NEXT_PUBLIC_CONTRACT_ADDRESS` | Yes | — | Escrow contract address (exposed to browser) |
+| `NEXT_PUBLIC_SIDRA_API_URL` | No | `http://localhost:3001/api` | Backend API URL for token/trend data |
+
+**Contracts (`contracts/.env`):**
+
+| Key | Required | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `PRIVATE_KEY` | For deployment | — | Deployer wallet private key |
+| `CONTRACT_ADDRESS` | After deploy | — | Deployed contract address |
+| `RPC_URL` | No | `http://127.0.0.1:8545` | Hardhat node or Sidrachain RPC |
 
 ### Compile and Test Smart Contracts
 
