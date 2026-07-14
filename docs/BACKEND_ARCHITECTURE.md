@@ -4,48 +4,94 @@ This document describes the system topology, database design patterns, and the e
 
 ## 1. System Topology
 
-The backend application bridges the frontend client, the PostgreSQL database, and the Sidrachain network:
-
-```mermaid
-%%{init: {'theme': 'dark'}}%%
-graph TD
-   Client[Frontend Client] --> |HTTPS| API[Backend API Service]
-   API --> |Drizzle ORM| DB[PostgreSQL Database]
-   API --> |RPC Provider| Blockchain((Blockchain Network))
-   Worker[Event Listener / Indexer] -->|Polls / Listens| Blockchain
-   Worker -->|Writes Events| DB
+```
+Client (Next.js) ──HTTPS──► API Service (NestJS)
+                                  │
+                          ┌───────┴───────┐
+                          ▼               ▼
+                   PostgreSQL        Sidrachain RPC
+                   (Drizzle ORM)     (viem client)
 ```
 
-## 2. Database Schema Guidelines
+## 2. Modules
 
-The database layer follows these implementation patterns:
+| Module | Path | Description |
+|---|---|---|
+| Auth | `src/auth/` | SIWE authentication, JWT issuance/refresh |
+| Escrows | `src/escrows/` | Escrow CRUD, state machine transitions |
+| Contracts | `src/contracts/` | Read-only blockchain client (viem) with mock fallback |
+| DB | `src/db/` | Drizzle ORM setup (PostgreSQL connection + schema) |
 
-- **ORM**: Configure and execute all queries using Drizzle ORM.
-- **Primary Keys**: Generate random UUIDs for all table primary identifiers.
-- **Foreign Keys & Verification**:
-  - Relate user profiles to escrows using public cryptographic wallet addresses instead of database UUIDs.
-  - This pattern allows off-chain services to verify transactions without mapping surrogate identifiers.
-- **Database Column Naming**: Use `snake_case` naming conventions for database tables and columns.
-- **Application Naming**: Map database attributes to `camelCase` identifiers in the NestJS application layer via the Drizzle configuration.
+## 3. Database Schema
 
-## 3. Escrow State Machine Transitions
+### `users`
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid | Primary key |
+| address | text | Wallet address (unique) |
+| created_at | timestamp | Auto-generated |
 
-Update escrow and event records only according to the following state constraints:
+### `refresh_tokens`
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid | Primary key |
+| user_id | uuid | FK → users.id |
+| token | text | Hashed refresh token |
+| expires_at | timestamp | Expiration |
+| revoked | boolean | Revocation flag |
 
-```mermaid
-stateDiagram-v2
-   [*] --> pending
+### `escrows`
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid | Primary key |
+| buyer | text | Wallet address |
+| seller | text | Wallet address |
+| amount | numeric(20,8) | Escrow amount |
+| token_symbol | text | Token (e.g. SDA) |
+| description | text | Purpose of transaction |
+| fixed_fee | numeric(20,8) | Service fee |
+| state | text | `pending`, `locked`, `released`, `refunded` |
+| created_at | timestamp | Auto-generated |
+| updated_at | timestamp | Updated on transition |
 
-   pending --> locked : Confirm smart contract deposit
-   
-   locked --> released : Buyer confirms delivery (funds transfer to seller)
-   released --> refunded : Return funds to buyer
+### `escrow_events`
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid | Primary key |
+| escrow_id | uuid | FK → escrows.id |
+| type | text | Event type (e.g. EscrowCreated) |
+| state | text | State at time of event |
+| metadata | text | Optional JSON payload |
+| occurred_at | timestamp | Event timestamp |
 
-   released --> not_funded : Mark unsuccessful funding
-   not_funded --> disputed : Raise dispute over funding timeout
-   not_funded --> resolved : Acknowledge mutual cancellation
+## 4. Escrow State Machine
 
-   disputed --> [*]
-   resolved --> [*]
-   refunded --> [*]
 ```
+[*] ──► pending
+          │
+          ▼ (buyer locks)
+        locked
+          │
+     ┌────┴────┐
+     ▼         ▼
+  released  refunded
+     │         │
+     └────┬────┘
+          ▼
+         [*]
+```
+
+Valid transitions:
+- `pending` → `locked` (buyer calls lock)
+- `locked` → `released` (buyer calls release)
+- `pending` → `refunded` (seller calls refund)
+- `locked` → `refunded` (seller calls refund)
+
+## 5. Auth Flow
+
+1. Frontend requests SIWE message from `POST /auth/siwe/initiate`
+2. User signs message with their wallet
+3. Frontend sends signature to `POST /auth/siwe/verify`
+4. Server verifies signature, returns JWT access + refresh tokens
+5. Subsequent requests include JWT in `Authorization: Bearer` header
+6. `JwtAuthGuard` protects all escrow endpoints

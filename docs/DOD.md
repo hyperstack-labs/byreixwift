@@ -11,6 +11,8 @@ A task is complete only when all the following conditions are met:
 ## 2. Verification and Testing
 
 - Perform manual verification of the updated feature.
+- Run all existing tests (`pnpm test` in client, server, and contracts) — zero failures required.
+- Add new tests for any new functionality where applicable.
 - Ensure the changes cause no regressions in existing codebase functionalities.
 
 ## 3. Code Review

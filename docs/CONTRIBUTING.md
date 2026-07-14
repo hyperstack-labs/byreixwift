@@ -30,4 +30,5 @@ Follow this procedure for submitting updates:
 
 - **Review Policy**: Ensure all commits pass Pull Request review before merging.
 - **Branch Cleanup**: Delete local and remote branches immediately after a successful merge.
+- **Testing**: Run all tests before opening a PR — `pnpm test` in `client/`, `server/`, and `contracts/`. Ensure zero failures.
 - **Definition of Done**: Verify that all deliverables satisfy the criteria defined in the [Definition of Done](./DOD.md).

@@ -17,64 +17,59 @@ For detailed specifications, read the [Technical Stack](./docs/TECH_STACK.md) an
 
 ### Prerequisites
 
-Ensure you have the following software installed:
-
-- Node.js (LTS version)
+- Node.js 22.x
 - pnpm
+- PostgreSQL (for the backend service)
 
 ### Install Dependencies
 
-Run the following commands to install dependencies across all workspace modules:
+Each workspace has its own `package.json`. Install dependencies for each:
 
 ```bash
-cd server && pnpm install
+cd contracts && pnpm install
+cd ../server && pnpm install
 cd ../client && pnpm install
-cd ../contracts && pnpm install
 ```
 
 ### Configure Environment Variables
 
-Create `.env` configuration files inside the `/server` and `/contracts` directories.
-Use the respective `.env.example` files as templates.
+Copy `.env.example` to `.env` in `/contracts` and `/server`. Copy or create `client/.env.local` based on the env vars expected by the client.
 
-Ensure the following configuration values are set:
+**Key configuration values:**
 
-| Key | Value | Description |
+| Key | Default | Description |
 | :--- | :--- | :--- |
 | `CHAIN` | `SIDRA` | Target blockchain network |
 | `CHAIN_ID` | `97453` | Sidrachain Chain ID |
-| `NETWORK_ID` | `97453` | Sidrachain Network ID |
-| `SIDRACHAIN_RPC_URL` | `https://node.sidrachain.com` | RPC Endpoint URL |
-| `EXPLORER_URL` | `https://ledger.sidrachain.com` | Block Explorer URL |
-| `DEPLOYER_WALLET_PRIVATE_KEY` | `<private_key>` | Deployer private key |
+| `RPC_URL` | `https://node.sidrachain.com` | RPC Endpoint URL |
+| `CONTRACT_ADDRESS` | — | Deployed escrow contract address |
+| `NEXT_PUBLIC_CONTRACT_ADDRESS` | — | Same address, exposed to the frontend |
+| `DATABASE_URL` | — | PostgreSQL connection string |
+| `JWT_SECRET` | — | Secret for JWT token signing |
 
 ### Compile and Test Smart Contracts
 
-Run the compiler and execution test suite:
-
 ```bash
 cd contracts
-pnpm hardhat compile
-pnpm hardhat test
+pnpm compile
+pnpm test
 ```
 
 ### Deploy Smart Contracts
 
-Deploy the escrow contract to your target network environment:
-
 ```bash
 cd contracts
 
-# Deploy to a local Hardhat node
+# Deploy to a local Hardhat node (requires `npx hardhat node` running)
 pnpm deploy:local
 
-# Deploy to the SidraChain mainnet
+# Deploy to the SidraChain mainnet (requires funded PRIVATE_KEY in .env)
 pnpm deploy:sidrachain
 ```
 
 ### Run the Applications
 
-Start the backend API service:
+Start PostgreSQL, then:
 
 ```bash
 cd server
@@ -82,21 +77,40 @@ pnpm dev
 ```
 The API service runs at `http://localhost:3001/api`.
 
-Start the frontend client:
-
 ```bash
 cd client
 pnpm dev
 ```
 The client application runs at `http://localhost:3000`.
 
+### Run Tests
+
+```bash
+# Contracts (Hardhat)
+cd contracts && pnpm test
+
+# Server (Jest)
+cd server && pnpm test
+
+# Client (Vitest)
+cd client && pnpm test
+```
+
+### Docker (Optional)
+
+```bash
+docker compose up
+```
+
+Starts PostgreSQL, the NestJS server, and the Next.js client.
+
 ---
 
 ## Technical Specifications and Guidelines
-
-Refer to the following resources for development policies:
 
 - [Project Scope](./docs/PROJECT.md)
 - [Contribution Guidelines](./docs/CONTRIBUTING.md)
 - [Definition of Done](./docs/DOD.md)
 - [Team Members](./docs/MEMBERS.md)
+- [SidraChain Integration](./docs/SIDRA_INTEGRATION.md)
+- [Backend Architecture](./docs/BACKEND_ARCHITECTURE.md)
