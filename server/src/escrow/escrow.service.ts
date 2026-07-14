@@ -72,9 +72,7 @@ export class EscrowService {
     }
 
     // Verify on-chain log if registering a live/on-chain escrow
-    const onChainMatch = dto.description.match(/^\[OnChainId:\s*(\d+)\]/);
-    if (onChainMatch) {
-      const onChainId = parseInt(onChainMatch[1], 10);
+    if (dto.onChainId !== undefined && dto.onChainId !== null) {
       if (!dto.txHash) {
         throw new BadRequestException(
           'txHash is required for live/on-chain escrows',
@@ -82,7 +80,7 @@ export class EscrowService {
       }
       const isVerified = await this.contractService.verifyOnChainCreation(
         dto.txHash,
-        onChainId,
+        dto.onChainId,
         dto.buyer,
         dto.seller,
         dto.amount,
@@ -105,6 +103,8 @@ export class EscrowService {
       description: dto.description.trim(),
       fixedFee: Number((dto.fixedFee ?? 0).toFixed(8)),
       state: 'pending',
+      onChainId: dto.onChainId ?? null,
+      txHash: dto.txHash ?? null,
       createdAt: now,
       updatedAt: now,
     };
@@ -196,9 +196,7 @@ export class EscrowService {
     dto: EscrowActionDto,
     eventName: 'EscrowLocked' | 'EscrowReleased' | 'EscrowRefunded',
   ) {
-    const onChainMatch = escrow.description.match(/^\[OnChainId:\s*(\d+)\]/);
-    if (onChainMatch) {
-      const onChainId = parseInt(onChainMatch[1], 10);
+    if (escrow.onChainId !== null && escrow.onChainId !== undefined) {
       if (!dto.txHash) {
         throw new BadRequestException(
           'txHash is required to transition live/on-chain escrows',
@@ -207,7 +205,7 @@ export class EscrowService {
       const isVerified = await this.contractService.verifyOnChainTransition(
         dto.txHash,
         eventName,
-        onChainId,
+        escrow.onChainId,
         dto.actor,
       );
       if (!isVerified) {

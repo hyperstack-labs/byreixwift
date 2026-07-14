@@ -30,6 +30,8 @@ interface EscrowRecord {
   description?: string;
   tokenSymbol?: string;
   createdAt?: string;
+  onChainId?: number | null;
+  txHash?: string | null;
 }
 
 /** Placeholder SDA/USD rate, replace with a live price feed when available */

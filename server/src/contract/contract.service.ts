@@ -22,11 +22,17 @@ export class ContractService {
     const rpc = this.configService.get<string>('RPC_URL');
     const contractAddress = this.configService.get<string>('CONTRACT_ADDRESS');
 
+    const isProd = process.env.NODE_ENV === 'production';
     if (
       !rpc ||
       !contractAddress ||
       contractAddress === '0x0000000000000000000000000000000000000000'
     ) {
+      if (isProd) {
+        throw new Error(
+          'RPC_URL and CONTRACT_ADDRESS are required in production.',
+        );
+      }
       this.logger.warn(
         'RPC_URL or CONTRACT_ADDRESS is missing/placeholder. Blockchain integration will run in mock mode.',
       );
@@ -64,6 +70,9 @@ export class ContractService {
       !this.client ||
       this.address === '0x0000000000000000000000000000000000000000'
     ) {
+      if (process.env.NODE_ENV === 'production') {
+        throw new Error('Blockchain client not initialized in production.');
+      }
       this.logger.warn(
         'getNextTransactionId: Client not initialized or zero address. Returning fallback/mock value.',
       );
@@ -93,6 +102,9 @@ export class ContractService {
       !this.client ||
       this.address === '0x0000000000000000000000000000000000000000'
     ) {
+      if (process.env.NODE_ENV === 'production') {
+        throw new Error('Blockchain client not initialized in production.');
+      }
       this.logger.warn(
         'getEscrow: Client not initialized or zero address. Returning mock escrow details.',
       );
@@ -152,6 +164,9 @@ export class ContractService {
       !this.client ||
       this.address === '0x0000000000000000000000000000000000000000'
     ) {
+      if (process.env.NODE_ENV === 'production') {
+        throw new Error('Blockchain client not initialized in production.');
+      }
       this.logger.warn(
         'verifyOnChainCreation: Running in mock mode. Automatically verifying creation.',
       );
@@ -220,6 +235,9 @@ export class ContractService {
       !this.client ||
       this.address === '0x0000000000000000000000000000000000000000'
     ) {
+      if (process.env.NODE_ENV === 'production') {
+        throw new Error('Blockchain client not initialized in production.');
+      }
       this.logger.warn(
         `verifyOnChainTransition(${eventName}): Running in mock mode. Automatically verifying transition.`,
       );

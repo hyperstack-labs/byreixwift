@@ -15,6 +15,13 @@
       "when": 1784034685411,
       "tag": "0001_messy_white_queen",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1784043193605,
+      "tag": "0002_bright_sphinx",
+      "breakpoints": true
     }
   ]
 }

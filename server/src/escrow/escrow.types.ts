@@ -23,6 +23,8 @@ export interface EscrowRecord {
   description: string;
   fixedFee: number;
   state: EscrowState;
+  onChainId?: number | null;
+  txHash?: string | null;
   createdAt: string;
   updatedAt: string;
 }

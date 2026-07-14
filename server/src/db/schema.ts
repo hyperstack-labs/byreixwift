@@ -5,6 +5,7 @@ import {
   uuid,
   boolean,
   numeric,
+  integer,
 } from 'drizzle-orm/pg-core';
 
 export const users = pgTable('users', {
@@ -43,6 +44,10 @@ export const escrows = pgTable('escrows', {
   fixedFee: numeric('fixed_fee', { precision: 20, scale: 8 }).notNull(),
 
   state: text('state').notNull().default('pending'),
+
+  onChainId: integer('on_chain_id'),
+
+  txHash: text('tx_hash'),
 
   createdAt: timestamp('created_at').defaultNow().notNull(),
 

@@ -92,8 +92,10 @@ export function EscrowPage() {
       return;
     }
 
-    const match = selectedEscrow.description.match(/^\[OnChainId:\s*(\d+)\]/);
-    const onChainId = match ? match[1] : "0";
+    const onChainId =
+      selectedEscrow.onChainId !== undefined && selectedEscrow.onChainId !== null
+        ? selectedEscrow.onChainId.toString()
+        : (selectedEscrow.description.match(/^\[OnChainId:\s*(\d+)\]/)?.[1] ?? "0");
 
     getContractEscrow(onChainId).then(setContractEscrow).catch(console.error);
   }, [mode, selectedEscrow]);
@@ -178,17 +180,15 @@ export function EscrowPage() {
 
         toast.success(`Transaction confirmed on-chain! ID: ${onChainTxId}`);
 
-        // Prefix description to persist the onChainTxId in the PostgreSQL database without changing schema
-        const prefixedDescription = `[OnChainId: ${onChainTxId}] ${formData.description}`;
-
         const payload = {
           buyer: connectedAddress.toLowerCase(),
           seller: formData.seller.toLowerCase(),
           amount: Number(formData.amount),
           tokenSymbol: formData.token,
-          description: prefixedDescription,
+          description: formData.description,
           fixedFee: Number(formData.fixedFee || "0"),
           txHash: hash,
+          onChainId: Number(onChainTxId),
         };
 
         const result = await createEscrow.mutateAsync(payload);
@@ -246,8 +246,13 @@ export function EscrowPage() {
 
       setIsPendingOnChain(true);
       try {
-        const match = selectedEscrow.description.match(/^\[OnChainId:\s*(\d+)\]/);
-        const onChainId = match ? BigInt(match[1]) : BigInt(0);
+        const rawOnChainId =
+          selectedEscrow.onChainId !== undefined && selectedEscrow.onChainId !== null
+            ? selectedEscrow.onChainId
+            : selectedEscrow.description.match(/^\[OnChainId:\s*(\d+)\]/)?.[1]
+              ? parseInt(selectedEscrow.description.match(/^\[OnChainId:\s*(\d+)\]/)![1], 10)
+              : 0;
+        const onChainId = BigInt(rawOnChainId);
 
         // Call the write contract method
         const hash = await writeContractAsync({

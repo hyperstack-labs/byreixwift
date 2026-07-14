@@ -75,8 +75,11 @@ export class KycService {
   async getAuthorizeUrl(
     userId: string,
   ): Promise<{ url: string; state: string }> {
+    const isProd = process.env.NODE_ENV === 'production';
     const bypass =
-      this.configService.get<string>('KYC_BYPASS') === 'true' || !this.clientId;
+      !isProd &&
+      (this.configService.get<string>('KYC_BYPASS') === 'true' ||
+        !this.clientId);
 
     if (bypass) {
       // Direct mock update to database for development/testing

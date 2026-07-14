@@ -42,6 +42,14 @@ export class CreateEscrowDto {
   @IsOptional()
   @IsString()
   txHash?: string;
+
+  /**
+   * The sequential ID of the escrow recorded on-chain.
+   * Required when registering live/on-chain escrows to verify parameters.
+   */
+  @IsOptional()
+  @IsNumber()
+  onChainId?: number;
 }
 
 export class EscrowActionDto {

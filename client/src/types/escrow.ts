@@ -9,6 +9,8 @@ export interface EscrowRecord {
   description: string;
   fixedFee: number;
   state: EscrowState;
+  onChainId?: number | null;
+  txHash?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -35,6 +37,7 @@ export interface CreateEscrowPayload {
   description: string;
   fixedFee?: number;
   txHash?: string;
+  onChainId?: number;
 }
 
 export interface EscrowActionPayload {
