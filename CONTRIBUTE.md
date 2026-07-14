@@ -1,47 +1,35 @@
-# Contributing to Byreixwift Frontend
+# Contribution Guidelines Cheat Sheet
 
-Thank you for contributing! Please follow these guidelines.
+This document outlines the standard workflow and naming conventions.
+For detailed contribution rules, read the [Contribution Guidelines](./docs/CONTRIBUTING.md).
 
----
+## Branch Naming Conventions
 
-## Branch Naming
+Prefix your branch names using one of the following schemas:
 
-- feature/short-description → Example: `feature/login-page`
-- fix/short-description → Example: `fix/navbar-bug`
-- hotfix/short-description → Example: `hotfix/login-crash`
-- docs/short-description → Example: `docs/update-readme`
+- `feature/<short-description>` (e.g., `feature/wallet-connect`)
+- `fix/<short-description>` (e.g., `fix/navbar-alignment`)
+- `hotfix/<short-description>` (e.g., `hotfix/login-crash`)
+- `docs/<short-description>` (e.g., `docs/update-readme`)
 
----
+## Commit Message Conventions
 
-## Commit Style
+Format commit messages using the following structure:
+`<type>: <description>`
 
-Format: `type: short description`
+Use one of the following commit types:
 
-Types:
-- `features:` for new features
-- `fix:` for bug fixes
-- `docs:` for documentation
-- `refactor:` for code changes
-- `awtup:` for setup/config
+- `feature`: Implementation of a new feature.
+- `fix`: Resolution of a bug or regression.
+- `docs`: Documentation edits.
+- `refactor`: Structural changes that do not alter code behavior.
 
-Examples:
-- `feature: add wallet connect button`
-- `fix: resolve header alignment issue`
-- `docs: add contribution guidelines`
-
----
+Example:
+`feature: add transaction status listener`
 
 ## Pull Request Rules
 
-- Never push directly to `main`
-- Always PR to `dev` branch
-- Small, focused PRs
-- Delete branch after merge
-
----
-
-## Notes
-
-- Do not commit secrets
-- Follow project structure and standards
-- Test before submitting
+- Do not commit secrets or private keys to the repository.
+- Do not push commits directly to the `main` branch.
+- Target all Pull Requests to the `dev` branch.
+- Verify changes locally before submitting a Pull Request.

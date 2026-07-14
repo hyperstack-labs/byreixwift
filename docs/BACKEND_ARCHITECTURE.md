@@ -1,12 +1,10 @@
-# Backend Architecture & Database Source of Truth
+# Backend Architecture
 
-This document serves as the 'Source of Truth' for the backend architecture.
+This document describes the system topology, database design patterns, and the escrow state machine.
 
----
+## 1. System Topology
 
-## 1. System Topology Overview
-
-The backend handles the communication between the client, PostgreSQL as database layer, and the blockchain network.
+The backend application bridges the frontend client, the PostgreSQL database, and the Sidrachain network:
 
 ```mermaid
 %%{init: {'theme': 'dark'}}%%
@@ -17,35 +15,37 @@ graph TD
    Worker[Event Listener / Indexer] -->|Polls / Listens| Blockchain
    Worker -->|Writes Events| DB
 ```
-## 2. Database Schema and Entity Relationships
 
-The data layer is managed using Drizzle ORM connected to PostgreSQL. All primary identifiers are randomly generated UUIDs.
-   
-   **NOTE**: relationships between escrows and users are tracked via the public cryptographic wallet string/address instead of the randomly generated internal database uuid. This allows direct, seamless  off-chain verficiation of on-chain entities without looking up surrogate IDs.
+## 2. Database Schema Guidelines
 
-### ERD 
-![Alt Text](./ERD.png)
+The database layer follows these implementation patterns:
 
-## 3. The Escrow State Machine
-Escrow business logic depends strictly on state updates. The state field in both escrows and escrow_events tables must adhere to the following transition constraints: 
+- **ORM**: Configure and execute all queries using Drizzle ORM.
+- **Primary Keys**: Generate random UUIDs for all table primary identifiers.
+- **Foreign Keys & Verification**:
+  - Relate user profiles to escrows using public cryptographic wallet addresses instead of database UUIDs.
+  - This pattern allows off-chain services to verify transactions without mapping surrogate identifiers.
+- **Database Column Naming**: Use `snake_case` naming conventions for database tables and columns.
+- **Application Naming**: Map database attributes to `camelCase` identifiers in the NestJS application layer via the Drizzle configuration.
+
+## 3. Escrow State Machine Transitions
+
+Update escrow and event records only according to the following state constraints:
+
 ```mermaid
 stateDiagram-v2
    [*] --> pending
 
-   pending --> locked : Smart contract event listener confirms<br/>on-chain deposit, initiate lock of funds
+   pending --> locked : Confirm smart contract deposit
    
-   locked --> released : Buyer confirms delivery.<br/>Smart contract releases funds to seller
-   released --> refunded : funds transfer to the buyer
+   locked --> released : Buyer confirms delivery (funds transfer to seller)
+   released --> refunded : Return funds to buyer
 
-   released --> not_funded : unsuccessful funding.<br/> Smart contract returns fund to buyer
-
-   not_funded --> disputed : Dispute raised over failure to fund the escrow within the agreed timeframe.
-   not_funded --> resolved : Both parties acknowledge the funding failure and mutually cancel.
+   released --> not_funded : Mark unsuccessful funding
+   not_funded --> disputed : Raise dispute over funding timeout
+   not_funded --> resolved : Acknowledge mutual cancellation
 
    disputed --> [*]
    resolved --> [*]
    refunded --> [*]
 ```
-
-## 4. Database Naming
-All future database column and attributes definition should follow the snake_case convention(user_id, escrow_events, created_at). On the other hand, CamelCase is handled inside the application layer via Drizzle ORM config properties.

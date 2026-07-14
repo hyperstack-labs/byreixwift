@@ -1,141 +1,105 @@
 # Sidra Data Integration Guide
 
-This document describes the assumptions made during the token and trend
-architecture refactor, and provides a step-by-step guide for wiring in
-official Sidra API data when it becomes available.
+This document describes how to integrate official Sidra API endpoints and configure data providers.
 
----
+## Architecture
 
-## Architecture Overview
+The client separates page displays from data fetch providers:
 
 ```
-Page / Display Component
-        │  (reads only from hooks)
-        ▼
-   React Query Hook          useSidraTokens · useTrendData
-        │  (calls factory)
-        ▼
-  DataProviderFactory        providers/data/DataProviderFactory.ts
-        │  (returns one of)
-        ├──► MockTokenDataProvider     providers/data/mock/
-        ├──► MockTrendDataProvider     providers/data/mock/
-        ├──► SidraTokenDataProvider    providers/data/sidra/   ← stub, ready to fill
-        └──► SidraTrendDataProvider    providers/data/sidra/   ← stub, ready to fill
+Page / Component
+       │ (Read data only from custom React Query hooks)
+       ▼
+React Query Hooks      (useSidraTokens, useTrendData)
+       │ (Request data from factory)
+       ▼
+DataProviderFactory    (providers/data/DataProviderFactory.ts)
+       │ (Return active provider configuration)
+       ├──► MockTokenDataProvider
+       ├──► MockTrendDataProvider
+       ├──► SidraTokenDataProvider (Real API integration stub)
+       └──► SidraTrendDataProvider (Real API integration stub)
 ```
 
-**Rule:** Page and display components import hooks only. They never import
-providers, service files, or mock data directly. This is enforced by the
-layer boundaries above.
+**Rule**: Do not import data providers or mock data classes directly into UI components. Use the React Query hooks.
 
----
+## Configure the Active Data Provider
 
-## How to Swap Mock → Real Sidra Data
+Select the active provider using one of the following methods:
 
-### Option A — Environment variable (recommended)
+### Option 1: Set Environment Variables (Recommended)
 
-```bash
-# .env.local
+Configure the following variables in your local `.env.local` file:
+
+```env
 NEXT_PUBLIC_USE_MOCK=false
 NEXT_PUBLIC_SIDRA_API_URL=http://localhost:3001/api/
 ```
 
-No code changes required. `DataProviderFactory` reads the flag at module
-load time and returns `SidraTokenDataProvider` / `SidraTrendDataProvider`.
+### Option 2: Modify the Code Configuration Toggle
 
-### Option B — Code toggle
+Change the flag value inside `providers/data/DataProviderFactory.ts`:
 
 ```ts
-// providers/data/DataProviderFactory.ts
-export const USE_MOCK: boolean = false; // flip this line
+export const USE_MOCK: boolean = false;
 ```
 
----
+## Data Requirements and Endpoints
 
-## Assumptions
+### Token Metrics Data
 
-### Token Data
+- **Primary Token**: `SDA` (Sidra Coin).
+- **Price Denomination**: US Dollars (`USD`).
+- **Endpoints**:
+  - List: `GET /token/list`
+  - Metrics: `GET /token/metrics?symbol=SDA`
+- **Authentication**: Include the `X-Sidra-Key` header on requests.
+- **Cache Lifecycle**: Configure a 5-minute cache lifespan (`staleTime` in `hooks/useSidraTokens.ts`).
 
-| Assumption | Rationale | Where to change if wrong |
-|---|---|---|
-| Primary token is `SDA` (Sidra Coin) | Based on Sidra ecosystem naming | `MockTokenDataProvider.ts` → `MOCK_TOKENS` |
-| `priceUsd` is denominated in US dollars | Standard convention; Sidra may use SAR | Add `priceFiat` field to `SidraTokenMetric` type |
-| Token list endpoint: `GET /token/list` | Conventional REST naming | `SidraTokenDataProvider.getTokenList()` |
-| Token metrics endpoint: `GET /token/metrics?symbol=SDA` | Conventional REST naming | `SidraTokenDataProvider.getTokenMetrics()` |
-| Response schema matches `SidraTokenMetric` interface | To be confirmed | Add a `mapResponse()` in `SidraTokenDataProvider` if field names differ |
-| Auth uses `X-Sidra-Key` header | Common API-key pattern; TBD | `SidraTokenDataProvider.ts` → `sidraFetch()` headers |
-| Cache TTL: 5 minutes for token list | Reasonable for near-real-time pricing | `hooks/useSidraTokens.ts` → `staleTime` |
+### Trend and Historical Price Data
 
-### Trend / Historical Price Data
+- **Endpoint**: `GET /token/history?symbol=SDA&range=7D`
+- **Response Format**: `Array<{ timestamp: string; priceUsd: number }>`
+- **Supported Ranges**: `1H`, `24H`, `7D`, `30D`, `1Y`
+- **Time Format**: ISO 8601 UTC string.
+- **Cache Lifecycle**: Configure a 2-minute limit for short ranges (1H, 24H) and 60 minutes for long ranges (30D, 1Y).
 
-| Assumption | Rationale | Where to change if wrong |
-|---|---|---|
-| History endpoint: `GET /token/history?symbol=SDA&range=7D` | Conventional REST naming | `SidraTrendDataProvider.getTrendData()` |
-| Response shape: `Array<{ timestamp: string; priceUsd: number }>` | Standard OHLCV-lite format | `SidraTrendDataProvider.ts` → `SidraHistoryPoint` interface |
-| Supported ranges: `1H · 24H · 7D · 30D · 1Y` | Typical exchange convention | `SidraTrendDataProvider.SIDRA_SUPPORTED_RANGES` |
-| `timestamp` is ISO 8601 UTC | Universal standard | `SidraTrendDataProvider.formatLabel()` |
-| Mock chart data is symbol-agnostic | Simplicity; real API will differentiate | `MockTrendDataProvider.getTrendData()` — `_symbol` param is ignored |
-| Cache TTL: 2 min for 1H/24H, 60 min for 30D/1Y | Tighter refresh for short windows | `SidraTrendDataProvider.getTrendData()` → `next: { revalidate }` |
+### Dashboard and Balance Data
 
-### Dashboard / Wallet Data
+- **Wallet Balance**: Fetch balance metrics directly from the blockchain RPC.
+- **Transactions**: Read transaction history entries from the backend database.
+- **Circulating Supply**: Fall back to a default value of `100 Billion SDA`.
+- **All Time High**: Fall back to a default value of `$3.45`.
 
-| Assumption | Rationale | Where to change if wrong |
-|---|---|---|
-| `WalletDashboard` token balances are hardcoded | Wallet balance requires on-chain read; out of scope for this refactor | Create `IWalletDataProvider` + `useWalletBalances()` hook when ready |
-| Transaction history is hardcoded | Requires a backend ledger (PostgreSQL, planned) | Create `ITransactionProvider` + `useTransactions()` hook when ready |
-| Circulating supply is hardcoded (`100 Billion SDA`) | Not in current Sidra API scope | Add `circulatingSupply` to `SidraTokenMetric` and surface in `SidraTokenDataProvider` |
-| All Time High is hardcoded (`$3.45`) | Not in current Sidra API scope | Add `ath` to `SidraTokenMetric` and surface in `SidraTokenDataProvider` |
+## Add a New Data Domain
 
----
+Implement new data categories by executing the following steps:
 
+1. Define the provider interface (e.g., `providers/data/IWalletDataProvider.ts`).
+2. Write a mock implementation (e.g., `providers/data/mock/MockWalletDataProvider.ts`).
+3. Write a production implementation stub (e.g., `providers/data/sidra/SidraWalletDataProvider.ts`).
+4. Register the new provider inside `DataProviderFactory.ts`.
+5. Create a React Query hook (e.g., `hooks/useWalletBalances.ts`) that requests the provider from the factory.
+6. Import and execute the custom hook inside your UI components.
 
-## Adding a New Data Domain
-
-Follow this pattern to extend the architecture (e.g. wallet balances, transactions):
-
-```
-1. Define the contract
-   providers/data/IWalletDataProvider.ts
-
-2. Write mock implementation
-   providers/data/mock/MockWalletDataProvider.ts
-
-3. Write real implementation stub
-   providers/data/sidra/SidraWalletDataProvider.ts
-
-4. Register in the factory
-   providers/data/DataProviderFactory.ts → add getWalletProvider()
-
-5. Create a hook
-   hooks/useWalletBalances.ts → calls DataProviderFactory.getWalletProvider()
-
-6. Consume in pages
-   components/pages/WalletDashboard.tsx → import { useWalletBalances }
-```
-
-No page component should be modified for steps 1–4.
-
----
-
-## File Map
+## Directory Layout
 
 ```
 client/src/
 ├── providers/
 │   └── data/
-│       ├── ITokenDataProvider.ts          Interface: token list & metrics
-│       ├── ITrendDataProvider.ts          Interface: historical price data
-│       ├── DataProviderFactory.ts         Singleton factory, env-controlled
+│       ├── ITokenDataProvider.ts          # Token list and metrics interface
+│       ├── ITrendDataProvider.ts          # Historical price interface
+│       ├── DataProviderFactory.ts         # Factory class resolver
 │       ├── mock/
-│       │   ├── MockTokenDataProvider.ts   Dev/test mock — only file with hardcoded tokens
-│       │   └── MockTrendDataProvider.ts   Dev/test mock — only file with hardcoded chart data
+│       │   ├── MockTokenDataProvider.ts   # Mock token metrics
+│       │   └── MockTrendDataProvider.ts   # Mock historical chart points
 │       └── sidra/
-│           ├── SidraTokenDataProvider.ts  Production stub — fill when API is live
-│           └── SidraTrendDataProvider.ts  Production stub — fill when API is live
+│           ├── SidraTokenDataProvider.ts  # API implementation stub
+│           └── SidraTrendDataProvider.ts  # API implementation stub
 ├── hooks/
-│   ├── useSidraTokens.ts                  Token list + single-token metrics
-│   └── useTrendData.ts                    Historical chart data + supported ranges
-├── services/
-│   └── tokenMetrics.ts                    @deprecated shim — safe to delete after migration
+│   ├── useSidraTokens.ts                  # Token metrics query hook
+│   └── useTrendData.ts                    # Trend metrics query hook
 └── types/
-    └── sidra.ts                           SidraTokenMetric — add fields here as API expands
+    └── sidra.ts                           # Shared type declarations
 ```

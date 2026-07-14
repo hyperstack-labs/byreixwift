@@ -1,55 +1,25 @@
-# Byreixwift
+# Project Scope
 
-## What Is This
+Byreixwift is a fixed-fee escrow application designed for Sidrachain.
 
-A clean, escrow-first web app for fixed-fee transactions on Sidrachain. The current product direction is a modern JS/TS stack with Next.js on the frontend, a Node/NestJS API, and a Solidity escrow contract.
+## Minimum Viable Product Scope
 
-## Target Users
+### Included Features
 
-- Buyers and sellers who need a simple escrow flow for Sidrachain transactions
-- Web3 users who want clear transaction states without extra platform complexity
-- Future HyperStack ecosystem users who need a safer payment and release flow
+- Landing page containing a project overview.
+- Wallet connection interface supporting Sidrachain-compatible wallets.
+- Escrow creation interface tracking transaction amounts, fixed fees, and buyer/seller metadata.
+- Escrow status tracker supporting the following states: `Pending`, `Locked`, `Released`, and `Refunded`.
+- Mock API implementation mirroring the smart contract lifecycle for frontend development.
+- Solidity smart contract implementing deposit, lock, release, and refund operations.
 
-## Design Direction
+### Out of Scope
 
-- Dark theme with green accent
-- Clean and clutter-free
-- Professional look
-- Mobile-friendly
+The following features are deferred to future releases:
 
----
-
-## MVP (Minimum Viable Product)
-
-### Included
-
-- [ ] Landing page with project overview
-- [ ] Wallet connection flow for Sidrachain-compatible wallets
-- [ ] Escrow creation flow with amount, fee, buyer, and seller metadata
-- [ ] Escrow lifecycle states: pending, locked, released, refunded
-- [ ] Mock API flow that mirrors the contract lifecycle for frontend testing
-- [ ] Smart escrow contract v0 with deposit, lock, release, and refund
-- [ ] Responsive design (works on mobile)
-
-### Not Included (for later)
-
-- Dispute resolution and arbitration
-- Multi-party or milestone escrow
-- Multi-chain support (ETH, Solana, zkSync - planned but not MVP)
-- Account verification / KYC flow
-- Notifications
-- Full database-backed production ledger and admin tooling
-
----
-
-## Tech Stack
-
-- **Frontend**: Next.js, TypeScript
-- **Styling**: Tailwind CSS (dark green theme)
-- **Backend**: Node.js, NestJS
-- **Database**: PostgreSQL (planned for production persistence)
-- **Contracts**: Solidity, Hardhat
-
-## Reference
-
-UI inspiration based on provided mockups - dark mode, green accents, wallet dashboard style.
+- Dispute resolution and transaction arbitration.
+- Multi-party and milestone-based escrows.
+- Multi-chain support (e.g., Ethereum, Solana, zkSync).
+- KYC and identity verification flows.
+- Notification dispatching services.
+- Administrative dashboards and transaction ledger analysis tools.

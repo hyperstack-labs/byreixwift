@@ -1,28 +1,34 @@
-# Technology Stack
+# Technical Stack Specifications
 
-ByReiXwift utilizes a modern, type-safe stack designed for reliability and performance within the Sidra ecosystem.
+## Frontend Architecture (`/client`)
 
-## Frontend Architecture
+The frontend application uses the following libraries:
 
-The user interface is built for speed and responsiveness, ensuring a professional experience across all devices.
+- **Framework**: Next.js (App Router) for routing and server-rendered components.
+- **Language**: TypeScript for static type checking.
+- **Styling**: Tailwind CSS for component interface styling.
+- **State Management**: Zustand for global client-side state.
+- **Data Queries**: React Query for backend request caching.
+- **Blockchain Interface**: Wagmi and Viem for RPC client interactions.
 
-- **Next.js**: React framework providing optimized routing and server-side capabilities.
-- **TypeScript**: Ensuring type safety and reducing runtime errors during development.
-- **Tailwind CSS**: Utility-first styling used to implement the current visual system.
-- **useSdaBalance**: Custom React hook that fetches and subscribes to the connected wallet's SDA token balance.
+## Backend Infrastructure (`/server`)
 
-## Backend and Data
+The server application uses the following framework elements:
 
-The infrastructure is designed for scalability and secure data management.
+- **Framework**: NestJS for server-side modular architecture.
+- **Runtime**: Node.js.
+- **ORM**: Drizzle ORM managing SQL queries and migrations.
+- **Database**: PostgreSQL database.
+- **Blockchain Integration**: `ContractService` utilizing Viem clients to poll contract events.
 
-- **Node.js**: Primary runtime for the API layer and escrow lifecycle services.
-- **NestJS**: Structured TypeScript framework for building the backend cleanly as the product grows.
-- **PostgreSQL**: Live system of record for escrow transactions, auth data, and audit-friendly state history.
-- **Solidity + Hardhat**: Contract development and testing for the escrow settlement layer.
-- **ContractService**: NestJS injectable service that encapsulates all smart contract interactions.
+## Smart Contracts (`/contracts`)
 
-## Development Tools
+The contract development suite uses the following tools:
 
-- **pnpm**: Fast, disk space efficient package manager.
-- **ESLint**: Code linting to maintain high internal standards.
-- **Git**: Collaborative version control following strict branch strategies.
+- **Language**: Solidity (version `^0.8.20`) for smart contract source code.
+- **Framework**: Hardhat for local compilation, testing, and deployment scripts.
+
+## Auxiliary Development Tools
+
+- **Package Manager**: pnpm for dependency management.
+- **Linting & Formatting**: ESLint and Prettier for code consistency.
