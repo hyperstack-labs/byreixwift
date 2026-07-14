@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import {
   createPublicClient,
   http,
@@ -16,9 +17,9 @@ export class ContractService {
    * Initializes the blockchain client if environment variables are provided.
    * If missing, defaults to mock mode to prevent NestJS eagerly crashing on startup.
    */
-  constructor() {
-    const rpc = process.env.RPC_URL;
-    const contractAddress = process.env.CONTRACT_ADDRESS;
+  constructor(private readonly configService: ConfigService) {
+    const rpc = this.configService.get<string>('RPC_URL');
+    const contractAddress = this.configService.get<string>('CONTRACT_ADDRESS');
 
     if (
       !rpc ||

@@ -64,3 +64,12 @@ export const escrowEvents = pgTable('escrow_events', {
 
   metadata: text('metadata'), // optional JSON/string log
 });
+
+export const kycStates = pgTable('kyc_states', {
+  state: text('state').primaryKey(),
+  codeVerifier: text('code_verifier').notNull(),
+  userId: uuid('user_id')
+    .references(() => users.id, { onDelete: 'cascade' })
+    .notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});

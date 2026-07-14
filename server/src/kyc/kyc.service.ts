@@ -3,31 +3,39 @@ import {
   UnauthorizedException,
   ServiceUnavailableException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { db } from '../db';
-import { users } from '../db/schema';
+import { users, kycStates } from '../db/schema';
 import { eq } from 'drizzle-orm';
 
 @Injectable()
 export class KycService {
-  private readonly clientId = process.env.KYCPORT_CLIENT_ID || '';
-  private readonly clientSecret = process.env.KYCPORT_CLIENT_SECRET || '';
-  private readonly redirectUri =
-    process.env.KYCPORT_REDIRECT_URI ||
-    'http://localhost:3001/api/kyc/callback';
-  private readonly webhookSecret = process.env.KYCPORT_WEBHOOK_SECRET || '';
-  private readonly issuer =
-    process.env.KYCPORT_ISSUER || 'https://www.kycport.com';
-  private readonly oidcConfigUrl = this.issuer
-    ? `${this.issuer}/api/oidc/.well-known/openid-configuration`
-    : '';
+  private readonly clientId: string;
+  private readonly clientSecret: string;
+  private readonly redirectUri: string;
+  private readonly webhookSecret: string;
+  private readonly issuer: string;
+  private readonly oidcConfigUrl: string;
 
   private oidcConfig: Record<string, any> | null = null;
   private jwks: Record<string, any> | null = null;
 
-  private readonly stateStore = new Map<
-    string,
-    { codeVerifier: string; userId: string }
-  >();
+  constructor(private readonly configService: ConfigService) {
+    this.clientId = this.configService.get<string>('KYCPORT_CLIENT_ID') || '';
+    this.clientSecret =
+      this.configService.get<string>('KYCPORT_CLIENT_SECRET') || '';
+    this.redirectUri =
+      this.configService.get<string>('KYCPORT_REDIRECT_URI') ||
+      'http://localhost:3001/api/kyc/callback';
+    this.webhookSecret =
+      this.configService.get<string>('KYCPORT_WEBHOOK_SECRET') || '';
+    this.issuer =
+      this.configService.get<string>('KYCPORT_ISSUER') ||
+      'https://www.kycport.com';
+    this.oidcConfigUrl = this.issuer
+      ? `${this.issuer}/api/oidc/.well-known/openid-configuration`
+      : '';
+  }
 
   private assertConfigured(): void {
     if (!this.clientId) {
@@ -72,7 +80,11 @@ export class KycService {
     const codeVerifier = this.generateCodeVerifier();
     const codeChallenge = await this.generateCodeChallenge(codeVerifier);
 
-    this.stateStore.set(state, { codeVerifier, userId });
+    await db.insert(kycStates).values({
+      state,
+      codeVerifier,
+      userId,
+    });
 
     const params = new URLSearchParams({
       response_type: 'code',
@@ -95,11 +107,14 @@ export class KycService {
     code: string,
     state: string,
   ): Promise<{ kycStatus: string; kycTier: string | null }> {
-    const stored = this.stateStore.get(state);
+    const [stored] = await db
+      .select()
+      .from(kycStates)
+      .where(eq(kycStates.state, state));
     if (!stored) {
       throw new UnauthorizedException('Invalid or expired state');
     }
-    this.stateStore.delete(state);
+    await db.delete(kycStates).where(eq(kycStates.state, state));
 
     const config = await this.getOidcConfig();
     const tokenBody = new URLSearchParams({

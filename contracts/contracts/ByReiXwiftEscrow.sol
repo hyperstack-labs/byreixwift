@@ -2,13 +2,14 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * @title ByReiXwiftEscrow
  * @dev Minimal escrow lifecycle with fixed-fee execution and no time-based charges.
  * The contract keeps the first version intentionally small: deposit, lock, release, refund.
  */
-contract ByReiXwiftEscrow is ReentrancyGuard {
+contract ByReiXwiftEscrow is ReentrancyGuard, Ownable {
     enum EscrowState { Pending, Locked, Released, Refunded }
 
     struct EscrowTransaction {
@@ -26,8 +27,8 @@ contract ByReiXwiftEscrow is ReentrancyGuard {
 
     mapping(uint256 => EscrowTransaction) public transactions;
     uint256 public nextTransactionId;
-    address public immutable feeCollector;
-    uint256 public immutable fixedFee;
+    address public feeCollector;
+    uint256 public fixedFee;
 
     event EscrowCreated(
         uint256 indexed txId,
@@ -40,11 +41,24 @@ contract ByReiXwiftEscrow is ReentrancyGuard {
     event EscrowLocked(uint256 indexed txId, address indexed actor);
     event EscrowReleased(uint256 indexed txId, address indexed actor, uint256 sellerAmount, uint256 feeAmount);
     event EscrowRefunded(uint256 indexed txId, address indexed actor, uint256 refundedAmount);
+    event FeeCollectorUpdated(address indexed oldCollector, address indexed newCollector);
+    event FixedFeeUpdated(uint256 oldFee, uint256 newFee);
 
-    constructor(address _feeCollector, uint256 _fixedFee) {
+    constructor(address _feeCollector, uint256 _fixedFee) Ownable(msg.sender) {
         require(_feeCollector != address(0), "Fee collector is required");
         feeCollector = _feeCollector;
         fixedFee = _fixedFee;
+    }
+
+    function setFeeCollector(address _newFeeCollector) external onlyOwner {
+        require(_newFeeCollector != address(0), "Invalid collector address");
+        emit FeeCollectorUpdated(feeCollector, _newFeeCollector);
+        feeCollector = _newFeeCollector;
+    }
+
+    function setFixedFee(uint256 _newFixedFee) external onlyOwner {
+        emit FixedFeeUpdated(fixedFee, _newFixedFee);
+        fixedFee = _newFixedFee;
     }
 
     modifier escrowExists(uint256 _txId) {

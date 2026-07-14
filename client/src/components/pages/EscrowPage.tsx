@@ -5,29 +5,7 @@ import { useAccount, useWriteContract, usePublicClient } from "wagmi";
 import { parseEther, parseEventLogs, keccak256, toHex } from "viem";
 import { getContractEscrow } from "@/lib/contract";
 import { ESCROW_ABI, ESCROW_CONTRACT_ADDRESS } from "@/config/contract";
-import {
-  Card,
-  Button,
-  Input,
-  Label,
-  Textarea,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui";
-import {
-  Loader2,
-  Plus,
-  Inbox,
-  Wallet,
-  ArrowRight,
-  AlertCircle,
-  CheckCircle2,
-  ExternalLink,
-} from "lucide-react";
+import { Card } from "@/components/ui";
 import { toast } from "sonner";
 import {
   useCreateEscrow,
@@ -38,11 +16,10 @@ import {
   useRefundEscrow,
 } from "@/hooks";
 import { EscrowRecord } from "@/types/escrow";
-import {
-  EscrowTransactionModal,
-  EscrowStatusBadge,
-  STATE_CONFIG,
-} from "@/components/EscrowTransactionModal";
+import { EscrowTransactionModal } from "@/components/EscrowTransactionModal";
+import { CreateEscrowDialog } from "@/components/escrow/CreateEscrowDialog";
+import { EscrowCard } from "@/components/escrow/EscrowCard";
+import { EscrowEmptyState } from "@/components/escrow/EscrowEmptyState";
 
 const isValidAddress = (a: string) => /^0x[0-9a-fA-F]{40}$/.test(a);
 
@@ -56,7 +33,7 @@ export function EscrowPage() {
   const { writeContractAsync } = useWriteContract();
   const publicClient = usePublicClient();
 
-  const [mode, setMode] = useState<"simulation" | "live">("simulation"); // For toggling between simulation and live modes
+  const [mode, setMode] = useState<"simulation" | "live">("simulation");
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [creationSuccessData, setCreationSuccessData] = useState<EscrowRecord | null>(null);
   const [selectedEscrowId, setSelectedEscrowId] = useState<string | null>(null);
@@ -229,7 +206,7 @@ export function EscrowPage() {
     }
 
     const payload = {
-      buyer: connectedAddress as string, // Buyer is read directly from connectedAddress
+      buyer: connectedAddress as string,
       seller: formData.seller,
       amount: Number(formData.amount),
       tokenSymbol: formData.token,
@@ -240,7 +217,6 @@ export function EscrowPage() {
     try {
       const result = await createEscrow.mutateAsync(payload);
       toast.success("Escrow created successfully");
-      // Read wrapped object based on NestJS controller response payload mapping
       setCreationSuccessData(result?.escrow || (result as unknown as EscrowRecord));
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to create escrow");
@@ -252,7 +228,6 @@ export function EscrowPage() {
     id: string,
     actor: string
   ) => {
-    // Clear any prior error before attempting the transition
     setModalError(null);
 
     if (mode === "live") {
@@ -319,7 +294,6 @@ export function EscrowPage() {
       if (action === "lock") await lockEscrow.mutateAsync({ id, payload: { actor } });
       if (action === "release") await releaseEscrow.mutateAsync({ id, payload: { actor } });
       if (action === "refund") await refundEscrow.mutateAsync({ id, payload: { actor } });
-      // Action Feedback
       toast.success(
         {
           lock: "Escrow locked successfully",
@@ -361,294 +335,36 @@ export function EscrowPage() {
             </div>
           </div>
 
-          <Dialog
+          <CreateEscrowDialog
             open={showCreateDialog}
             onOpenChange={(open) => {
-              // Prevent modal cancellation while network calls are processing
               if (isMutating) return;
               setShowCreateDialog(open);
               if (!open) {
                 setTimeout(resetForm, 300);
               }
             }}
-          >
-            <div className="flex flex-col gap-4 self-start sm:self-center sm:flex-row sm:items-center">
-              {/* Live Mode Toggle */}
-              <div className="flex items-center p-1 rounded-xl bg-neutral-900/90 border border-neutral-800 text-xs font-semibold shadow-inner">
-                <button
-                  type="button"
-                  onClick={() => setMode("simulation")}
-                  className={`px-3 py-1.5 rounded-lg border transition-all duration-200 cursor-pointer ${
-                    mode === "simulation"
-                      ? "bg-neutral-800 text-gray-400 border-neutral-700/50 shadow-md font-bold"
-                      : "bg-transparent text-neutral-500 border-transparent hover:text-neutral-300 font-bold"
-                  }`}
-                >
-                  Simulation
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setMode("live")}
-                  className={`px-3 py-1.5 rounded-lg border transition-all duration-200 cursor-pointer ${
-                    mode === "live"
-                      ? "bg-primary text-primary-foreground border-transparent shadow-lg shadow-primary/20 font-bold"
-                      : "bg-transparent text-neutral-500 border-transparent hover:text-neutral-300 font-bold"
-                  }`}
-                >
-                  Live
-                </button>
-              </div>
-              <div className="w-fit">
-                <DialogTrigger asChild>
-                  <Button
-                    size="sm"
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground cursor-pointer font-bold"
-                  >
-                    <Plus className="w-4 h-4 " />
-                    New
-                  </Button>
-                </DialogTrigger>
-              </div>
-            </div>
-
-            <DialogContent className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%-2rem)] max-w-md bg-card border-border p-0 overflow-hidden flex flex-col max-h-[90vh]">
-              {!creationSuccessData ? (
-                <>
-                  <DialogHeader className="p-6 border-b border-border shrink-0">
-                    <DialogTitle>New Escrow</DialogTitle>
-                    <DialogDescription>
-                      Funds will be held by the smart contract until all parties act.
-                    </DialogDescription>
-                  </DialogHeader>
-
-                  <div className="p-6 space-y-4 overflow-y-auto flex-1">
-                    <div className="space-y-1.5">
-                      <div className="flex justify-between items-center">
-                        <Label htmlFor="buyer" className="text-sm">
-                          Buyer Wallet
-                        </Label>
-                        {formErrors.buyer && (
-                          <span className="text-[10px] text-red-500 flex items-center gap-1 animate-in fade-in slide-in-from-right-1">
-                            <AlertCircle className="w-3 h-3" /> {formErrors.buyer}
-                          </span>
-                        )}
-                      </div>
-                      <Input
-                        id="buyer"
-                        readOnly
-                        value={connectedAddress ?? ""}
-                        placeholder="Connect wallet to auto-fill"
-                        className="bg-muted/40 font-mono text-sm border-border text-muted-foreground cursor-default select-all"
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <div className="flex justify-between items-center">
-                        <Label htmlFor="seller" className="text-sm">
-                          Seller Wallet
-                        </Label>
-                        {formErrors.seller && (
-                          <span className="text-[10px] text-red-500 flex items-center gap-1 animate-in fade-in slide-in-from-right-1">
-                            <AlertCircle className="w-3 h-3" /> {formErrors.seller}
-                          </span>
-                        )}
-                      </div>
-                      <Input
-                        id="seller"
-                        placeholder="0x..."
-                        disabled={isMutating}
-                        value={formData.seller}
-                        onChange={(e) => setFormData({ ...formData, seller: e.target.value })}
-                        className={`bg-background font-mono text-sm transition-colors ${
-                          formErrors.seller
-                            ? "border-red-500 ring-1 ring-red-500/20"
-                            : "border-border"
-                        }`}
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-3">
-                      <div className="space-y-1.5">
-                        <div className="flex justify-between items-center">
-                          <Label htmlFor="amount" className="text-sm">
-                            Amount
-                          </Label>
-                          {formErrors.amount && (
-                            <AlertCircle className="w-3 h-3 text-red-500 animate-pulse" />
-                          )}
-                        </div>
-                        <Input
-                          id="amount"
-                          type="number"
-                          placeholder="0.00"
-                          disabled={isMutating}
-                          value={formData.amount}
-                          onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                          className={`bg-background transition-colors ${
-                            formErrors.amount
-                              ? "border-red-500 ring-1 ring-red-500/20"
-                              : "border-border"
-                          }`}
-                        />
-                      </div>
-                      <div className="space-y-1.5">
-                        <div className="flex justify-between items-center">
-                          <Label htmlFor="fixedFee" className="text-sm">
-                            Fee
-                          </Label>
-                          {formErrors.fixedFee && (
-                            <AlertCircle className="w-3 h-3 text-red-500 animate-pulse" />
-                          )}
-                        </div>
-                        <Input
-                          id="fixedFee"
-                          type="number"
-                          placeholder="0.00"
-                          disabled={isMutating}
-                          value={formData.fixedFee}
-                          onChange={(e) => setFormData({ ...formData, fixedFee: e.target.value })}
-                          className={`bg-background transition-colors ${
-                            formErrors.fixedFee
-                              ? "border-red-500 ring-1 ring-red-500/20"
-                              : "border-border"
-                          }`}
-                        />
-                      </div>
-                      <div className="space-y-1.5">
-                        <div className="flex justify-between items-center">
-                          <Label htmlFor="token" className="text-sm">
-                            Token
-                          </Label>
-                          {formErrors.token && (
-                            <AlertCircle className="w-3 h-3 text-red-500 animate-pulse" />
-                          )}
-                        </div>
-                        <Input
-                          id="token"
-                          disabled={isMutating}
-                          value={formData.token}
-                          onChange={(e) => setFormData({ ...formData, token: e.target.value })}
-                          className={`bg-background transition-colors ${
-                            formErrors.token
-                              ? "border-red-500 ring-1 ring-red-500/20"
-                              : "border-border text-muted-foreground"
-                          }`}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <div className="flex justify-between items-center">
-                        <Label htmlFor="description" className="text-sm">
-                          Description
-                        </Label>
-                        {formErrors.description && (
-                          <span className="text-[10px] text-red-500 flex items-center gap-1 animate-in fade-in slide-in-from-right-1">
-                            <AlertCircle className="w-3 h-3" /> {formErrors.description}
-                          </span>
-                        )}
-                      </div>
-                      <Textarea
-                        id="description"
-                        placeholder="Purpose of transaction"
-                        disabled={isMutating}
-                        value={formData.description}
-                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                        className={`bg-background min-h-20 transition-colors ${
-                          formErrors.description
-                            ? "border-red-500 ring-1 ring-red-500/20"
-                            : "border-border"
-                        }`}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="p-6 border-t border-border bg-card flex gap-2 shrink-0">
-                    <Button
-                      variant="outline"
-                      disabled={isMutating}
-                      onClick={() => {
-                        setShowCreateDialog(false);
-                        setTimeout(resetForm, 300);
-                      }}
-                      className="flex-1 border-border cursor-pointer"
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      onClick={handleCreateEscrow}
-                      disabled={isMutating}
-                      className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground cursor-pointer"
-                    >
-                      {isMutating ? (
-                        <span className="flex items-center justify-center gap-2 whitespace-nowrap animate-in fade-in duration-200">
-                          <Loader2 className="w-4 h-4 animate-spin" /> Initializing...
-                        </span>
-                      ) : (
-                        "Create"
-                      )}
-                    </Button>
-                  </div>
-                </>
-              ) : (
-                <div className="p-8 flex flex-col items-center text-center animate-in zoom-in-95 duration-300">
-                  <div className="w-16 h-16 rounded-full bg-green-500/10 text-green-500 flex items-center justify-center mb-6">
-                    <CheckCircle2 className="w-10 h-10" />
-                  </div>
-                  <DialogTitle className="text-xl">Escrow Initialized</DialogTitle>
-                  <DialogDescription className="mt-2 text-balance">
-                    Escrow{" "}
-                    <span className="font-mono text-foreground">{creationSuccessData.id}</span> has
-                    been successfully created.
-                  </DialogDescription>
-
-                  <div className="w-full mt-8 p-4 rounded-xl border border-border bg-muted/30 space-y-3 text-left">
-                    <div className="flex justify-between text-xs">
-                      <span className="text-muted-foreground">Amount:</span>
-                      <span className="font-bold">
-                        {creationSuccessData.amount} {creationSuccessData.tokenSymbol}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-xs">
-                      <span className="text-muted-foreground">Seller:</span>
-                      <span className="font-mono">
-                        {creationSuccessData.seller
-                          ? `${creationSuccessData.seller.slice(0, 10)}...`
-                          : "0x..."}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="w-full mt-8 flex flex-col gap-2">
-                    <Button
-                      className="w-full bg-primary text-primary-foreground cursor-pointer"
-                      onClick={() => {
-                        const id = creationSuccessData.id;
-                        setShowCreateDialog(false);
-                        setTimeout(() => {
-                          setSelectedEscrowId(id);
-                          resetForm();
-                        }, 100);
-                      }}
-                    >
-                      View Details
-                      <ExternalLink className="w-4 h-4 ml-2" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      className="w-full text-muted-foreground hover:text-foreground cursor-pointer"
-                      onClick={() => {
-                        setShowCreateDialog(false);
-                        setTimeout(resetForm, 300);
-                      }}
-                    >
-                      Close
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </DialogContent>
-          </Dialog>
+            isMutating={isMutating}
+            connectedAddress={connectedAddress}
+            formData={formData}
+            onChangeFormData={setFormData}
+            formErrors={formErrors}
+            onCreate={handleCreateEscrow}
+            creationSuccessData={creationSuccessData}
+            onViewDetails={(id) => {
+              setShowCreateDialog(false);
+              setTimeout(() => {
+                setSelectedEscrowId(id);
+                resetForm();
+              }, 100);
+            }}
+            onClose={() => {
+              setShowCreateDialog(false);
+              setTimeout(resetForm, 300);
+            }}
+            mode={mode}
+            setMode={setMode}
+          />
         </div>
 
         {/* Error State */}
@@ -685,84 +401,20 @@ export function EscrowPage() {
         {/* Dynamic Pipelines Grid */}
         <div className="space-y-3">
           {!isLoading &&
-            escrows.map((escrow) => {
-              // Safe casing translation to prevent lookups from returning undefined configurations
-              const lookupKey = escrow.state?.toUpperCase() as keyof typeof STATE_CONFIG;
-              const cfg = STATE_CONFIG[lookupKey] || { dotClass: "bg-muted" };
-              const cleanedEscrow = cleanEscrowDescription(escrow);
-
-              return (
-                <Card
-                  key={escrow.id}
-                  onClick={() => !isMutating && setSelectedEscrowId(escrow.id)}
-                  className={`p-4 bg-card border-border hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all cursor-pointer group active:scale-[0.98] duration-200 ${
-                    isMutating ? "opacity-60 cursor-not-allowed pointer-events-none" : ""
-                  }`}
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex items-start gap-3 min-w-0 text-left">
-                      <div
-                        className={`w-2.5 h-2.5 rounded-full mt-1.5 shrink-0 shadow-[0_0_8px_rgba(0,0,0,0.1)] ${cfg.dotClass}`}
-                      />
-                      <div className="min-w-0">
-                        <p className="font-semibold truncate group-hover:text-primary transition-all duration-200 group-hover:translate-x-0.5">
-                          {cleanedEscrow.description}
-                        </p>
-                        <div className="flex items-center gap-1.5 mt-1 text-xs text-muted-foreground/70 font-mono">
-                          <Wallet className="w-3 h-3 shrink-0 opacity-60" />
-                          <span>{escrow.buyer ? escrow.buyer.slice(0, 6) : "0x000"}...</span>
-                          <ArrowRight className="w-2.5 h-2.5 opacity-30 shrink-0" />
-                          <span>{escrow.seller ? escrow.seller.slice(0, 6) : "0x000"}...</span>
-                        </div>
-                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground/40 mt-2 font-bold">
-                          {new Date(escrow.createdAt).toLocaleDateString(undefined, {
-                            month: "short",
-                            day: "numeric",
-                          })}{" "}
-                          •{" "}
-                          {new Date(escrow.createdAt).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-end gap-2 shrink-0">
-                      <p className="font-bold text-xs tabular-nums text-right mr-2">
-                        {escrow.amount}{" "}
-                        <span className="text-[10px] text-muted-foreground/60 font-medium">
-                          {escrow.tokenSymbol}
-                        </span>
-                      </p>
-                      <EscrowStatusBadge state={escrow.state} />
-                    </div>
-                  </div>
-                </Card>
-              );
-            })}
+            escrows.map((escrow) => (
+              <EscrowCard
+                key={escrow.id}
+                escrow={escrow}
+                isMutating={isMutating}
+                onSelect={setSelectedEscrowId}
+                cleanEscrowDescription={cleanEscrowDescription}
+              />
+            ))}
         </div>
 
         {/* Empty State */}
         {!isLoading && escrows.length === 0 && (
-          <div className="text-center py-20 border border-dashed border-border rounded-2xl bg-linear-to-b from-card/50 to-transparent animate-in fade-in zoom-in-95 duration-700">
-            <div className="relative inline-block mb-4">
-              <Inbox className="w-12 h-12 mx-auto opacity-10 text-primary" />
-              <div className="absolute inset-0 bg-primary/5 blur-2xl rounded-full" />
-            </div>
-            <h3 className="text-sm font-semibold text-foreground">No active escrows</h3>
-            <p className="text-xs text-muted-foreground mt-2 max-w-50 mx-auto leading-relaxed">
-              Securely hold funds for services or goods until both parties are satisfied.
-            </p>
-            <Button
-              variant="outline"
-              size="sm"
-              className="mt-8 border-border hover:bg-background hover:text-primary transition-colors cursor-pointer"
-              onClick={() => setShowCreateDialog(true)}
-            >
-              <Plus className="w-3.5 h-3.5 mr-2" />
-              Initialize First Escrow
-            </Button>
-          </div>
+          <EscrowEmptyState onInitialize={() => setShowCreateDialog(true)} />
         )}
       </div>
 
@@ -774,12 +426,11 @@ export function EscrowPage() {
           isMutating={isMutating}
           contractEscrow={contractEscrow}
           error={modalError}
-          mode={mode} // Pass the current mode to the modal
+          mode={mode}
           onLock={() => handleTransition("lock", selectedEscrow.id, selectedEscrow.buyer)}
           onRelease={() => handleTransition("release", selectedEscrow.id, selectedEscrow.buyer)}
           onRefund={() => handleTransition("refund", selectedEscrow.id, selectedEscrow.seller)}
           onClose={() => {
-            // Prevent closing modal during active background updates
             if (isMutating) return;
             setSelectedEscrowId(null);
             setModalError(null);

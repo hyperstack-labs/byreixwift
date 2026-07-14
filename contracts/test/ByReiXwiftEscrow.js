@@ -80,4 +80,30 @@ describe("ByReiXwiftEscrow", function () {
       "Only seller can call this"
     );
   });
+
+  it("allows owner to update fee collector and fixed fee, blocks non-owners", async function () {
+    const { escrow, buyer, seller, outsider, feeCollector, fixedFee } = await deployFixture();
+    const newCollector = outsider.address;
+    const newFee = ethers.parseEther("0.02");
+
+    // Blocks non-owner (seller) from updating fee collector or fixed fee
+    await expect(
+      escrow.connect(seller).setFeeCollector(newCollector)
+    ).to.be.revertedWithCustomError(escrow, "OwnableUnauthorizedAccount");
+    await expect(
+      escrow.connect(seller).setFixedFee(newFee)
+    ).to.be.revertedWithCustomError(escrow, "OwnableUnauthorizedAccount");
+
+    // Allows owner (buyer) to update
+    await expect(escrow.connect(buyer).setFeeCollector(newCollector))
+      .to.emit(escrow, "FeeCollectorUpdated")
+      .withArgs(feeCollector.address, newCollector);
+
+    await expect(escrow.connect(buyer).setFixedFee(newFee))
+      .to.emit(escrow, "FixedFeeUpdated")
+      .withArgs(fixedFee, newFee);
+
+    expect(await escrow.feeCollector()).to.equal(newCollector);
+    expect(await escrow.fixedFee()).to.equal(newFee);
+  });
 });

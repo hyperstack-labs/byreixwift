@@ -4,7 +4,7 @@ import { createConfig, http, WagmiProvider } from "wagmi";
 import { mainnet, sepolia } from "wagmi/chains";
 import { defineChain } from "viem";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 
 // Custom Sidrachain network
 export const sidrachain = defineChain({
@@ -31,9 +31,9 @@ export const config = createConfig({
   },
 });
 
-const queryClient = new QueryClient();
-
 export function Web3Provider({ children }: { children: ReactNode }) {
+  const [queryClient] = useState(() => new QueryClient());
+
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>

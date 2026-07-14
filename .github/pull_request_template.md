@@ -21,6 +21,6 @@ Closes # (Link the issue here)
 - [ ] My changes generate **no new warnings**
 
 ## Testing & Quality
-- [ ] I have run `pnpm fix` to resolve styling/compiler errors
+- [ ] I have run `pnpm fix` to standardize code and fix any linting errors
 - [ ] I ensure that my fix is effective or that my feature works as intended
 - [ ] (Optional) I have added tests that prove my fix is effective

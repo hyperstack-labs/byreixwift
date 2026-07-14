@@ -50,7 +50,7 @@ export const useAuthStore = create<AuthState>()(
       partialize: (state) => ({
         isAuthenticated: state.isAuthenticated,
         identity: state.identity,
-        accessToken: state.accessToken,
+        accessToken: null, // Omit accessToken from LocalStorage to mitigate XSS vulnerability
         kycStatus: state.kycStatus,
         kycTier: state.kycTier,
       }),

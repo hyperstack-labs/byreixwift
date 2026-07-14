@@ -1,4 +1,5 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { SiweMessage, generateNonce } from 'siwe';
 import * as jwt from 'jsonwebtoken';
 import { db } from '../db';
@@ -8,9 +9,14 @@ import * as crypto from 'crypto';
 
 @Injectable()
 export class AuthService {
-  private readonly JWT_SECRET = process.env.JWT_SECRET || 'secret';
-  private readonly REFRESH_SECRET =
-    process.env.REFRESH_SECRET || 'refresh-secret';
+  private readonly jwtSecret: string;
+  private readonly refreshSecret: string;
+
+  constructor(private readonly configService: ConfigService) {
+    this.jwtSecret = this.configService.get<string>('JWT_SECRET') || 'secret';
+    this.refreshSecret =
+      this.configService.get<string>('REFRESH_SECRET') || 'refresh-secret';
+  }
 
   getNonce(): string {
     return generateNonce();
@@ -79,7 +85,7 @@ export class AuthService {
   }
 
   private generateAccessToken(userId: string, address: string): string {
-    return jwt.sign({ sub: userId, address }, this.JWT_SECRET, {
+    return jwt.sign({ sub: userId, address }, this.jwtSecret, {
       expiresIn: '15m',
     });
   }
@@ -92,7 +98,7 @@ export class AuthService {
   ): string {
     return jwt.sign(
       { sub: userId, address, kycStatus, kycTier },
-      this.JWT_SECRET,
+      this.jwtSecret,
       {
         expiresIn: '15m',
       },
