@@ -1,11 +1,17 @@
 "use client";
 
 import { motion } from "motion/react";
-import { User, Shield, CreditCard, Activity, Bell, ShieldCheck } from "lucide-react";
+import { User, Shield, CreditCard, Activity, Bell, ShieldCheck, Fingerprint } from "lucide-react";
 import { Button } from "../ui";
+import { useAuthStore } from "@/store";
+import { KycStatusBadge } from "@/components/kyc/KycStatusBadge";
+import { KycVerifyButton } from "@/components/kyc/KycVerifyButton";
 
 export function ProfilePage() {
-  const userAddress = "0x742d...9aB8";
+  const identity = useAuthStore((s) => s.identity);
+  const kycStatus = useAuthStore((s) => s.kycStatus);
+  const kycTier = useAuthStore((s) => s.kycTier);
+  const userAddress = identity || "0x0000...0000";
 
   return (
     <div className="min-h-screen pt-40 pb-20 px-4 sm:px-6 lg:px-8 bg-background">
@@ -60,6 +66,29 @@ export function ProfilePage() {
                 <p className="text-2xl font-bold text-white">{stat.value}</p>
               </motion.div>
             ))}
+          </div>
+
+          {/* KYC Section */}
+          <div className="mb-8">
+            <div className="p-8 rounded-3xl bg-card border border-border">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+                    <Fingerprint className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-white mb-1">Identity Verification</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Verify your identity to unlock higher transaction limits and enhanced security.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 shrink-0">
+                  <KycStatusBadge status={kycStatus} tier={kycTier} />
+                  <KycVerifyButton />
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Settings Sections */}

@@ -36,7 +36,12 @@ export class AuthService {
       }
 
       // 2. Generate tokens
-      const accessToken = this.generateAccessToken(user.id, user.address);
+      const accessToken = this.generateAccessTokenWithKyc(
+        user.id,
+        user.address,
+        user.kycStatus,
+        user.kycTier,
+      );
       const refreshToken = this.generateRefreshToken();
 
       // 3. Store refresh token (hashed)
@@ -56,7 +61,12 @@ export class AuthService {
       return {
         accessToken,
         refreshToken,
-        user: { id: user.id, address: user.address },
+        user: {
+          id: user.id,
+          address: user.address,
+          kycStatus: user.kycStatus,
+          kycTier: user.kycTier,
+        },
       };
     } catch (e) {
       console.error("SIWE verify failed:", (e as Error).message, (e as Error).stack);
@@ -66,6 +76,17 @@ export class AuthService {
 
   private generateAccessToken(userId: string, address: string): string {
     return jwt.sign({ sub: userId, address }, this.JWT_SECRET, {
+      expiresIn: "15m",
+    });
+  }
+
+  private generateAccessTokenWithKyc(
+    userId: string,
+    address: string,
+    kycStatus: string | null,
+    kycTier: string | null,
+  ): string {
+    return jwt.sign({ sub: userId, address, kycStatus, kycTier }, this.JWT_SECRET, {
       expiresIn: "15m",
     });
   }
@@ -108,7 +129,12 @@ export class AuthService {
     }
 
     // 3. Issue a new access token AND a new rotated refresh token!
-    const newAccessToken = this.generateAccessToken(user.id, user.address);
+    const newAccessToken = this.generateAccessTokenWithKyc(
+      user.id,
+      user.address,
+      user.kycStatus,
+      user.kycTier,
+    );
     const newRefreshToken = this.generateRefreshToken();
 
     // 4. Store new refresh token
