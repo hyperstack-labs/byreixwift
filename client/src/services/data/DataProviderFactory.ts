@@ -1,9 +1,9 @@
 import { ITokenDataProvider } from "./ITokenDataProvider";
 import { ITrendDataProvider } from "./ITrendDataProvider";
-import { MockTokenDataProvider } from "@/providers/data/mock/MockTokenDataProvider";
-import { MockTrendDataProvider } from "@/providers/data/mock/MockTrendDataProvider";
-import { SidraTokenDataProvider } from "@/providers/data/sidra/SidraTokenDataProvider";
-import { SidraTrendDataProvider } from "@/providers/data/sidra/SidraTrendDataProvider";
+import { MockTokenDataProvider } from "@/services/data/mock/MockTokenDataProvider";
+import { MockTrendDataProvider } from "@/services/data/mock/MockTrendDataProvider";
+import { SidraTokenDataProvider } from "@/services/data/sidra/SidraTokenDataProvider";
+import { SidraTrendDataProvider } from "@/services/data/sidra/SidraTrendDataProvider";
 
 /**
  * @integration-point

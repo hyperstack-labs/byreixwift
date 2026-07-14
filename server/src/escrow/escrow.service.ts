@@ -9,10 +9,10 @@ import { CreateEscrowDto, EscrowActionDto } from './dto';
 import { EscrowEventRecord, EscrowRecord, EscrowState } from './escrow.types';
 import { escrows, escrowEvents } from '../db/schema';
 import { eq } from 'drizzle-orm';
-import { ContractService } from '../contracts/contract.service';
+import { ContractService } from '../contract/contract.service';
 
 @Injectable()
-export class EscrowsService {
+export class EscrowService {
   /**
    * Initializes the escrow service with backend persistence and on-chain validator helpers.
    */

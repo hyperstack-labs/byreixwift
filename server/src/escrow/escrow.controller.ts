@@ -8,33 +8,33 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { CreateEscrowDto, EscrowActionDto } from './dto';
-import { EscrowsService } from './escrows.service';
+import { EscrowService } from './escrow.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 
 @Controller('escrows')
 @UseGuards(JwtAuthGuard)
-export class EscrowsController {
-  constructor(private readonly escrowsService: EscrowsService) {}
+export class EscrowController {
+  constructor(private readonly escrowService: EscrowService) {}
 
   @Get()
   listEscrows() {
-    return this.escrowsService.listEscrows();
+    return this.escrowService.listEscrows();
   }
 
   @Get(':id')
   getEscrow(@Param('id') id: string) {
-    return this.escrowsService.getEscrow(id);
+    return this.escrowService.getEscrow(id);
   }
 
   @Get(':id/events')
   getEscrowEvents(@Param('id') id: string) {
-    return this.escrowsService.getEvents(id);
+    return this.escrowService.getEvents(id);
   }
 
   @Post()
   createEscrow(@Body() dto: CreateEscrowDto) {
-    return this.escrowsService.createEscrow(dto);
+    return this.escrowService.createEscrow(dto);
   }
 
   @Post(':id/lock')
@@ -46,7 +46,7 @@ export class EscrowsController {
     if (dto.actor.toLowerCase() !== user.address.toLowerCase()) {
       throw new BadRequestException('Actor does not match authenticated user');
     }
-    return this.escrowsService.lockEscrow(id, dto);
+    return this.escrowService.lockEscrow(id, dto);
   }
 
   @Post(':id/release')
@@ -58,7 +58,7 @@ export class EscrowsController {
     if (dto.actor.toLowerCase() !== user.address.toLowerCase()) {
       throw new BadRequestException('Actor does not match authenticated user');
     }
-    return this.escrowsService.releaseEscrow(id, dto);
+    return this.escrowService.releaseEscrow(id, dto);
   }
 
   @Post(':id/refund')
@@ -70,6 +70,6 @@ export class EscrowsController {
     if (dto.actor.toLowerCase() !== user.address.toLowerCase()) {
       throw new BadRequestException('Actor does not match authenticated user');
     }
-    return this.escrowsService.refundEscrow(id, dto);
+    return this.escrowService.refundEscrow(id, dto);
   }
 }

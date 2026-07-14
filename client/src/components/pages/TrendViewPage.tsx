@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Card, Button } from "../ui";
 import { useSidraTokens } from "@/hooks/useSidraTokens";
 import { useTrendData, useSupportedRanges } from "@/hooks/useTrendData";
-import { TrendTimeRange } from "@/providers/data/ITrendDataProvider";
+import { TrendTimeRange } from "@/services/data/ITrendDataProvider";
 import {
   TrendingUp,
   TrendingDown,

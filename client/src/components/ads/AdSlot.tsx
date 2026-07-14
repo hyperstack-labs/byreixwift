@@ -1,7 +1,7 @@
 "use client";
 
 import React, { ReactNode } from "react";
-import { useAdTracking } from "@/app/hooks/useAdTracking";
+import { useAdTracking } from "@/hooks";
 
 interface AdSlotProps {
   adId: string;

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
-import { EscrowsService } from '../escrows.service';
-import { ContractService } from '../../contracts/contract.service';
+import { EscrowService } from '../escrow.service';
+import { ContractService } from '../../contract/contract.service';
 
 function queryChain(resolveValue: any) {
   const chain: any = {
@@ -19,8 +19,8 @@ function queryChain(resolveValue: any) {
   return chain;
 }
 
-describe('EscrowsService', () => {
-  let service: EscrowsService;
+describe('EscrowService', () => {
+  let service: EscrowService;
   let mockDb: any;
   let mockContractService: any;
 
@@ -52,13 +52,13 @@ describe('EscrowsService', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        EscrowsService,
+        EscrowService,
         { provide: 'DB', useValue: mockDb },
         { provide: ContractService, useValue: mockContractService },
       ],
     }).compile();
 
-    service = module.get<EscrowsService>(EscrowsService);
+    service = module.get<EscrowService>(EscrowService);
   });
 
   describe('listEscrows', () => {

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { AdPlaceholder } from "./ad-placeholder";
+import { AdPlaceholder } from "./AdPlaceholder";
 
 export const AdContainer = ({ simulateError = false }: { simulateError?: boolean }) => {
   // Initialize states

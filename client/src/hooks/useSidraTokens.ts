@@ -1,6 +1,6 @@
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
 import { SidraTokenMetric } from "@/types/sidra";
-import { DataProviderFactory } from "@/providers/data/DataProviderFactory";
+import { DataProviderFactory } from "@/services/data/DataProviderFactory";
 
 export const TOKEN_QUERY_KEYS = {
   list: ["sidraTokens"] as const,

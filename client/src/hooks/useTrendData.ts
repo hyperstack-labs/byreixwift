@@ -1,6 +1,6 @@
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
-import { TrendDataPoint, TrendTimeRange } from "@/providers/data/ITrendDataProvider";
-import { DataProviderFactory } from "@/providers/data/DataProviderFactory";
+import { TrendDataPoint, TrendTimeRange } from "@/services/data/ITrendDataProvider";
+import { DataProviderFactory } from "@/services/data/DataProviderFactory";
 
 export const TREND_QUERY_KEYS = {
   data: (symbol: string, range: TrendTimeRange) => ["trendData", symbol, range] as const,

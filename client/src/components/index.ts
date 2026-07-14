@@ -6,5 +6,5 @@ export * from "./LoginForm";
 export * from "./Logo";
 export * from "./Navbar";
 export * from "./WalletLoginButton";
-export * from "./ad-container";
-export * from "./ad-placeholder";
+export * from "./ads/AdContainer";
+export * from "./ads/AdPlaceholder";

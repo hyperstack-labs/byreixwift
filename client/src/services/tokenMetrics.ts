@@ -6,7 +6,7 @@
  * @deprecated — use hooks/useSidraTokens or DataProviderFactory instead.
  */
 
-// import { DataProviderFactory, USE_MOCK } from "@/providers/data/DataProviderFactory";
+// import { DataProviderFactory, USE_MOCK } from "@/services/data/DataProviderFactory";
 import { SidraTokenMetric } from "@/types/sidra";
 
 // export { USE_MOCK };
