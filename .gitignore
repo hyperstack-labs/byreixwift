@@ -44,7 +44,11 @@ obj
 
 bin
 
-
-
 *_PLAN.md
 **/dist/
+
+# testing
+**/test-results/
+**/playwright-report/
+**/blob-report/
+**/playwright/.cache/
