@@ -24,6 +24,9 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useAccount, useSendTransaction, useBalance } from "wagmi";
+import { parseEther, formatEther } from "viem";
+import { sidrachain } from "@/providers/Web3Provider";
 import { useSidraTokens } from "@/hooks/useSidraTokens";
 
 type TxStatus = "idle" | "pending" | "success" | "error";
@@ -38,18 +41,33 @@ interface TransferReceipt {
 }
 
 export function SendPage() {
+  const { address: connectedAddress, isConnected } = useAccount();
+  const { data: balanceData, isLoading: isLoadingBalance } = useBalance({
+    address: connectedAddress,
+    chainId: sidrachain.id,
+    query: { enabled: !!connectedAddress },
+  });
+  const { sendTransactionAsync, isPending: isTxPending } = useSendTransaction();
+
   const [recipient, setRecipient] = useState("");
   const [amount, setAmount] = useState("");
-  const [selectedToken] = useState({ symbol: "SDA", balance: "12,450.50" });
+  const [selectedToken] = useState({ symbol: "SDA" });
   const [memo, setMemo] = useState("");
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isValidAddress, setIsValidAddress] = useState(true);
 
-  // State tracking for real network broadcast delays
-  const [isBroadcasting, setIsBroadcasting] = useState(false);
   const [txStatus, setTxStatus] = useState<TxStatus>("idle");
   const [receipt, setReceipt] = useState<TransferReceipt | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
+
+  const isBroadcasting = isTxPending;
+
+  const realBalance = balanceData
+    ? parseFloat(formatEther(balanceData.value)).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 4,
+      })
+    : "0.00";
 
   const { data: tokenData, isLoading: isLoadingTokens, error: tokenError } = useSidraTokens();
 
@@ -87,7 +105,7 @@ export function SendPage() {
       toast.error("Please enter a valid amount");
       return;
     }
-    if (parseFloat(amount) > parseFloat(selectedToken.balance.replace(/,/g, ""))) {
+    if (balanceData && parseFloat(amount) > parseFloat(formatEther(balanceData.value))) {
       toast.error("Insufficient balance");
       return;
     }
@@ -95,30 +113,34 @@ export function SendPage() {
   };
 
   const confirmSend = async () => {
-    setIsBroadcasting(true);
+    if (!connectedAddress || !isConnected) {
+      toast.error("Please connect your wallet first");
+      return;
+    }
     setTxStatus("pending");
     setErrorMessage("");
 
     try {
-      if (tokenError) {
-        throw new Error("Network layer context drop-out.");
-      }
+      const hash = await sendTransactionAsync({
+        to: recipient as `0x${string}`,
+        value: parseEther(amount),
+        chainId: sidrachain.id,
+      });
 
-      const successfulReceipt: TransferReceipt = {
+      const receiptData: TransferReceipt = {
         recipient,
         amount,
         symbol: selectedToken.symbol,
         memo: memo || undefined,
-        txHash: "0x4b9a...2e1f",
+        txHash: hash,
         timestamp: new Date().toLocaleTimeString(),
       };
 
-      setReceipt(successfulReceipt);
+      setReceipt(receiptData);
       setTxStatus("success");
       toast.success("Transaction sent successfully!");
       setShowConfirmDialog(false);
 
-      // Reset form variables upon verified success
       setRecipient("");
       setAmount("");
       setMemo("");
@@ -139,8 +161,6 @@ export function SendPage() {
       setTxStatus("error");
       toast.error(`${msg} Please try again.`);
       setShowConfirmDialog(false);
-    } finally {
-      setIsBroadcasting(false);
     }
   };
 
@@ -276,8 +296,8 @@ export function SendPage() {
                   <Label htmlFor="amount" className="text-sm">
                     Amount
                   </Label>
-                  <span className="text-xs text-muted-foreground">
-                    Balance: {selectedToken.balance} {selectedToken.symbol}
+                    <span className="text-xs text-muted-foreground">
+                    Balance: {isLoadingBalance ? "..." : `${realBalance} ${selectedToken.symbol}`}
                   </span>
                 </div>
                 <div className="p-4 rounded-xl bg-background border border-border transition-colors focus-within:border-primary/50">
@@ -314,7 +334,7 @@ export function SendPage() {
                     )}
                     <button
                       disabled={isBroadcasting}
-                      onClick={() => setAmount(selectedToken.balance.replace(/,/g, ""))}
+                      onClick={() => setAmount(balanceData ? formatEther(balanceData.value) : "0")}
                       className="text-sm font-semibold text-primary hover:underline underline-offset-4 cursor-pointer disabled:opacity-50"
                     >
                       Use Maximum

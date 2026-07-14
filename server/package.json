@@ -9,7 +9,9 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/main.ts",
     "build": "tsc -p tsconfig.build.json",
-    "start": "node dist/main.js"
+    "start": "node dist/main.js",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.19",
@@ -29,12 +31,16 @@
     "viem": "^2.52.0"
   },
   "devDependencies": {
+    "@nestjs/testing": "^11.1.28",
     "@types/cookie-parser": "^1.4.10",
     "@types/express": "^5.0.6",
+    "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.12.2",
     "@types/pg": "^8.20.0",
     "drizzle-kit": "^0.31.10",
+    "jest": "^30.4.2",
+    "ts-jest": "^29.4.11",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.3"
   },
@@ -44,7 +50,8 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "@nestjs/core",
-      "esbuild"
+      "esbuild",
+      "unrs-resolver"
     ]
   }
 }
