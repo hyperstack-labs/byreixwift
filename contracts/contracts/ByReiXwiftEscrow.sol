@@ -29,6 +29,7 @@ contract ByReiXwiftEscrow is ReentrancyGuard, Ownable {
     uint256 public nextTransactionId;
     address public feeCollector;
     uint256 public fixedFee;
+    address public arbitrator;
 
     event EscrowCreated(
         uint256 indexed txId,
@@ -43,11 +44,14 @@ contract ByReiXwiftEscrow is ReentrancyGuard, Ownable {
     event EscrowRefunded(uint256 indexed txId, address indexed actor, uint256 refundedAmount);
     event FeeCollectorUpdated(address indexed oldCollector, address indexed newCollector);
     event FixedFeeUpdated(uint256 oldFee, uint256 newFee);
+    event ArbitratorUpdated(address indexed oldArbitrator, address indexed newArbitrator);
+    event EscrowArbitrated(uint256 indexed txId, address indexed arbitrator, EscrowState finalState);
 
     constructor(address _feeCollector, uint256 _fixedFee) Ownable(msg.sender) {
         require(_feeCollector != address(0), "Fee collector is required");
         feeCollector = _feeCollector;
         fixedFee = _fixedFee;
+        arbitrator = msg.sender;
     }
 
     function setFeeCollector(address _newFeeCollector) external onlyOwner {
@@ -59,6 +63,12 @@ contract ByReiXwiftEscrow is ReentrancyGuard, Ownable {
     function setFixedFee(uint256 _newFixedFee) external onlyOwner {
         emit FixedFeeUpdated(fixedFee, _newFixedFee);
         fixedFee = _newFixedFee;
+    }
+
+    function setArbitrator(address _newArbitrator) external onlyOwner {
+        require(_newArbitrator != address(0), "Invalid arbitrator address");
+        emit ArbitratorUpdated(arbitrator, _newArbitrator);
+        arbitrator = _newArbitrator;
     }
 
     modifier escrowExists(uint256 _txId) {
@@ -163,5 +173,48 @@ contract ByReiXwiftEscrow is ReentrancyGuard, Ownable {
         require(refundedBuyer, "Refund failed");
 
         emit EscrowRefunded(_txId, msg.sender, escrow.grossAmount);
+    }
+
+    function arbitrateRelease(uint256 _txId)
+        external
+        nonReentrant
+        escrowExists(_txId)
+        inState(_txId, EscrowState.Locked)
+    {
+        require(msg.sender == arbitrator || msg.sender == owner(), "Only arbitrator or owner can arbitrate");
+        EscrowTransaction storage escrow = transactions[_txId];
+
+        escrow.state = EscrowState.Released;
+        escrow.resolvedAt = uint64(block.timestamp);
+
+        (bool paidSeller, ) = escrow.seller.call{value: escrow.netAmount}("");
+        require(paidSeller, "Seller transfer failed");
+
+        if (fixedFee > 0) {
+            (bool paidFeeCollector, ) = feeCollector.call{value: fixedFee}("");
+            require(paidFeeCollector, "Fee transfer failed");
+        }
+
+        emit EscrowReleased(_txId, msg.sender, escrow.netAmount, fixedFee);
+        emit EscrowArbitrated(_txId, msg.sender, EscrowState.Released);
+    }
+
+    function arbitrateRefund(uint256 _txId)
+        external
+        nonReentrant
+        escrowExists(_txId)
+        inState(_txId, EscrowState.Locked)
+    {
+        require(msg.sender == arbitrator || msg.sender == owner(), "Only arbitrator or owner can arbitrate");
+        EscrowTransaction storage escrow = transactions[_txId];
+
+        escrow.state = EscrowState.Refunded;
+        escrow.resolvedAt = uint64(block.timestamp);
+
+        (bool refundedBuyer, ) = escrow.buyer.call{value: escrow.grossAmount}("");
+        require(refundedBuyer, "Refund failed");
+
+        emit EscrowRefunded(_txId, msg.sender, escrow.grossAmount);
+        emit EscrowArbitrated(_txId, msg.sender, EscrowState.Refunded);
     }
 }

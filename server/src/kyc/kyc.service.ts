@@ -75,6 +75,29 @@ export class KycService {
   async getAuthorizeUrl(
     userId: string,
   ): Promise<{ url: string; state: string }> {
+    const bypass =
+      this.configService.get<string>('KYC_BYPASS') === 'true' || !this.clientId;
+
+    if (bypass) {
+      // Direct mock update to database for development/testing
+      await db
+        .update(users)
+        .set({
+          kycStatus: 'verified',
+          kycTier: '2',
+          kycVerifiedAt: new Date(),
+        })
+        .where(eq(users.id, userId));
+
+      const frontendUrl =
+        this.configService.get<string>('FRONTEND_URL') ||
+        'http://localhost:3000';
+      return {
+        url: `${frontendUrl}/app/kyc/callback?status=verified&tier=2`,
+        state: 'mock-state',
+      };
+    }
+
     const config = await this.getOidcConfig();
     const state = crypto.randomUUID();
     const codeVerifier = this.generateCodeVerifier();

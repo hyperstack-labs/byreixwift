@@ -7,6 +7,7 @@ import { EscrowModule } from './escrow/escrow.module';
 import { DbModule } from './db/db.module';
 import { ContractModule } from './contract/contract.module';
 import { KycModule } from './kyc/kyc.module';
+import { TokenModule } from './token/token.module';
 import { validate } from './config/env.validation';
 
 @Module({
@@ -26,6 +27,7 @@ import { validate } from './config/env.validation';
     ContractModule,
     DbModule,
     KycModule,
+    TokenModule,
   ],
   providers: [
     {

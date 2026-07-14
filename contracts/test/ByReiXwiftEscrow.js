@@ -106,4 +106,28 @@ describe("ByReiXwiftEscrow", function () {
     expect(await escrow.feeCollector()).to.equal(newCollector);
     expect(await escrow.fixedFee()).to.equal(newFee);
   });
+
+  it("allows arbitrator or owner to arbitrate locked escrow", async function () {
+    const { escrow, buyer, seller, feeCollector, outsider, fixedFee } = await deployFixture();
+    const depositValue = ethers.parseEther("1");
+    const expectedSellerAmount = depositValue - fixedFee;
+
+    // Setup an escrow and lock it
+    await escrow.connect(buyer).deposit(seller.address, ethers.ZeroHash, { value: depositValue });
+    await escrow.connect(buyer).lock(0);
+
+    // Outsiders cannot arbitrate
+    await expect(escrow.connect(outsider).arbitrateRelease(0)).to.be.revertedWith(
+      "Only arbitrator or owner can arbitrate"
+    );
+
+    // Arbitrator (initially deployer/buyer in this fixture) can arbitrate release
+    await expect(() => escrow.connect(buyer).arbitrateRelease(0)).to.changeEtherBalances(
+      [seller, feeCollector],
+      [expectedSellerAmount, fixedFee]
+    );
+
+    const releasedEscrow = await escrow.transactions(0);
+    expect(releasedEscrow.state).to.equal(2); // Released
+  });
 });
