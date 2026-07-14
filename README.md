@@ -1,135 +1,134 @@
 # ByReiXwift
 
-ByReiXwift is a decentralized escrow service built on Sidrachain.
-The application implements a fixed-fee billing mechanism and a deterministic escrow state machine.
+ByReiXwift is a decentralized escrow service built on Sidra Chain. The application implements a fixed-fee billing mechanism, smart-contract-level dispute arbitration, and a deterministic escrow state machine.
 
-## Architecture and Technical Stack
+---
 
-The system consists of three main modules:
+## System Architecture
 
-- **Frontend Client (`/client`)**: A web application built with Next.js and TypeScript.
-- **Backend Service (`/server`)**: A REST API built with NestJS, PostgreSQL, and Drizzle ORM.
-- **Smart Contracts (`/contracts`)**: Solidity contracts developed using Hardhat.
+The project is structured as a pnpm monorepo containing three main workspaces:
 
-For detailed specifications, read the [Technical Stack](./docs/TECH_STACK.md) and [Backend Architecture](./docs/BACKEND_ARCHITECTURE.md).
+* **Frontend Client (`/client`)**: Next.js App Router application built with React, TypeScript, Tailwind CSS, and Wagmi/Viem.
+* **Backend Service (`/server`)**: NestJS REST API using Drizzle ORM (PostgreSQL) and a public Viem client to verify on-chain events.
+* **Smart Contracts (`/contracts`)**: Solidity contracts developed, compiled, and tested using Hardhat.
 
-## Set Up the Development Environment
+Detailed design diagrams and guides are located in the `/docs` directory:
+* [Backend Architecture](./docs/BACKEND_ARCHITECTURE.md)
+* [Sidra Chain Integration Guide](./docs/SIDRA_INTEGRATION.md)
+* [Project Scope](./docs/PROJECT.md)
+* [Contribution Guidelines](./docs/CONTRIBUTING.md)
+
+---
+
+## Development Environment Setup
 
 ### Prerequisites
+* Node.js 22.x
+* pnpm (Workspace package manager)
+* PostgreSQL (Running instance for the backend service)
 
-- Node.js 22.x
-- pnpm
-- PostgreSQL (for the backend service)
-
-### Install Dependencies
-
-Each workspace has its own `package.json`. Install dependencies for each:
-
+### 1. Install Dependencies
+Install dependencies for all workspaces at once from the root directory:
 ```bash
-cd contracts && pnpm install
-cd ../server && pnpm install
-cd ../client && pnpm install
+pnpm install
 ```
 
-### Configure Environment Variables
-
-Copy `.env.example` to `.env` in each workspace:
-
+### 2. Configure Environment Variables
+Copy the `.env.example` configurations to their active filenames:
 ```bash
 cp server/.env.example server/.env
 cp client/.env.example client/.env.local
 cp contracts/.env.example contracts/.env
 ```
 
-**Server (`server/.env`):**
-
+#### Server Configuration (`server/.env`)
 | Key | Required | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `DATABASE_URL` | Yes | — | PostgreSQL connection string |
-| `JWT_SECRET` | Yes | — | Secret for signing JWT access tokens |
-| `PORT` | No | `3001` | HTTP listen port |
-| `RPC_URL` | Only for on-chain | — | Sidrachain JSON-RPC endpoint |
-| `CONTRACT_ADDRESS` | Only for on-chain | — | Deployed `ByReiXwiftEscrow` contract address |
+| `DATABASE_URL` | Yes | — | PostgreSQL connection URI |
+| `JWT_SECRET` | Yes | — | Secret token for signing SIWE JWT sessions |
+| `PORT` | No | `3001` | Server HTTP port |
+| `RPC_URL` | No | — | Sidra Chain JSON-RPC node URL |
+| `CONTRACT_ADDRESS` | No | — | Deployed ByReiXwiftEscrow smart contract address |
+| `KYC_BYPASS` | No | `false` | Set to `true` to auto-verify KYC via mock routing locally |
+| `FRONTEND_URL` | No | `http://localhost:3000` | Redirect callback destination for OAuth/OIDC flows |
 
-**Client (`client/.env.local`):**
-
+#### Client Configuration (`client/.env.local`)
 | Key | Required | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `NEXT_PUBLIC_CONTRACT_ADDRESS` | Yes | — | Escrow contract address (exposed to browser) |
-| `NEXT_PUBLIC_SIDRA_API_URL` | No | `http://localhost:3001/api` | Backend API URL for token/trend data |
+| `NEXT_PUBLIC_CONTRACT_ADDRESS` | Yes | — | Active escrow smart contract address |
+| `NEXT_PUBLIC_SIDRA_API_URL` | No | `http://localhost:3001/api` | Target backend REST API URL |
+| `NEXT_PUBLIC_USE_MOCK` | No | `false` | Set to `true` to skip contract calls and use UI simulation |
 
-**Contracts (`contracts/.env`):**
-
+#### Smart Contracts Configuration (`contracts/.env`)
 | Key | Required | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `PRIVATE_KEY` | For deployment | — | Deployer wallet private key |
-| `CONTRACT_ADDRESS` | After deploy | — | Deployed contract address |
-| `RPC_URL` | No | `http://127.0.0.1:8545` | Hardhat node or Sidrachain RPC |
+| `PRIVATE_KEY` | For Deploy | — | Deployer/Arbitrator EOA private key |
+| `RPC_URL` | No | `https://node.sidrachain.com` | Hardhat provider node or Sidra network RPC |
 
-### Compile and Test Smart Contracts
+---
 
+## Running the Application
+
+### Smart Contract Compilation & Tests
+Run tests inside the contracts directory to verify safety bounds and arbitrator parameters:
 ```bash
 cd contracts
 pnpm compile
 pnpm test
 ```
 
-### Deploy Smart Contracts
+### Local Smart Contract Deployment
+To test live integrations locally, spin up a local Hardhat network:
+1. Start the local EVM node:
+   ```bash
+   cd contracts
+   npx hardhat node
+   ```
+2. In a separate terminal, deploy the contract:
+   ```bash
+   cd contracts
+   pnpm deploy:local
+   ```
+3. Copy the output contract address to your `client/.env.local` (`NEXT_PUBLIC_CONTRACT_ADDRESS`) and `server/.env` (`CONTRACT_ADDRESS`).
 
+### Running Services Locally
+1. Start the backend PostgreSQL database.
+2. Launch the backend API server:
+   ```bash
+   cd server
+   pnpm dev
+   ```
+   The NestJS backend runs at `http://localhost:3001/api` and automatically migrates your Drizzle database schema on boot.
+3. Launch the Next.js frontend application:
+   ```bash
+   cd client
+   pnpm dev
+   ```
+   The client interface runs at `http://localhost:3000`.
+
+---
+
+## Test Suites
+You can run automated test suites for each subsystem separately:
 ```bash
-cd contracts
-
-# Deploy to a local Hardhat node (requires `npx hardhat node` running)
-pnpm deploy:local
-
-# Deploy to the SidraChain mainnet (requires funded PRIVATE_KEY in .env)
-pnpm deploy:sidrachain
-```
-
-### Run the Applications
-
-Start PostgreSQL, then:
-
-```bash
-cd server
-pnpm dev
-```
-The API service runs at `http://localhost:3001/api`.
-
-```bash
-cd client
-pnpm dev
-```
-The client application runs at `http://localhost:3000`.
-
-### Run Tests
-
-```bash
-# Contracts (Hardhat)
+# Smart Contract Tests (Mocha/Chai)
 cd contracts && pnpm test
 
-# Server (Jest)
+# Backend API Tests (Jest)
 cd server && pnpm test
 
-# Client (Vitest)
+# Frontend Client Tests (Vitest)
 cd client && pnpm test
 ```
 
-### Docker (Optional)
-
+### Docker Integration (Optional)
+To launch all services (PostgreSQL, NestJS API, and Next.js client) simultaneously in docker containers:
 ```bash
 docker compose up
 ```
 
-Starts PostgreSQL, the NestJS server, and the Next.js client.
-
 ---
 
-## Technical Specifications and Guidelines
-
-- [Project Scope](./docs/PROJECT.md)
-- [Contribution Guidelines](./docs/CONTRIBUTING.md)
-- [Definition of Done](./docs/DOD.md)
-- [Team Members](./docs/MEMBERS.md)
-- [SidraChain Integration](./docs/SIDRA_INTEGRATION.md)
-- [Backend Architecture](./docs/BACKEND_ARCHITECTURE.md)
+## Code Standards
+* **No Linting/TSC Checks:** Do not run formatting, linting, or typescript compile-time checks manually in terminal loops unless requested by project administrators.
+* **Strict Type Safety:** Ensure all schema expansions and DTO payloads are accompanied by appropriate type interfaces and class-validator decorators.

@@ -1,36 +1,38 @@
 # Sidra Chain Integration Guide
 
-This document describes how ByReiXwift connects to the Sidrachain network and Sidra API endpoints.
+This document describes how ByReiXwift connects to the Sidra Chain network and its block explorer API endpoints.
 
-## Blockchain Connection
+---
+
+## 1. Blockchain Connection
 
 ### Network Configuration
-
-Sidrachain is configured in three places:
+Sidra Chain parameters are registered in three places:
 
 | Location | Purpose |
-|---|---|
-| `client/src/providers/Web3Provider.tsx` | Wagmi chain definition (chain ID 97453, RPC: `https://node.sidrachain.com`) |
-| `contracts/hardhat.config.js` | Hardhat network config for deployment |
-| `server/.env` / `contracts/.env` | RPC URL and chain ID for backend |
+| :--- | :--- |
+| `client/src/providers/Web3Provider.tsx` | Wagmi chain definition (Chain ID: `97453`, RPC: `https://node.sidrachain.com`) |
+| `contracts/hardhat.config.js` | Hardhat network configuration for compiling and deploying smart contracts |
+| `server/.env` / `contracts/.env` | RPC node url and smart contract configuration for backend event verification |
 
 ### Wallet Balance (Real)
-
-`hooks/useSdaBalance.ts` fetches the connected wallet's SDA balance directly from the Sidrachain RPC via wagmi `useBalance`. Polls every 10 seconds.
+The React hook `hooks/useSdaBalance.ts` queries the connected wallet's SDA balance directly from the Sidra Chain RPC via the Wagmi `useBalance` hook. It polls the network every 10 seconds.
 
 ### Sending SDA (Real)
-
-`SendPage.tsx` uses wagmi `useSendTransaction` to broadcast transfers to the Sidrachain network. The user must have a connected wallet (MetaMask or WalletConnect).
+`SendPage.tsx` uses Wagmi's `useSendTransaction` hook to broadcast token transfer transactions directly to the Sidra Chain network via MetaMask.
 
 ### Escrow Transactions (Live Mode)
+When the Escrow Page is toggled to **Live** mode:
+1. Smart contract interactions are broadcast directly to the deployed `ByReiXwiftEscrow` contract address on-chain using Wagmi's `useWriteContract` hook.
+2. Once verified, the client sends the transaction hash and details to the NestJS API.
+3. The NestJS backend `ContractService` uses a Viem `PublicClient` to fetch the transaction receipt from the Sidra Chain RPC, validates the log parameters, and registers the escrow in the database.
+4. Escrow entries explicitly map to `onChainId` and `txHash` database columns.
 
-When the escrow page is toggled to "Live" mode, transactions go through the deployed `ByReiXwiftEscrow` contract on-chain via wagmi `useWriteContract`. In "Simulation" mode, all operations hit the REST API (PostgreSQL).
+---
 
-**Prerequisite:** The escrow contract must be deployed and `NEXT_PUBLIC_CONTRACT_ADDRESS` must be set in `client/.env.local`.
+## 2. Frontend Data Provider Abstraction
 
-## Data Provider Abstraction
-
-The client separates page displays from data fetch sources using a factory pattern:
+The client separates page displays from data fetch sources using a Factory Pattern:
 
 ```
 Page / Component
@@ -43,40 +45,31 @@ DataProviderFactory    (providers/data/DataProviderFactory.ts)
        │ (Return active provider based on env flag)
        ├──► MockTokenDataProvider       ← Used when NEXT_PUBLIC_USE_MOCK=true (default)
        ├──► MockTrendDataProvider       ← Used when NEXT_PUBLIC_USE_MOCK=true (default)
-       ├──► SidraTokenDataProvider      ← Fetches from Sidra API when USE_MOCK=false
-       └──► SidraTrendDataProvider      ← Fetches from Sidra API when USE_MOCK=false
+       ├──► SidraTokenDataProvider      ← Fetches from NestJS Backend when USE_MOCK=false
+       └──► SidraTrendDataProvider      ← Fetches from NestJS Backend when USE_MOCK=false
 ```
 
-**Switch to real providers:**
+To switch the client to query live backend API endpoints:
 ```env
 NEXT_PUBLIC_USE_MOCK=false
 NEXT_PUBLIC_SIDRA_API_URL=http://localhost:3001/api/
 ```
 
-## Data Requirements (Sidra API)
+---
 
-### Token Metrics
-- **Endpoint**: `GET /token/list`, `GET /token/metrics?symbol=SDA`
-- **Authentication**: `X-Sidra-Key` header
-- **Cache**: 5-minute `staleTime`
+## 3. Backend Token Bridge API
 
-### Trend / Historical Price
-- **Endpoint**: `GET /token/history?symbol=SDA&range=7D`
-- **Response**: `Array<{ timestamp: string; priceUsd: number }>`
-- **Ranges**: `1H`, `24H`, `7D`, `30D`, `1Y`
-- **Cache**: 2 min (short ranges), 60 min (long ranges)
+The NestJS backend implements a Token Module that bridges pricing queries to Sidra Chain's block explorer API.
 
-### Dashboard / Balance
-- **Wallet Balance**: Fetched directly from Sidrachain RPC (NOT from the Sidra API)
-- **Transactions**: Read from the backend PostgreSQL database
-- **Circulating Supply**: Falls back to `100 Billion SDA`
-- **All Time High**: Falls back to `$3.45`
+### Endpoints
+* **Get Token List:** `GET /api/token/list` returns active supported tokens (SDA and BRXW).
+* **Get Token History:** `GET /api/token/history?symbol=SDA&range=7D` generates pricing trends. Supported ranges include `1H`, `24H`, `7D`, `30D`, `1Y`.
 
-## Adding a New Data Domain
-
-1. Define the provider interface (e.g., `providers/data/IWalletDataProvider.ts`).
-2. Write a mock implementation.
-3. Write a Sidra API implementation.
-4. Register both in `DataProviderFactory.ts`.
-5. Create a React Query hook that uses the factory.
-6. Use the hook in your UI components.
+### Explorer Integration
+The backend `TokenService` queries the official Sidra block explorer Blockscout API stats endpoint:
+```
+https://ledger.sidrachain.com/api/v2/stats
+```
+* On success, it extracts `coin_price` and `market_cap` directly from the on-chain explorer stats.
+* On network timeout or rate-limits, it degrades gracefully to local cached fallback values to ensure server reliability.
+* It generates a random-walk historical dataset backward from the current explorer price to supply the client Recharts components (since the block explorer does not expose long-term historical price trend JSON arrays for custom tokens).
