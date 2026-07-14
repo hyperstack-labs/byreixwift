@@ -10,6 +10,9 @@ import {
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   address: text("address").notNull().unique(),
+  kycStatus: text("kyc_status").default("none"),
+  kycTier: text("kyc_tier"),
+  kycVerifiedAt: timestamp("kyc_verified_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

@@ -79,7 +79,7 @@ export function LoginRouteClient() {
       });
 
       // 5. Update Store
-      login(data.user.address, data.accessToken);
+      login(data.user.address, data.accessToken, data.user.kycStatus, data.user.kycTier);
       toast.success("Connected.");
       router.push(nextPath);
     } catch (error) {

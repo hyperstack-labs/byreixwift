@@ -7,4 +7,3 @@ export async function getContractEscrow(id: string) {
 
   return response.json();
 }
-console.log("API URL:", process.env.NEXT_PUBLIC_API_URL);

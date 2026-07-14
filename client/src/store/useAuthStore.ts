@@ -5,9 +5,12 @@ interface AuthState {
   isAuthenticated: boolean;
   identity: string | null;
   accessToken: string | null;
-  login: (identity: string, accessToken: string) => void;
+  kycStatus: string | null;
+  kycTier: string | null;
+  login: (identity: string, accessToken: string, kycStatus?: string | null, kycTier?: string | null) => void;
   logout: () => void;
   setAccessToken: (token: string) => void;
+  setKyc: (kycStatus: string, kycTier: string) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -16,9 +19,14 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       identity: null,
       accessToken: null,
-      login: (identity, accessToken) => set({ isAuthenticated: true, identity, accessToken }),
-      logout: () => set({ isAuthenticated: false, identity: null, accessToken: null }),
+      kycStatus: null,
+      kycTier: null,
+      login: (identity, accessToken, kycStatus?, kycTier?) =>
+        set({ isAuthenticated: true, identity, accessToken, kycStatus: kycStatus ?? null, kycTier: kycTier ?? null }),
+      logout: () =>
+        set({ isAuthenticated: false, identity: null, accessToken: null, kycStatus: null, kycTier: null }),
       setAccessToken: (accessToken) => set({ accessToken }),
+      setKyc: (kycStatus, kycTier) => set({ kycStatus, kycTier }),
     }),
     {
       name: "byreixwift-auth",
@@ -26,6 +34,8 @@ export const useAuthStore = create<AuthState>()(
         isAuthenticated: state.isAuthenticated,
         identity: state.identity,
         accessToken: state.accessToken,
+        kycStatus: state.kycStatus,
+        kycTier: state.kycTier,
       }),
     }
   )
