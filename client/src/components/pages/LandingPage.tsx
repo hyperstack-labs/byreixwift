@@ -676,7 +676,7 @@ export function LandingPage({ onConnect }: LandingPageProps) {
 
             <p className="mt-4.5 max-w-xl text-[0.98rem] leading-[1.72] text-muted-foreground sm:mt-5.5 sm:text-[1.03rem] lg:text-[1.08rem]">
               Preview every transaction, verify merchant identities, and reveal hidden fees before
-              you sign.                 Know what you're signing before you sign it.
+              you sign.                 Know what you&rsquo;re signing before you sign it.
             </p>
 
             <div className="mt-6 flex w-full max-w-lg flex-col gap-3 sm:mt-7 sm:w-auto sm:max-w-none sm:flex-row sm:justify-center">
@@ -969,7 +969,7 @@ export function LandingPage({ onConnect }: LandingPageProps) {
               Use escrow when trust needs structure.
             </h2>
             <p className="mt-4 max-w-[34rem] text-[0.98rem] leading-[1.68] text-muted-foreground sm:mt-6 sm:text-lg">
-              Lock funds, release on completion, or refund if terms aren't met. State is always visible.
+              Lock funds, release on completion, or refund if terms aren&rsquo;t met. State is always visible.
             </p>
             <div className={`mt-7 ${contentCardClass} p-4.5 sm:mt-8 sm:p-6`}>
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary/85">

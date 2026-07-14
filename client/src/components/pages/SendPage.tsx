@@ -67,7 +67,7 @@ export function SendPage() {
       })
     : "0.00";
 
-  const { data: tokenData, isLoading: isLoadingTokens, error: tokenError } = useSidraTokens();
+  const { data: tokenData, isLoading: isLoadingTokens } = useSidraTokens();
 
   const selectedTokenData = tokenData?.find((t) => t.symbol === selectedToken.symbol);
 
