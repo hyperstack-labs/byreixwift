@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { useAccount } from "wagmi";
+import { useAccount, useWriteContract, usePublicClient } from "wagmi";
+import { parseEther, parseEventLogs, keccak256, toHex } from "viem";
 import { getContractEscrow } from "@/lib/contract";
+import { ESCROW_ABI, ESCROW_CONTRACT_ADDRESS } from "@/config/contract";
 import {
   Card,
   Button,
@@ -44,8 +46,16 @@ import {
 
 const isValidAddress = (a: string) => /^0x[0-9a-fA-F]{40}$/.test(a);
 
+const cleanEscrowDescription = (e: EscrowRecord): EscrowRecord => ({
+  ...e,
+  description: e.description.replace(/^\[OnChainId:\s*\d+\]\s*/, ""),
+});
+
 export function EscrowPage() {
   const { address: connectedAddress } = useAccount();
+  const { writeContractAsync } = useWriteContract();
+  const publicClient = usePublicClient();
+
   const [mode, setMode] = useState<"simulation" | "live">("simulation"); // For toggling between simulation and live modes
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [creationSuccessData, setCreationSuccessData] = useState<EscrowRecord | null>(null);
@@ -60,6 +70,15 @@ export function EscrowPage() {
     description: "",
     fixedFee: "0",
   });
+  const [isPendingOnChain, setIsPendingOnChain] = useState(false);
+  const [prevSelectedId, setPrevSelectedId] = useState<string | null>(null);
+  const [prevMode, setPrevMode] = useState<"simulation" | "live">("simulation");
+
+  if (selectedEscrowId !== prevSelectedId || mode !== prevMode) {
+    setPrevSelectedId(selectedEscrowId);
+    setPrevMode(mode);
+    setContractEscrow(null);
+  }
 
   // Real hooks connected to the /api/escrows endpoints
   const { data: escrows = [], isLoading, error } = useEscrows();
@@ -89,13 +108,18 @@ export function EscrowPage() {
     ? (escrows.find((e) => e.id === selectedEscrowId) ?? null)
     : null;
 
+  const cleanedSelectedEscrow = selectedEscrow ? cleanEscrowDescription(selectedEscrow) : null;
+
   useEffect(() => {
-    if (mode !== "live") {
+    if (mode !== "live" || !selectedEscrow) {
       return;
     }
 
-    getContractEscrow("0").then(setContractEscrow).catch(console.error);
-  }, [mode]);
+    const match = selectedEscrow.description.match(/^\[OnChainId:\s*(\d+)\]/);
+    const onChainId = match ? match[1] : "0";
+
+    getContractEscrow(onChainId).then(setContractEscrow).catch(console.error);
+  }, [mode, selectedEscrow]);
 
   // Aggregate calculation for header stats
   const totalLocked = escrows
@@ -107,7 +131,8 @@ export function EscrowPage() {
     createEscrow.isPending ||
     lockEscrow.isPending ||
     releaseEscrow.isPending ||
-    refundEscrow.isPending;
+    refundEscrow.isPending ||
+    isPendingOnChain;
 
   // Field validation
   const validateForm = () => {
@@ -127,6 +152,78 @@ export function EscrowPage() {
   const handleCreateEscrow = async () => {
     if (!validateForm()) {
       toast.error("Please fill in all required fields correctly");
+      return;
+    }
+
+    if (mode === "live") {
+      if (!connectedAddress) {
+        toast.error("Please connect your wallet first");
+        return;
+      }
+      if (!publicClient) {
+        toast.error("Blockchain provider is not ready. Please check your connection.");
+        return;
+      }
+
+      setIsPendingOnChain(true);
+      setModalError(null);
+      try {
+        const grossAmountValue = parseEther(formData.amount) + parseEther(formData.fixedFee || "0");
+        const agreementHash = keccak256(toHex(formData.description || ""));
+
+        // Call the write contract method
+        const hash = await writeContractAsync({
+          address: ESCROW_CONTRACT_ADDRESS,
+          abi: ESCROW_ABI,
+          functionName: "deposit",
+          args: [formData.seller as `0x${string}`, agreementHash],
+          value: grossAmountValue,
+        });
+
+        toast.info("Transaction submitted on-chain. Waiting for confirmation...", {
+          description: `Tx Hash: ${hash.slice(0, 8)}...${hash.slice(-6)}`,
+        });
+
+        // Wait for confirmation
+        const receipt = await publicClient.waitForTransactionReceipt({ hash });
+
+        // Parse logs to find transaction ID
+        const logs = parseEventLogs({
+          abi: ESCROW_ABI,
+          eventName: "EscrowCreated",
+          logs: receipt.logs,
+        });
+
+        const onChainTxId = logs[0]?.args?.txId?.toString();
+        if (!onChainTxId) {
+          throw new Error("Could not find EscrowCreated event in transaction receipt.");
+        }
+
+        toast.success(`Transaction confirmed on-chain! ID: ${onChainTxId}`);
+
+        // Prefix description to persist the onChainTxId in the PostgreSQL database without changing schema
+        const prefixedDescription = `[OnChainId: ${onChainTxId}] ${formData.description}`;
+
+        const payload = {
+          buyer: connectedAddress.toLowerCase(),
+          seller: formData.seller.toLowerCase(),
+          amount: Number(formData.amount),
+          tokenSymbol: formData.token,
+          description: prefixedDescription,
+          fixedFee: Number(formData.fixedFee || "0"),
+        };
+
+        const result = await createEscrow.mutateAsync(payload);
+        toast.success("Escrow recorded in database successfully");
+        setCreationSuccessData(result?.escrow || (result as unknown as EscrowRecord));
+        resetForm();
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : "Failed to execute transaction";
+        toast.error(msg);
+        setModalError(msg);
+      } finally {
+        setIsPendingOnChain(false);
+      }
       return;
     }
 
@@ -156,6 +253,64 @@ export function EscrowPage() {
   ) => {
     // Clear any prior error before attempting the transition
     setModalError(null);
+
+    if (mode === "live") {
+      if (!connectedAddress) {
+        toast.error("Please connect your wallet first");
+        return;
+      }
+      if (!selectedEscrow) {
+        toast.error("No escrow selected");
+        return;
+      }
+      if (!publicClient) {
+        toast.error("Blockchain provider is not ready");
+        return;
+      }
+
+      setIsPendingOnChain(true);
+      try {
+        const match = selectedEscrow.description.match(/^\[OnChainId:\s*(\d+)\]/);
+        const onChainId = match ? BigInt(match[1]) : BigInt(0);
+
+        // Call the write contract method
+        const hash = await writeContractAsync({
+          address: ESCROW_CONTRACT_ADDRESS,
+          abi: ESCROW_ABI,
+          functionName: action,
+          args: [onChainId],
+        });
+
+        toast.info(`Transaction submitted: ${action}. Waiting for confirmation...`, {
+          description: `Tx Hash: ${hash.slice(0, 8)}...${hash.slice(-6)}`,
+        });
+
+        // Wait for confirmation
+        await publicClient.waitForTransactionReceipt({ hash });
+        toast.success(`Transaction confirmed on-chain! Syncing state with database...`);
+
+        // Record on backend REST API to sync the DB status
+        if (action === "lock") await lockEscrow.mutateAsync({ id, payload: { actor } });
+        if (action === "release") await releaseEscrow.mutateAsync({ id, payload: { actor } });
+        if (action === "refund") await refundEscrow.mutateAsync({ id, payload: { actor } });
+
+        toast.success(
+          {
+            lock: "Escrow locked successfully",
+            release: "Funds released successfully",
+            refund: "Escrow refunded successfully",
+          }[action]
+        );
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Failed to execute transaction";
+        toast.error(message);
+        setModalError(message);
+      } finally {
+        setIsPendingOnChain(false);
+      }
+      return;
+    }
+
     try {
       if (action === "lock") await lockEscrow.mutateAsync({ id, payload: { actor } });
       if (action === "release") await releaseEscrow.mutateAsync({ id, payload: { actor } });
@@ -530,6 +685,7 @@ export function EscrowPage() {
               // Safe casing translation to prevent lookups from returning undefined configurations
               const lookupKey = escrow.state?.toUpperCase() as keyof typeof STATE_CONFIG;
               const cfg = STATE_CONFIG[lookupKey] || { dotClass: "bg-muted" };
+              const cleanedEscrow = cleanEscrowDescription(escrow);
 
               return (
                 <Card
@@ -546,7 +702,7 @@ export function EscrowPage() {
                       />
                       <div className="min-w-0">
                         <p className="font-semibold truncate group-hover:text-primary transition-all duration-200 group-hover:translate-x-0.5">
-                          {escrow.description}
+                          {cleanedEscrow.description}
                         </p>
                         <div className="flex items-center gap-1.5 mt-1 text-xs text-muted-foreground/70 font-mono">
                           <Wallet className="w-3 h-3 shrink-0 opacity-60" />
@@ -607,9 +763,9 @@ export function EscrowPage() {
       </div>
 
       {/* Transaction Modal */}
-      {selectedEscrow && (
+      {selectedEscrow && cleanedSelectedEscrow && (
         <EscrowTransactionModal
-          escrow={selectedEscrow}
+          escrow={cleanedSelectedEscrow}
           events={events}
           isMutating={isMutating}
           contractEscrow={contractEscrow}

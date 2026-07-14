@@ -422,7 +422,10 @@ export function WalletDashboard() {
                         <div className="min-w-0 flex-1">
                           <div className="flex items-start justify-between gap-2">
                             <p className="font-bold truncate text-sm capitalize text-foreground">
-                              {escrow.description || `Escrow #${escrow.id}`}
+                              {(escrow.description || `Escrow #${escrow.id}`).replace(
+                                /^\[OnChainId:\s*\d+\]\s*/,
+                                ""
+                              )}
                             </p>
                             <p className="text-sm font-bold whitespace-nowrap text-foreground">
                               {escrow.amount}
