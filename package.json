@@ -7,7 +7,8 @@
     "dev:all": "pnpm dev:client & pnpm dev:server",
     "fix": "pnpm -r fix",
     "lint": "pnpm -r lint",
-    "build": "pnpm -r build"
+    "build": "pnpm -r build",
+    "test:e2e": "pnpm --filter byreixwift test:e2e"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

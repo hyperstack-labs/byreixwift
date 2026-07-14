@@ -5,6 +5,7 @@ import { AppModule } from './app.module';
 import cookieParser from 'cookie-parser';
 import * as path from 'path';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
+import helmet from 'helmet';
 
 import { db } from './db';
 import { escrows } from './db/schema';
@@ -12,6 +13,9 @@ import { escrows } from './db/schema';
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule);
+
+  // Apply Helmet middleware for security headers
+  app.use(helmet());
 
   try {
     logger.log('Running database migrations...');
