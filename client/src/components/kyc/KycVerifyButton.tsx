@@ -21,9 +21,7 @@ export function KycVerifyButton() {
       window.location.href = data.url;
     } catch (err) {
       const axiosErr = err as AxiosError<{ message: string }>;
-      const msg =
-        axiosErr.response?.data?.message ||
-        "KYC verification is not available right now";
+      const msg = axiosErr.response?.data?.message || "KYC verification is not available right now";
       toast.error(msg);
     } finally {
       setLoading(false);
@@ -37,11 +35,7 @@ export function KycVerifyButton() {
       variant={kycStatus === "pending" ? "outline" : "default"}
       className="gap-2"
     >
-      {loading ? (
-        <Loader2 className="w-4 h-4 animate-spin" />
-      ) : (
-        <ShieldCheck className="w-4 h-4" />
-      )}
+      {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShieldCheck className="w-4 h-4" />}
       {kycStatus === "pending" ? "Verifying..." : "Verify Identity"}
       <ExternalLink className="w-3 h-3 opacity-60" />
     </Button>

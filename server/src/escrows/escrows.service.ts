@@ -3,13 +3,13 @@ import {
   Injectable,
   NotFoundException,
   Inject,
-} from "@nestjs/common";
-import { randomUUID } from "crypto";
-import { CreateEscrowDto, EscrowActionDto } from "./dto";
-import { EscrowEventRecord, EscrowRecord, EscrowState } from "./escrow.types";
-import { escrows, escrowEvents } from "../db/schema";
-import { eq } from "drizzle-orm";
-import { ContractService } from "../contracts/contract.service";
+} from '@nestjs/common';
+import { randomUUID } from 'crypto';
+import { CreateEscrowDto, EscrowActionDto } from './dto';
+import { EscrowEventRecord, EscrowRecord, EscrowState } from './escrow.types';
+import { escrows, escrowEvents } from '../db/schema';
+import { eq } from 'drizzle-orm';
+import { ContractService } from '../contracts/contract.service';
 
 @Injectable()
 export class EscrowsService {
@@ -17,7 +17,7 @@ export class EscrowsService {
    * Initializes the escrow service with backend persistence and on-chain validator helpers.
    */
   constructor(
-    @Inject("DB") private readonly db: any,
+    @Inject('DB') private readonly db: any,
     private readonly contractService: ContractService,
   ) {}
 
@@ -29,7 +29,7 @@ export class EscrowsService {
     const rows = await this.db
       .select()
       .from(escrows)
-      .orderBy(escrows.createdAt, "desc");
+      .orderBy(escrows.createdAt, 'desc');
     return rows;
   }
 
@@ -43,7 +43,7 @@ export class EscrowsService {
       .from(escrows)
       .where(eq(escrows.id, id));
     if (!escrow) {
-      throw new NotFoundException("Escrow not found");
+      throw new NotFoundException('Escrow not found');
     }
     return escrow;
   }
@@ -67,7 +67,7 @@ export class EscrowsService {
   async createEscrow(dto: CreateEscrowDto) {
     if (dto.buyer.toLowerCase() === dto.seller.toLowerCase()) {
       throw new BadRequestException(
-        "buyer and seller must be different addresses",
+        'buyer and seller must be different addresses',
       );
     }
 
@@ -77,7 +77,7 @@ export class EscrowsService {
       const onChainId = parseInt(onChainMatch[1], 10);
       if (!dto.txHash) {
         throw new BadRequestException(
-          "txHash is required for live/on-chain escrows",
+          'txHash is required for live/on-chain escrows',
         );
       }
       const isVerified = await this.contractService.verifyOnChainCreation(
@@ -90,7 +90,7 @@ export class EscrowsService {
       );
       if (!isVerified) {
         throw new BadRequestException(
-          "On-chain creation transaction verification failed",
+          'On-chain creation transaction verification failed',
         );
       }
     }
@@ -104,13 +104,13 @@ export class EscrowsService {
       tokenSymbol: dto.tokenSymbol.trim().toUpperCase(),
       description: dto.description.trim(),
       fixedFee: Number((dto.fixedFee ?? 0).toFixed(8)),
-      state: "pending",
+      state: 'pending',
       createdAt: now,
       updatedAt: now,
     };
 
     await this.db.insert(escrows).values(escrow);
-    await this.appendEvent(escrow.id, "EscrowCreated", escrow.state, {
+    await this.appendEvent(escrow.id, 'EscrowCreated', escrow.state, {
       amount: escrow.amount,
       tokenSymbol: escrow.tokenSymbol,
       fixedFee: escrow.fixedFee,
@@ -127,16 +127,16 @@ export class EscrowsService {
    */
   async lockEscrow(id: string, dto: EscrowActionDto) {
     const escrow = await this.getEscrow(id);
-    this.assertActor(escrow.buyer, dto.actor, "Only the buyer can lock escrow");
+    this.assertActor(escrow.buyer, dto.actor, 'Only the buyer can lock escrow');
     this.assertState(
       escrow.state,
-      "pending",
-      "Only pending escrow can be locked",
+      'pending',
+      'Only pending escrow can be locked',
     );
 
-    await this.verifyOnChainTransitionIfLive(escrow, dto, "EscrowLocked");
+    await this.verifyOnChainTransitionIfLive(escrow, dto, 'EscrowLocked');
 
-    return this.transition(id, "locked", "TransactionLocked", {
+    return this.transition(id, 'locked', 'TransactionLocked', {
       actor: dto.actor,
     });
   }
@@ -149,17 +149,17 @@ export class EscrowsService {
     this.assertActor(
       escrow.buyer,
       dto.actor,
-      "Only the buyer can release escrow",
+      'Only the buyer can release escrow',
     );
     this.assertState(
       escrow.state,
-      "locked",
-      "Only locked escrow can be released",
+      'locked',
+      'Only locked escrow can be released',
     );
 
-    await this.verifyOnChainTransitionIfLive(escrow, dto, "EscrowReleased");
+    await this.verifyOnChainTransitionIfLive(escrow, dto, 'EscrowReleased');
 
-    return this.transition(id, "released", "FundsReleased", {
+    return this.transition(id, 'released', 'FundsReleased', {
       actor: dto.actor,
       amountToSeller: Number((escrow.amount - escrow.fixedFee).toFixed(8)),
       fee: escrow.fixedFee,
@@ -174,16 +174,16 @@ export class EscrowsService {
     this.assertActor(
       escrow.seller,
       dto.actor,
-      "Only the seller can refund escrow",
+      'Only the seller can refund escrow',
     );
 
-    if (escrow.state === "released" || escrow.state === "refunded") {
-      throw new BadRequestException("Escrow can no longer be refunded");
+    if (escrow.state === 'released' || escrow.state === 'refunded') {
+      throw new BadRequestException('Escrow can no longer be refunded');
     }
 
-    await this.verifyOnChainTransitionIfLive(escrow, dto, "EscrowRefunded");
+    await this.verifyOnChainTransitionIfLive(escrow, dto, 'EscrowRefunded');
 
-    return this.transition(id, "refunded", "FundsRefunded", {
+    return this.transition(id, 'refunded', 'FundsRefunded', {
       actor: dto.actor,
     });
   }
@@ -194,14 +194,14 @@ export class EscrowsService {
   private async verifyOnChainTransitionIfLive(
     escrow: EscrowRecord,
     dto: EscrowActionDto,
-    eventName: "EscrowLocked" | "EscrowReleased" | "EscrowRefunded",
+    eventName: 'EscrowLocked' | 'EscrowReleased' | 'EscrowRefunded',
   ) {
     const onChainMatch = escrow.description.match(/^\[OnChainId:\s*(\d+)\]/);
     if (onChainMatch) {
       const onChainId = parseInt(onChainMatch[1], 10);
       if (!dto.txHash) {
         throw new BadRequestException(
-          "txHash is required to transition live/on-chain escrows",
+          'txHash is required to transition live/on-chain escrows',
         );
       }
       const isVerified = await this.contractService.verifyOnChainTransition(
@@ -221,7 +221,7 @@ export class EscrowsService {
   private async transition(
     id: string,
     nextState: EscrowState,
-    eventType: EscrowEventRecord["type"],
+    eventType: EscrowEventRecord['type'],
     metadata?: Record<string, string | number>,
   ) {
     const escrow = await this.getEscrow(id);
@@ -242,7 +242,7 @@ export class EscrowsService {
 
   private async appendEvent(
     escrowId: string,
-    type: EscrowEventRecord["type"],
+    type: EscrowEventRecord['type'],
     state: EscrowState,
     metadata?: Record<string, string | number>,
   ) {

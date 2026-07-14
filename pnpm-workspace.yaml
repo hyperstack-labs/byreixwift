@@ -1,0 +1,9 @@
+packages:
+  - 'client'
+  - 'server'
+  - 'contracts'
+allowBuilds:
+  esbuild: true
+  keccak: true
+  sharp: true
+  unrs-resolver: true

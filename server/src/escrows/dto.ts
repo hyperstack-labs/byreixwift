@@ -6,17 +6,17 @@ import {
   Matches,
   Max,
   Min,
-} from "class-validator";
+} from 'class-validator';
 
 const walletPattern = /^0x[a-fA-F0-9]{40}$/;
 
 export class CreateEscrowDto {
   @IsString()
-  @Matches(walletPattern, { message: "buyer must be a valid wallet address" })
+  @Matches(walletPattern, { message: 'buyer must be a valid wallet address' })
   buyer!: string;
 
   @IsString()
-  @Matches(walletPattern, { message: "seller must be a valid wallet address" })
+  @Matches(walletPattern, { message: 'seller must be a valid wallet address' })
   seller!: string;
 
   @IsNumber({ maxDecimalPlaces: 8 })
@@ -46,7 +46,7 @@ export class CreateEscrowDto {
 
 export class EscrowActionDto {
   @IsString()
-  @Matches(walletPattern, { message: "actor must be a valid wallet address" })
+  @Matches(walletPattern, { message: 'actor must be a valid wallet address' })
   actor!: string;
 
   /**

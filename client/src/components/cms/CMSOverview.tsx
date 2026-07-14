@@ -100,13 +100,9 @@ const CMSOverview = ({ isLoading = false }) => {
                     size={14}
                     className="text-zinc-500 mt-0.5 shrink-0 group-hover:text-(--byreix-green) transition-colors"
                   />
-                  <span className="text-white/70 line-clamp-1">
-                    Placeholder activity item.
-                  </span>
+                  <span className="text-white/70 line-clamp-1">Placeholder activity item.</span>
                 </div>
-                <span className="text-zinc-600 text-[10px] whitespace-nowrap ml-4">
-                   N/A
-                </span>
+                <span className="text-zinc-600 text-[10px] whitespace-nowrap ml-4">N/A</span>
               </div>
             ))}
           </div>

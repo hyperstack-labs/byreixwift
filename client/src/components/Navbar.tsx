@@ -197,7 +197,7 @@ export function Navbar({
                   <button
                     onClick={() => setShowAccountMenu(!showAccountMenu)}
                     className="flex items-center gap-2 text-xs text-neutral-300 font-mono bg-white/5 hover:bg-white/8 border border-white/10 px-3 py-1.5 rounded-md transition duration-200 cursor-pointer outline-none select-none"
-                     aria-label="Account menu"
+                    aria-label="Account menu"
                   >
                     <span className="text-[10px] font-semibold tracking-wide text-neutral-400 font-sans whitespace-nowrap">
                       Sidrachain

@@ -1,4 +1,4 @@
-name: PR Checks (Frontend)
+name: PR Checks
 
 on:
   pull_request:
@@ -7,16 +7,14 @@ on:
       - dev
     paths:
       - 'client/**'
+      - 'server/**'
+      - 'contracts/**'
       - '.github/workflows/ci.yml'
 
 jobs:
   lint_and_build:
     name: Lint & Build
     runs-on: ubuntu-latest
-    
-    defaults:
-      run:
-        working-directory: client
 
     steps:
       - name: Checkout repository
@@ -32,7 +30,7 @@ jobs:
         with:
           node-version: '22'
           cache: 'pnpm'
-          cache-dependency-path: client/pnpm-lock.yaml
+          cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile

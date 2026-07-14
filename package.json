@@ -1,0 +1,20 @@
+{
+  "name": "byreixwift-root",
+  "private": true,
+  "scripts": {
+    "dev:client": "pnpm --filter byreixwift dev",
+    "dev:server": "pnpm --filter byreixwift-server dev",
+    "dev:all": "pnpm dev:client & pnpm dev:server",
+    "fix": "pnpm -r fix",
+    "lint": "pnpm -r lint",
+    "build": "pnpm -r build"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@nestjs/core",
+      "esbuild",
+      "unrs-resolver",
+      "keccak"
+    ]
+  }
+}

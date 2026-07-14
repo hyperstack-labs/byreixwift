@@ -1,16 +1,16 @@
 export const ESCROW_STATES = [
-  "pending",
-  "locked",
-  "released",
-  "refunded",
+  'pending',
+  'locked',
+  'released',
+  'refunded',
 ] as const;
 export type EscrowState = (typeof ESCROW_STATES)[number];
 
 export const ESCROW_EVENT_TYPES = [
-  "EscrowCreated",
-  "TransactionLocked",
-  "FundsReleased",
-  "FundsRefunded",
+  'EscrowCreated',
+  'TransactionLocked',
+  'FundsReleased',
+  'FundsRefunded',
 ] as const;
 export type EscrowEventType = (typeof ESCROW_EVENT_TYPES)[number];
 

@@ -1,5 +1,11 @@
-import { Injectable } from "@nestjs/common";
-import { createPublicClient, http, parseAbi, parseEventLogs, parseEther } from "viem";
+import { Injectable } from '@nestjs/common';
+import {
+  createPublicClient,
+  http,
+  parseAbi,
+  parseEventLogs,
+  parseEther,
+} from 'viem';
 
 @Injectable()
 export class ContractService {
@@ -17,13 +23,13 @@ export class ContractService {
     if (
       !rpc ||
       !contractAddress ||
-      contractAddress === "0x0000000000000000000000000000000000000000"
+      contractAddress === '0x0000000000000000000000000000000000000000'
     ) {
       console.warn(
-        "⚠️ RPC_URL or CONTRACT_ADDRESS is missing/placeholder. Blockchain integration will run in mock mode.",
+        '⚠️ RPC_URL or CONTRACT_ADDRESS is missing/placeholder. Blockchain integration will run in mock mode.',
       );
       this.client = null;
-      this.address = "0x0000000000000000000000000000000000000000";
+      this.address = '0x0000000000000000000000000000000000000000';
       return;
     }
 
@@ -33,18 +39,18 @@ export class ContractService {
         transport: http(rpc),
       });
     } catch (error) {
-      console.error("❌ Failed to initialize blockchain client:", error);
+      console.error('❌ Failed to initialize blockchain client:', error);
       this.client = null;
     }
   }
 
   private abi = parseAbi([
-    "function nextTransactionId() view returns (uint256)",
-    "function transactions(uint256) view returns (address,address,uint256,uint256,bytes32,uint8,uint64,uint64,uint64,bool)",
-    "event EscrowCreated(uint256 indexed txId, address indexed buyer, address indexed seller, uint256 grossAmount, uint256 fixedFee, bytes32 agreementHash)",
-    "event EscrowLocked(uint256 indexed txId, address indexed actor)",
-    "event EscrowReleased(uint256 indexed txId, address indexed actor, uint256 sellerAmount, uint256 feeAmount)",
-    "event EscrowRefunded(uint256 indexed txId, address indexed actor, uint256 refundedAmount)",
+    'function nextTransactionId() view returns (uint256)',
+    'function transactions(uint256) view returns (address,address,uint256,uint256,bytes32,uint8,uint64,uint64,uint64,bool)',
+    'event EscrowCreated(uint256 indexed txId, address indexed buyer, address indexed seller, uint256 grossAmount, uint256 fixedFee, bytes32 agreementHash)',
+    'event EscrowLocked(uint256 indexed txId, address indexed actor)',
+    'event EscrowReleased(uint256 indexed txId, address indexed actor, uint256 sellerAmount, uint256 feeAmount)',
+    'event EscrowRefunded(uint256 indexed txId, address indexed actor, uint256 refundedAmount)',
   ]);
 
   /**
@@ -54,23 +60,23 @@ export class ContractService {
   async getNextTransactionId() {
     if (
       !this.client ||
-      this.address === "0x0000000000000000000000000000000000000000"
+      this.address === '0x0000000000000000000000000000000000000000'
     ) {
       console.warn(
-        "getNextTransactionId: Client not initialized or zero address. Returning fallback/mock value.",
+        'getNextTransactionId: Client not initialized or zero address. Returning fallback/mock value.',
       );
-      return "0";
+      return '0';
     }
     try {
       const result = await this.client.readContract({
         address: this.address,
         abi: this.abi,
-        functionName: "nextTransactionId",
+        functionName: 'nextTransactionId',
       });
       return result.toString();
     } catch (error) {
-      console.warn("getNextTransactionId failed, falling back to mock:", error);
-      return "0";
+      console.warn('getNextTransactionId failed, falling back to mock:', error);
+      return '0';
     }
   }
 
@@ -81,21 +87,21 @@ export class ContractService {
   async getEscrow(id: number) {
     if (
       !this.client ||
-      this.address === "0x0000000000000000000000000000000000000000"
+      this.address === '0x0000000000000000000000000000000000000000'
     ) {
       console.warn(
-        "getEscrow: Client not initialized or zero address. Returning mock escrow details.",
+        'getEscrow: Client not initialized or zero address. Returning mock escrow details.',
       );
       return [
-        "0x0000000000000000000000000000000000000000",
-        "0x0000000000000000000000000000000000000000",
-        "0",
-        "0",
-        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        '0x0000000000000000000000000000000000000000',
+        '0x0000000000000000000000000000000000000000',
+        '0',
+        '0',
+        '0x0000000000000000000000000000000000000000000000000000000000000000',
         0,
-        "0",
-        "0",
-        "0",
+        '0',
+        '0',
+        '0',
         false,
       ];
     }
@@ -103,22 +109,22 @@ export class ContractService {
       const data = await this.client.readContract({
         address: this.address,
         abi: this.abi,
-        functionName: "transactions",
+        functionName: 'transactions',
         args: [BigInt(id)],
       });
       return this.serialize(data);
     } catch (error) {
       console.warn(`getEscrow(${id}) failed, falling back to mock:`, error);
       return [
-        "0x0000000000000000000000000000000000000000",
-        "0x0000000000000000000000000000000000000000",
-        "0",
-        "0",
-        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        '0x0000000000000000000000000000000000000000',
+        '0x0000000000000000000000000000000000000000',
+        '0',
+        '0',
+        '0x0000000000000000000000000000000000000000000000000000000000000000',
         0,
-        "0",
-        "0",
-        "0",
+        '0',
+        '0',
+        '0',
         false,
       ];
     }
@@ -138,10 +144,10 @@ export class ContractService {
   ): Promise<boolean> {
     if (
       !this.client ||
-      this.address === "0x0000000000000000000000000000000000000000"
+      this.address === '0x0000000000000000000000000000000000000000'
     ) {
       console.warn(
-        "verifyOnChainCreation: Running in mock mode. Automatically verifying creation.",
+        'verifyOnChainCreation: Running in mock mode. Automatically verifying creation.',
       );
       return true;
     }
@@ -150,13 +156,13 @@ export class ContractService {
       const receipt = await this.client.getTransactionReceipt({
         hash: txHash as `0x${string}`,
       });
-      if (receipt.status !== "success") {
+      if (receipt.status !== 'success') {
         return false;
       }
 
       const logs = parseEventLogs({
         abi: this.abi,
-        eventName: "EscrowCreated",
+        eventName: 'EscrowCreated',
         logs: receipt.logs,
       });
 
@@ -200,13 +206,13 @@ export class ContractService {
    */
   async verifyOnChainTransition(
     txHash: string,
-    eventName: "EscrowLocked" | "EscrowReleased" | "EscrowRefunded",
+    eventName: 'EscrowLocked' | 'EscrowReleased' | 'EscrowRefunded',
     onChainId: number,
     actor: string,
   ): Promise<boolean> {
     if (
       !this.client ||
-      this.address === "0x0000000000000000000000000000000000000000"
+      this.address === '0x0000000000000000000000000000000000000000'
     ) {
       console.warn(
         `verifyOnChainTransition(${eventName}): Running in mock mode. Automatically verifying transition.`,
@@ -218,7 +224,7 @@ export class ContractService {
       const receipt = await this.client.getTransactionReceipt({
         hash: txHash as `0x${string}`,
       });
-      if (receipt.status !== "success") {
+      if (receipt.status !== 'success') {
         return false;
       }
 
@@ -257,7 +263,7 @@ export class ContractService {
   private serialize(data: any) {
     return JSON.parse(
       JSON.stringify(data, (_, value) =>
-        typeof value === "bigint" ? value.toString() : value,
+        typeof value === 'bigint' ? value.toString() : value,
       ),
     );
   }

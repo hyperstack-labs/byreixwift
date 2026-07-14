@@ -7,7 +7,12 @@ interface AuthState {
   accessToken: string | null;
   kycStatus: string | null;
   kycTier: string | null;
-  login: (identity: string, accessToken: string, kycStatus?: string | null, kycTier?: string | null) => void;
+  login: (
+    identity: string,
+    accessToken: string,
+    kycStatus?: string | null,
+    kycTier?: string | null
+  ) => void;
   logout: () => void;
   setAccessToken: (token: string) => void;
   setKyc: (kycStatus: string, kycTier: string) => void;
@@ -22,9 +27,21 @@ export const useAuthStore = create<AuthState>()(
       kycStatus: null,
       kycTier: null,
       login: (identity, accessToken, kycStatus?, kycTier?) =>
-        set({ isAuthenticated: true, identity, accessToken, kycStatus: kycStatus ?? null, kycTier: kycTier ?? null }),
+        set({
+          isAuthenticated: true,
+          identity,
+          accessToken,
+          kycStatus: kycStatus ?? null,
+          kycTier: kycTier ?? null,
+        }),
       logout: () =>
-        set({ isAuthenticated: false, identity: null, accessToken: null, kycStatus: null, kycTier: null }),
+        set({
+          isAuthenticated: false,
+          identity: null,
+          accessToken: null,
+          kycStatus: null,
+          kycTier: null,
+        }),
       setAccessToken: (accessToken) => set({ accessToken }),
       setKyc: (kycStatus, kycTier) => set({ kycStatus, kycTier }),
     }),

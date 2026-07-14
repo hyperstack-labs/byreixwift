@@ -11,7 +11,10 @@
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/main.js",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "lint": "eslint \"{src,apps,libs}/**/*.ts\" --fix",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "fix": "pnpm run lint && pnpm run format"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.19",
@@ -38,8 +41,14 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.12.2",
     "@types/pg": "^8.20.0",
+    "@typescript-eslint/eslint-plugin": "^8.24.0",
+    "@typescript-eslint/parser": "^8.24.0",
     "drizzle-kit": "^0.31.10",
+    "eslint": "^9.39.4",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.3",
     "jest": "^30.4.2",
+    "prettier": "^3.8.3",
     "ts-jest": "^29.4.11",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.3"

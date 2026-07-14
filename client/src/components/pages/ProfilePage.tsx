@@ -79,7 +79,8 @@ export function ProfilePage() {
                   <div>
                     <h3 className="text-lg font-bold text-white mb-1">Identity Verification</h3>
                     <p className="text-sm text-muted-foreground">
-                      Verify your identity to unlock higher transaction limits and enhanced security.
+                      Verify your identity to unlock higher transaction limits and enhanced
+                      security.
                     </p>
                   </div>
                 </div>

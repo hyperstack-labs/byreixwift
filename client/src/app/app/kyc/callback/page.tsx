@@ -38,9 +38,7 @@ export default function KycCallbackPage() {
       <Card className="max-w-md w-full text-center">
         <CardHeader>
           <CardTitle>
-            {status === "verified"
-              ? "Verification Complete"
-              : "Verification Submitted"}
+            {status === "verified" ? "Verification Complete" : "Verification Submitted"}
           </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col items-center gap-4 pb-8">

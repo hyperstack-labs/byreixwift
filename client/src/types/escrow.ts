@@ -41,4 +41,3 @@ export interface EscrowActionPayload {
   actor: string;
   txHash?: string;
 }
-

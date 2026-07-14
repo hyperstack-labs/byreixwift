@@ -676,7 +676,7 @@ export function LandingPage({ onConnect }: LandingPageProps) {
 
             <p className="mt-4.5 max-w-xl text-[0.98rem] leading-[1.72] text-muted-foreground sm:mt-5.5 sm:text-[1.03rem] lg:text-[1.08rem]">
               Preview every transaction, verify merchant identities, and reveal hidden fees before
-              you sign.                 Know what you&rsquo;re signing before you sign it.
+              you sign. Know what you&rsquo;re signing before you sign it.
             </p>
 
             <div className="mt-6 flex w-full max-w-lg flex-col gap-3 sm:mt-7 sm:w-auto sm:max-w-none sm:flex-row sm:justify-center">
@@ -969,7 +969,8 @@ export function LandingPage({ onConnect }: LandingPageProps) {
               Use escrow when trust needs structure.
             </h2>
             <p className="mt-4 max-w-[34rem] text-[0.98rem] leading-[1.68] text-muted-foreground sm:mt-6 sm:text-lg">
-              Lock funds, release on completion, or refund if terms aren&rsquo;t met. State is always visible.
+              Lock funds, release on completion, or refund if terms aren&rsquo;t met. State is
+              always visible.
             </p>
             <div className={`mt-7 ${contentCardClass} p-4.5 sm:mt-8 sm:p-6`}>
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary/85">
@@ -1041,9 +1042,7 @@ export function LandingPage({ onConnect }: LandingPageProps) {
             {...sectionReveal(reducedMotion, 0.08)}
             className="mt-8 grid gap-3 sm:grid-cols-2 sm:grid-rows-2"
           >
-            <div
-              className={`${contentCardClass} col-span-2 p-4 sm:col-span-2 sm:p-5`}
-            >
+            <div className={`${contentCardClass} col-span-2 p-4 sm:col-span-2 sm:p-5`}>
               <div className="flex items-center gap-2">
                 <div className="h-1 w-6 rounded-full bg-primary" />
                 <p className="text-sm font-semibold text-foreground">{principles[0].title}</p>
@@ -1052,9 +1051,7 @@ export function LandingPage({ onConnect }: LandingPageProps) {
                 {principles[0].copy}
               </p>
             </div>
-            <div
-              className={`${contentCardClass} p-4 sm:p-5`}
-            >
+            <div className={`${contentCardClass} p-4 sm:p-5`}>
               <div className="flex items-center gap-2">
                 <div className="h-1 w-6 rounded-full bg-[--byreix-gold-soft]" />
                 <p className="text-sm font-semibold text-foreground">{principles[1].title}</p>
@@ -1063,9 +1060,7 @@ export function LandingPage({ onConnect }: LandingPageProps) {
                 {principles[1].copy}
               </p>
             </div>
-            <div
-              className={`${contentCardClass} p-4 sm:p-5`}
-            >
+            <div className={`${contentCardClass} p-4 sm:p-5`}>
               <div className="flex items-center gap-2">
                 <div className="h-1 w-6 rounded-full bg-primary" />
                 <p className="text-sm font-semibold text-foreground">{principles[2].title}</p>
@@ -1074,9 +1069,7 @@ export function LandingPage({ onConnect }: LandingPageProps) {
                 {principles[2].copy}
               </p>
             </div>
-            <div
-              className={`${contentCardClass} col-span-2 p-4 sm:col-span-2 sm:p-5`}
-            >
+            <div className={`${contentCardClass} col-span-2 p-4 sm:col-span-2 sm:p-5`}>
               <div className="flex items-center gap-2">
                 <div className="h-1 w-6 rounded-full bg-[--byreix-gold-soft]" />
                 <p className="text-sm font-semibold text-foreground">{principles[3].title}</p>
@@ -1094,7 +1087,7 @@ export function LandingPage({ onConnect }: LandingPageProps) {
         className="px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20"
       >
         <div className="mx-auto grid max-w-6xl items-start gap-7 sm:gap-10 lg:grid-cols-[0.92fr_1.08fr] lg:gap-14">
-            <motion.div {...sectionReveal(reducedMotion)}>
+          <motion.div {...sectionReveal(reducedMotion)}>
             <SectionLabel>How It Works</SectionLabel>
             <h2 className="mt-4 text-[1.82rem] font-bold leading-[1.04] tracking-tight text-foreground sm:mt-6 sm:text-[2.55rem] lg:text-[3.25rem]">
               Connect. Review. Approve.

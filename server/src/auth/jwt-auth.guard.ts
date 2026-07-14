@@ -3,8 +3,8 @@ import {
   ExecutionContext,
   Injectable,
   UnauthorizedException,
-} from "@nestjs/common";
-import * as jwt from "jsonwebtoken";
+} from '@nestjs/common';
+import * as jwt from 'jsonwebtoken';
 
 /**
  * Custom JWT Authentication Guard to protect server endpoints.
@@ -12,20 +12,20 @@ import * as jwt from "jsonwebtoken";
  */
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-  private readonly JWT_SECRET = process.env.JWT_SECRET || "secret";
+  private readonly JWT_SECRET = process.env.JWT_SECRET || 'secret';
 
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
-    const authHeader = request.headers["authorization"];
+    const authHeader = request.headers['authorization'];
 
     if (!authHeader) {
-      throw new UnauthorizedException("No authorization header found");
+      throw new UnauthorizedException('No authorization header found');
     }
 
-    const [type, token] = authHeader.split(" ");
+    const [type, token] = authHeader.split(' ');
 
-    if (type !== "Bearer" || !token) {
-      throw new UnauthorizedException("Invalid token format");
+    if (type !== 'Bearer' || !token) {
+      throw new UnauthorizedException('Invalid token format');
     }
 
     try {
@@ -35,8 +35,8 @@ export class JwtAuthGuard implements CanActivate {
         address: payload.address.toLowerCase(),
       };
       return true;
-    } catch (err) {
-      throw new UnauthorizedException("Invalid or expired token");
+    } catch {
+      throw new UnauthorizedException('Invalid or expired token');
     }
   }
 }
