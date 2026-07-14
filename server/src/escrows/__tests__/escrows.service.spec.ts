@@ -1,6 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { BadRequestException, NotFoundException } from "@nestjs/common";
 import { EscrowsService } from "../escrows.service";
+import { ContractService } from "../../contracts/contract.service";
 
 function queryChain(resolveValue: any) {
   const chain: any = {
@@ -21,6 +22,7 @@ function queryChain(resolveValue: any) {
 describe("EscrowsService", () => {
   let service: EscrowsService;
   let mockDb: any;
+  let mockContractService: any;
 
   const mockEscrow = {
     id: "550e8400-e29b-41d4-a716-446655440000",
@@ -43,10 +45,16 @@ describe("EscrowsService", () => {
       update: jest.fn(),
     };
 
+    mockContractService = {
+      verifyOnChainCreation: jest.fn().mockResolvedValue(true),
+      verifyOnChainTransition: jest.fn().mockResolvedValue(true),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         EscrowsService,
         { provide: "DB", useValue: mockDb },
+        { provide: ContractService, useValue: mockContractService },
       ],
     }).compile();
 

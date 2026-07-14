@@ -211,6 +211,7 @@ export function EscrowPage() {
           tokenSymbol: formData.token,
           description: prefixedDescription,
           fixedFee: Number(formData.fixedFee || "0"),
+          txHash: hash,
         };
 
         const result = await createEscrow.mutateAsync(payload);
@@ -290,9 +291,9 @@ export function EscrowPage() {
         toast.success(`Transaction confirmed on-chain! Syncing state with database...`);
 
         // Record on backend REST API to sync the DB status
-        if (action === "lock") await lockEscrow.mutateAsync({ id, payload: { actor } });
-        if (action === "release") await releaseEscrow.mutateAsync({ id, payload: { actor } });
-        if (action === "refund") await refundEscrow.mutateAsync({ id, payload: { actor } });
+        if (action === "lock") await lockEscrow.mutateAsync({ id, payload: { actor, txHash: hash } });
+        if (action === "release") await releaseEscrow.mutateAsync({ id, payload: { actor, txHash: hash } });
+        if (action === "refund") await refundEscrow.mutateAsync({ id, payload: { actor, txHash: hash } });
 
         toast.success(
           {

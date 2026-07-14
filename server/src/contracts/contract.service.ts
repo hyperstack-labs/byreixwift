@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { createPublicClient, http, parseAbi } from "viem";
+import { createPublicClient, http, parseAbi, parseEventLogs, parseEther } from "viem";
 
 @Injectable()
 export class ContractService {
@@ -41,6 +41,10 @@ export class ContractService {
   private abi = parseAbi([
     "function nextTransactionId() view returns (uint256)",
     "function transactions(uint256) view returns (address,address,uint256,uint256,bytes32,uint8,uint64,uint64,uint64,bool)",
+    "event EscrowCreated(uint256 indexed txId, address indexed buyer, address indexed seller, uint256 grossAmount, uint256 fixedFee, bytes32 agreementHash)",
+    "event EscrowLocked(uint256 indexed txId, address indexed actor)",
+    "event EscrowReleased(uint256 indexed txId, address indexed actor, uint256 sellerAmount, uint256 feeAmount)",
+    "event EscrowRefunded(uint256 indexed txId, address indexed actor, uint256 refundedAmount)",
   ]);
 
   /**
@@ -117,6 +121,132 @@ export class ContractService {
         "0",
         false,
       ];
+    }
+  }
+
+  /**
+   * Verifies that the EscrowCreated event matches the stored database record parameters.
+   * Prevents fraudulent creation logs from being registered in the database.
+   */
+  async verifyOnChainCreation(
+    txHash: string,
+    onChainId: number,
+    buyer: string,
+    seller: string,
+    amount: number,
+    fixedFee: number,
+  ): Promise<boolean> {
+    if (
+      !this.client ||
+      this.address === "0x0000000000000000000000000000000000000000"
+    ) {
+      console.warn(
+        "verifyOnChainCreation: Running in mock mode. Automatically verifying creation.",
+      );
+      return true;
+    }
+
+    try {
+      const receipt = await this.client.getTransactionReceipt({
+        hash: txHash as `0x${string}`,
+      });
+      if (receipt.status !== "success") {
+        return false;
+      }
+
+      const logs = parseEventLogs({
+        abi: this.abi,
+        eventName: "EscrowCreated",
+        logs: receipt.logs,
+      });
+
+      const grossWei = parseEther((amount + fixedFee).toFixed(18)).toString();
+      const feeWei = parseEther(fixedFee.toFixed(18)).toString();
+
+      const matchingLog = logs.find((log: any) => {
+        const logTxId = log.args.txId;
+        const logBuyer = log.args.buyer;
+        const logSeller = log.args.seller;
+        const logGross = log.args.grossAmount;
+        const logFee = log.args.fixedFee;
+
+        return (
+          logTxId !== undefined &&
+          logTxId.toString() === onChainId.toString() &&
+          logBuyer !== undefined &&
+          logBuyer.toLowerCase() === buyer.toLowerCase() &&
+          logSeller !== undefined &&
+          logSeller.toLowerCase() === seller.toLowerCase() &&
+          logGross !== undefined &&
+          logGross.toString() === grossWei &&
+          logFee !== undefined &&
+          logFee.toString() === feeWei
+        );
+      });
+
+      return !!matchingLog;
+    } catch (error) {
+      console.error(
+        `Failed to verify on-chain creation for tx ${txHash}:`,
+        error,
+      );
+      return false;
+    }
+  }
+
+  /**
+   * Verifies that the transition event was successfully broadcast to the chain.
+   * Confirms status modification authenticity based on true event logs.
+   */
+  async verifyOnChainTransition(
+    txHash: string,
+    eventName: "EscrowLocked" | "EscrowReleased" | "EscrowRefunded",
+    onChainId: number,
+    actor: string,
+  ): Promise<boolean> {
+    if (
+      !this.client ||
+      this.address === "0x0000000000000000000000000000000000000000"
+    ) {
+      console.warn(
+        `verifyOnChainTransition(${eventName}): Running in mock mode. Automatically verifying transition.`,
+      );
+      return true;
+    }
+
+    try {
+      const receipt = await this.client.getTransactionReceipt({
+        hash: txHash as `0x${string}`,
+      });
+      if (receipt.status !== "success") {
+        return false;
+      }
+
+      const logs = parseEventLogs({
+        abi: this.abi,
+        eventName,
+        logs: receipt.logs,
+      });
+
+      const matchingLog = logs.find((log: any) => {
+        const logTxId = log.args.txId;
+        const logActor = log.args.actor;
+
+        return (
+          logTxId !== undefined &&
+          logTxId.toString() === onChainId.toString() &&
+          logActor !== undefined &&
+          logActor.toLowerCase() === actor.toLowerCase()
+        );
+      });
+
+      return !!matchingLog;
+    } catch (error) {
+      console.error(
+        `Failed to verify on-chain transition ${eventName} for tx ${txHash}:`,
+        error,
+      );
+      return false;
     }
   }
 

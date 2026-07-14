@@ -9,11 +9,22 @@ import { CreateEscrowDto, EscrowActionDto } from "./dto";
 import { EscrowEventRecord, EscrowRecord, EscrowState } from "./escrow.types";
 import { escrows, escrowEvents } from "../db/schema";
 import { eq } from "drizzle-orm";
+import { ContractService } from "../contracts/contract.service";
 
 @Injectable()
 export class EscrowsService {
-  constructor(@Inject("DB") private readonly db: any) {}
+  /**
+   * Initializes the escrow service with backend persistence and on-chain validator helpers.
+   */
+  constructor(
+    @Inject("DB") private readonly db: any,
+    private readonly contractService: ContractService,
+  ) {}
 
+  /**
+   * Retrieves all escrow records ordered chronologically.
+   * Required to display users' transactions.
+   */
   async listEscrows(): Promise<EscrowRecord[]> {
     const rows = await this.db
       .select()
@@ -22,6 +33,10 @@ export class EscrowsService {
     return rows;
   }
 
+  /**
+   * Retrieves a single escrow record by its UUID.
+   * Throws NotFoundException if record does not exist.
+   */
   async getEscrow(id: string): Promise<EscrowRecord> {
     const [escrow] = await this.db
       .select()
@@ -33,6 +48,9 @@ export class EscrowsService {
     return escrow;
   }
 
+  /**
+   * Retrieves audit logs and events associated with a specific escrow.
+   */
   async getEvents(id: string): Promise<EscrowEventRecord[]> {
     await this.getEscrow(id); // ensure escrow exists
     const rows = await this.db
@@ -42,11 +60,39 @@ export class EscrowsService {
     return rows;
   }
 
+  /**
+   * Registers a new escrow.
+   * Verifies the on-chain creation log when running in live/on-chain mode.
+   */
   async createEscrow(dto: CreateEscrowDto) {
     if (dto.buyer.toLowerCase() === dto.seller.toLowerCase()) {
       throw new BadRequestException(
         "buyer and seller must be different addresses",
       );
+    }
+
+    // Verify on-chain log if registering a live/on-chain escrow
+    const onChainMatch = dto.description.match(/^\[OnChainId:\s*(\d+)\]/);
+    if (onChainMatch) {
+      const onChainId = parseInt(onChainMatch[1], 10);
+      if (!dto.txHash) {
+        throw new BadRequestException(
+          "txHash is required for live/on-chain escrows",
+        );
+      }
+      const isVerified = await this.contractService.verifyOnChainCreation(
+        dto.txHash,
+        onChainId,
+        dto.buyer,
+        dto.seller,
+        dto.amount,
+        dto.fixedFee ?? 0,
+      );
+      if (!isVerified) {
+        throw new BadRequestException(
+          "On-chain creation transaction verification failed",
+        );
+      }
     }
 
     const now = new Date().toISOString();
@@ -76,6 +122,9 @@ export class EscrowsService {
     };
   }
 
+  /**
+   * Locks the escrow. Requires valid buyer signature and on-chain verification in live mode.
+   */
   async lockEscrow(id: string, dto: EscrowActionDto) {
     const escrow = await this.getEscrow(id);
     this.assertActor(escrow.buyer, dto.actor, "Only the buyer can lock escrow");
@@ -85,11 +134,16 @@ export class EscrowsService {
       "Only pending escrow can be locked",
     );
 
+    await this.verifyOnChainTransitionIfLive(escrow, dto, "EscrowLocked");
+
     return this.transition(id, "locked", "TransactionLocked", {
       actor: dto.actor,
     });
   }
 
+  /**
+   * Releases funds to the seller. Requires buyer action and on-chain verification in live mode.
+   */
   async releaseEscrow(id: string, dto: EscrowActionDto) {
     const escrow = await this.getEscrow(id);
     this.assertActor(
@@ -103,6 +157,8 @@ export class EscrowsService {
       "Only locked escrow can be released",
     );
 
+    await this.verifyOnChainTransitionIfLive(escrow, dto, "EscrowReleased");
+
     return this.transition(id, "released", "FundsReleased", {
       actor: dto.actor,
       amountToSeller: Number((escrow.amount - escrow.fixedFee).toFixed(8)),
@@ -110,6 +166,9 @@ export class EscrowsService {
     });
   }
 
+  /**
+   * Refunds funds back to the buyer. Requires seller action and on-chain verification in live mode.
+   */
   async refundEscrow(id: string, dto: EscrowActionDto) {
     const escrow = await this.getEscrow(id);
     this.assertActor(
@@ -122,9 +181,41 @@ export class EscrowsService {
       throw new BadRequestException("Escrow can no longer be refunded");
     }
 
+    await this.verifyOnChainTransitionIfLive(escrow, dto, "EscrowRefunded");
+
     return this.transition(id, "refunded", "FundsRefunded", {
       actor: dto.actor,
     });
+  }
+
+  /**
+   * Internal helper to verify on-chain state change logs for live escrows.
+   */
+  private async verifyOnChainTransitionIfLive(
+    escrow: EscrowRecord,
+    dto: EscrowActionDto,
+    eventName: "EscrowLocked" | "EscrowReleased" | "EscrowRefunded",
+  ) {
+    const onChainMatch = escrow.description.match(/^\[OnChainId:\s*(\d+)\]/);
+    if (onChainMatch) {
+      const onChainId = parseInt(onChainMatch[1], 10);
+      if (!dto.txHash) {
+        throw new BadRequestException(
+          "txHash is required to transition live/on-chain escrows",
+        );
+      }
+      const isVerified = await this.contractService.verifyOnChainTransition(
+        dto.txHash,
+        eventName,
+        onChainId,
+        dto.actor,
+      );
+      if (!isVerified) {
+        throw new BadRequestException(
+          `On-chain transition transaction verification failed for event: ${eventName}`,
+        );
+      }
+    }
   }
 
   private async transition(

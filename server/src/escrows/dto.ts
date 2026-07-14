@@ -34,10 +34,26 @@ export class CreateEscrowDto {
   @Min(0)
   @Max(1000000)
   fixedFee?: number;
+
+  /**
+   * The transaction hash of the on-chain creation log.
+   * Required when registering live/on-chain escrows to verify parameters.
+   */
+  @IsOptional()
+  @IsString()
+  txHash?: string;
 }
 
 export class EscrowActionDto {
   @IsString()
   @Matches(walletPattern, { message: "actor must be a valid wallet address" })
   actor!: string;
+
+  /**
+   * The transaction hash of the on-chain transition log.
+   * Required for locking, releasing, or refunding live/on-chain escrows.
+   */
+  @IsOptional()
+  @IsString()
+  txHash?: string;
 }

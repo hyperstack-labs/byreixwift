@@ -1,5 +1,13 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from "@nestjs/common";
-import { CreateEscrowDto } from "./dto";
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  UseGuards,
+  BadRequestException,
+} from "@nestjs/common";
+import { CreateEscrowDto, EscrowActionDto } from "./dto";
 import { EscrowsService } from "./escrows.service";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { CurrentUser } from "../auth/current-user.decorator";
@@ -30,17 +38,38 @@ export class EscrowsController {
   }
 
   @Post(":id/lock")
-  lockEscrow(@Param("id") id: string, @CurrentUser() user: any) {
-    return this.escrowsService.lockEscrow(id, { actor: user.address });
+  lockEscrow(
+    @Param("id") id: string,
+    @Body() dto: EscrowActionDto,
+    @CurrentUser() user: any,
+  ) {
+    if (dto.actor.toLowerCase() !== user.address.toLowerCase()) {
+      throw new BadRequestException("Actor does not match authenticated user");
+    }
+    return this.escrowsService.lockEscrow(id, dto);
   }
 
   @Post(":id/release")
-  releaseEscrow(@Param("id") id: string, @CurrentUser() user: any) {
-    return this.escrowsService.releaseEscrow(id, { actor: user.address });
+  releaseEscrow(
+    @Param("id") id: string,
+    @Body() dto: EscrowActionDto,
+    @CurrentUser() user: any,
+  ) {
+    if (dto.actor.toLowerCase() !== user.address.toLowerCase()) {
+      throw new BadRequestException("Actor does not match authenticated user");
+    }
+    return this.escrowsService.releaseEscrow(id, dto);
   }
 
   @Post(":id/refund")
-  refundEscrow(@Param("id") id: string, @CurrentUser() user: any) {
-    return this.escrowsService.refundEscrow(id, { actor: user.address });
+  refundEscrow(
+    @Param("id") id: string,
+    @Body() dto: EscrowActionDto,
+    @CurrentUser() user: any,
+  ) {
+    if (dto.actor.toLowerCase() !== user.address.toLowerCase()) {
+      throw new BadRequestException("Actor does not match authenticated user");
+    }
+    return this.escrowsService.refundEscrow(id, dto);
   }
 }

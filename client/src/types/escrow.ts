@@ -34,8 +34,11 @@ export interface CreateEscrowPayload {
   tokenSymbol: string;
   description: string;
   fixedFee?: number;
+  txHash?: string;
 }
 
 export interface EscrowActionPayload {
   actor: string;
+  txHash?: string;
 }
+
