@@ -101,11 +101,11 @@ const CMSOverview = ({ isLoading = false }) => {
                     className="text-zinc-500 mt-0.5 shrink-0 group-hover:text-(--byreix-green) transition-colors"
                   />
                   <span className="text-white/70 line-clamp-1">
-                    Cogito ergo sum, I think therefore i am.
+                    Placeholder activity item.
                   </span>
                 </div>
                 <span className="text-zinc-600 text-[10px] whitespace-nowrap ml-4">
-                  67 days ago
+                   N/A
                 </span>
               </div>
             ))}

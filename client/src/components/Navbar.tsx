@@ -39,7 +39,6 @@ export function Navbar({
   const [scrolled, setScrolled] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Read SDA balance from Sidrachain
   const {
     formatted: sdaFormatted,
     isLoading: isLoadingSda,
@@ -54,7 +53,6 @@ export function Navbar({
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close menu on click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -199,12 +197,11 @@ export function Navbar({
                   <button
                     onClick={() => setShowAccountMenu(!showAccountMenu)}
                     className="flex items-center gap-2 text-xs text-neutral-300 font-mono bg-white/5 hover:bg-white/8 border border-white/10 px-3 py-1.5 rounded-md transition duration-200 cursor-pointer outline-none select-none"
-                    aria-label="Toggle user account profile menu options"
+                     aria-label="Account menu"
                   >
                     <span className="text-[10px] font-semibold tracking-wide text-neutral-400 font-sans whitespace-nowrap">
                       Sidrachain
                     </span>
-                    {/* Connected dot, glows when Sidrachain RPC is live */}
                     <span
                       className={`h-1.5 w-1.5 rounded-full transition-colors duration-500 ${
                         isSidrachainLive
@@ -215,7 +212,6 @@ export function Navbar({
                     <span className="w-px h-3 bg-white/15 rounded-full mx-0.5 shrink-0" />
                     <span className="whitespace-nowrap">{connectedLabel}</span>
                     <span className="w-px h-3 bg-white/15 rounded-full mx-0.5 shrink-0" />
-                    {/* SDA Wallet Display */}
                     <span className="ml-1 text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded-full font-sans flex items-center min-w-10 justify-center whitespace-nowrap">
                       {isLoadingSda ? (
                         <Loader2 className="w-2.5 h-2.5 animate-spin text-emerald-400" />
@@ -240,7 +236,7 @@ export function Navbar({
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 8, scale: 0.95 }}
                         transition={{ duration: 0.15, ease: [0.23, 1, 0.32, 1] }}
-                        className="absolute right-0 mt-2 w-56 bg-neutral-950 border border-neutral-900 rounded-xl overflow-hidden shadow-[0_12px_30px_rgba(0,0,0,0.5)] z-50 p-1.5 flex flex-col gap-0.5"
+                        className="absolute right-0 top-full mt-1 w-56 bg-neutral-950 border border-neutral-900 rounded-xl overflow-y-auto max-h-[calc(100dvh-5rem)] shadow-[0_12px_30px_rgba(0,0,0,0.5)] z-50 p-1.5 flex flex-col gap-0.5"
                       >
                         <button
                           onClick={() => {
@@ -312,7 +308,7 @@ export function Navbar({
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
-            className="absolute left-0 right-0 top-14 overflow-hidden border-b border-white/5 bg-black/95 backdrop-blur-xl md:hidden"
+            className="absolute left-0 right-0 top-14 overflow-y-auto max-h-[calc(100vh-3.5rem)] border-b border-white/5 bg-black/95 backdrop-blur-xl md:hidden"
           >
             <div className="flex flex-col gap-1 px-4 py-4">
               {navLinks.map((link) => (
@@ -382,7 +378,6 @@ export function Navbar({
                 <div className="flex flex-col gap-2.5">
                   <div className="flex items-center justify-between gap-2 text-xs text-neutral-300 font-mono bg-white/5 border border-white/10 px-3 py-2 rounded-lg">
                     <div className="flex items-center gap-2 min-w-0">
-                      {/* Connected dot, glows when Sidrachain RPC is live for mobile view */}
                       <span
                         className={`h-1.5 w-1.5 shrink-0 rounded-full transition-colors duration-500 ${
                           isSidrachainLive
@@ -392,7 +387,6 @@ export function Navbar({
                       />
                       <span className="truncate">{connectedLabel}</span>
                     </div>
-                    {/* Mobile SDA Balance Display */}
                     <span className="shrink-0 text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded-full font-sans flex items-center min-w-10 justify-center whitespace-nowrap">
                       {isLoadingSda ? (
                         <Loader2 className="w-2.5 h-2.5 animate-spin text-emerald-400" />
