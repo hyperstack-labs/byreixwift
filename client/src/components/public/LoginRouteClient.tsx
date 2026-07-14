@@ -80,7 +80,7 @@ export function LoginRouteClient() {
 
       // 5. Update Store
       login(data.user.address, data.accessToken);
-      toast.success("Wallet access granted. Welcome back!");
+      toast.success("Connected.");
       router.push(nextPath);
     } catch (error) {
       console.error("SIWE error:", error);

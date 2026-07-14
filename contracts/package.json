@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "compile": "hardhat compile",
-    "test": "hardhat test"
+    "test": "hardhat test",
+    "deploy:local": "hardhat run scripts/deploy.js --network localhost",
+    "deploy:sidrachain": "hardhat run scripts/deploy.js --network sidrachain"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.1.2",
@@ -19,14 +21,8 @@
     "viem": "^2.52.2"
   },
   "pnpm": {
-    "overrides": {
-      "cookie": "^1.0.2",
-      "flat": "^6.0.1",
-      "serialize-javascript": "^7.0.3",
-      "tmp": "^0.2.5",
-      "undici": "^6.24.0",
-      "ws": "^8.18.3",
-      "elliptic": "^6.5.7"
-    }
+    "onlyBuiltDependencies": [
+      "keccak"
+    ]
   }
 }

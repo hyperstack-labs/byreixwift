@@ -15,15 +15,16 @@ import {
 import {
   Send,
   QrCode,
-  Scan,
   ChevronDown,
   AlertCircle,
   CheckCircle2,
   Loader2,
   XCircle,
-  ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useAccount, useSendTransaction, useBalance } from "wagmi";
+import { parseEther, formatEther } from "viem";
+import { sidrachain } from "@/providers/Web3Provider";
 import { useSidraTokens } from "@/hooks/useSidraTokens";
 
 type TxStatus = "idle" | "pending" | "success" | "error";
@@ -38,20 +39,35 @@ interface TransferReceipt {
 }
 
 export function SendPage() {
+  const { address: connectedAddress, isConnected } = useAccount();
+  const { data: balanceData, isLoading: isLoadingBalance } = useBalance({
+    address: connectedAddress,
+    chainId: sidrachain.id,
+    query: { enabled: !!connectedAddress },
+  });
+  const { sendTransactionAsync, isPending: isTxPending } = useSendTransaction();
+
   const [recipient, setRecipient] = useState("");
   const [amount, setAmount] = useState("");
-  const [selectedToken] = useState({ symbol: "SDA", balance: "12,450.50" });
+  const [selectedToken] = useState({ symbol: "SDA" });
   const [memo, setMemo] = useState("");
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isValidAddress, setIsValidAddress] = useState(true);
 
-  // State tracking for real network broadcast delays
-  const [isBroadcasting, setIsBroadcasting] = useState(false);
   const [txStatus, setTxStatus] = useState<TxStatus>("idle");
   const [receipt, setReceipt] = useState<TransferReceipt | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const { data: tokenData, isLoading: isLoadingTokens, error: tokenError } = useSidraTokens();
+  const isBroadcasting = isTxPending;
+
+  const realBalance = balanceData
+    ? parseFloat(formatEther(balanceData.value)).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 4,
+      })
+    : "0.00";
+
+  const { data: tokenData, isLoading: isLoadingTokens } = useSidraTokens();
 
   const selectedTokenData = tokenData?.find((t) => t.symbol === selectedToken.symbol);
 
@@ -87,7 +103,7 @@ export function SendPage() {
       toast.error("Please enter a valid amount");
       return;
     }
-    if (parseFloat(amount) > parseFloat(selectedToken.balance.replace(/,/g, ""))) {
+    if (balanceData && parseFloat(amount) > parseFloat(formatEther(balanceData.value))) {
       toast.error("Insufficient balance");
       return;
     }
@@ -95,52 +111,44 @@ export function SendPage() {
   };
 
   const confirmSend = async () => {
-    setIsBroadcasting(true);
+    if (!connectedAddress || !isConnected) {
+      toast.error("Please connect your wallet first");
+      return;
+    }
     setTxStatus("pending");
     setErrorMessage("");
 
     try {
-      if (tokenError) {
-        throw new Error("Network layer context drop-out.");
-      }
+      const hash = await sendTransactionAsync({
+        to: recipient as `0x${string}`,
+        value: parseEther(amount),
+        chainId: sidrachain.id,
+      });
 
-      const successfulReceipt: TransferReceipt = {
+      const receiptData: TransferReceipt = {
         recipient,
         amount,
         symbol: selectedToken.symbol,
         memo: memo || undefined,
-        txHash: "0x4b9a...2e1f",
+        txHash: hash,
         timestamp: new Date().toLocaleTimeString(),
       };
 
-      setReceipt(successfulReceipt);
+      setReceipt(receiptData);
       setTxStatus("success");
       toast.success("Transaction sent successfully!");
       setShowConfirmDialog(false);
 
-      // Reset form variables upon verified success
       setRecipient("");
       setAmount("");
       setMemo("");
     } catch (error) {
-      const msg = error instanceof Error ? error.message : "Transaction broadcast failed.";
+      const msg = error instanceof Error ? error.message : "Transaction failed.";
       setErrorMessage(msg);
-
-      const failureReceipt: TransferReceipt = {
-        recipient,
-        amount,
-        symbol: selectedToken.symbol,
-        memo: memo || undefined,
-        txHash: "0x0000...0000",
-        timestamp: new Date().toLocaleTimeString(),
-      };
-
-      setReceipt(failureReceipt);
       setTxStatus("error");
-      toast.error(`${msg} Please try again.`);
+      setReceipt(null);
+      toast.error(msg);
       setShowConfirmDialog(false);
-    } finally {
-      setIsBroadcasting(false);
     }
   };
 
@@ -158,7 +166,7 @@ export function SendPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      {(txStatus === "success" || txStatus === "error") && receipt ? (
+      {txStatus !== "idle" ? (
         <Card className="p-6 bg-card border-border">
           <div className="flex flex-col items-center text-center space-y-4">
             {txStatus === "success" ? (
@@ -172,50 +180,45 @@ export function SendPage() {
             )}
 
             <div className="space-y-1">
-              <h2 className="text-2xl font-bold">
-                {txStatus === "success" ? "Transfer Completed" : "Transfer Failed"}
-              </h2>
+              <h2 className="text-2xl font-bold">{txStatus === "success" ? "Sent" : "Failed"}</h2>
               <p className="text-muted-foreground text-sm">
-                {txStatus === "success"
-                  ? "Your assets have been successfully dispatched to the network."
-                  : errorMessage || "The transmission routing sequence failed."}
+                {txStatus === "success" ? "Your transaction has been sent." : errorMessage}
               </p>
             </div>
 
-            <div className="w-full rounded-xl bg-background border border-border p-4 mt-4 text-left space-y-3">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Dispatched Amount</span>
-                <span className="font-semibold text-foreground">
-                  {receipt.amount} {receipt.symbol}
-                </span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Recipient Target</span>
-                <span className="font-mono text-xs truncate max-w-50">{receipt.recipient}</span>
-              </div>
-              {receipt.memo && (
+            {receipt && (
+              <div className="w-full rounded-xl bg-background border border-border p-4 mt-4 text-left space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Attached Memo</span>
-                  <span className="italic text-foreground">&quot;{receipt.memo}&quot;</span>
+                  <span className="text-muted-foreground">Amount</span>
+                  <span className="font-semibold text-foreground">
+                    {receipt.amount} {receipt.symbol}
+                  </span>
                 </div>
-              )}
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Tx Hash Reference</span>
-                <a
-                  href="#"
-                  className="flex items-center gap-1 text-primary hover:underline font-mono text-xs"
-                >
-                  {receipt.txHash} <ExternalLink className="h-3 w-3" />
-                </a>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">To</span>
+                  <span className="font-mono text-xs truncate max-w-50">{receipt.recipient}</span>
+                </div>
+                {receipt.memo && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Memo</span>
+                    <span className="italic text-foreground">&quot;{receipt.memo}&quot;</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Transaction Hash</span>
+                  <span className="font-mono text-xs truncate max-w-50 text-primary">
+                    {receipt.txHash}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Time</span>
+                  <span className="font-medium">{receipt.timestamp}</span>
+                </div>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Execution Time</span>
-                <span className="font-medium">{receipt.timestamp}</span>
-              </div>
-            </div>
+            )}
 
             <Button onClick={resetForm} className="w-full mt-6 py-6 text-lg font-bold">
-              {txStatus === "success" ? "Send More Assets" : "Return to Form"}
+              {txStatus === "success" ? "Send More" : "Try Again"}
             </Button>
           </div>
         </Card>
@@ -248,15 +251,20 @@ export function SendPage() {
                       variant="ghost"
                       size="sm"
                       disabled={isBroadcasting}
+                      onClick={() => {
+                        navigator.clipboard
+                          .readText()
+                          .then((text) => {
+                            if (/^0x[a-fA-F0-9]{40}$/.test(text)) {
+                              setRecipient(text);
+                              setIsValidAddress(true);
+                              toast.success("Address pasted from clipboard");
+                            }
+                          })
+                          .catch(() => toast.error("No address found in clipboard"));
+                      }}
                       className="h-9 w-9 p-0 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
-                    >
-                      <Scan className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      disabled={isBroadcasting}
-                      className="h-9 w-9 p-0 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+                      aria-label="Paste address from clipboard"
                     >
                       <QrCode className="w-4 h-4" />
                     </Button>
@@ -277,7 +285,7 @@ export function SendPage() {
                     Amount
                   </Label>
                   <span className="text-xs text-muted-foreground">
-                    Balance: {selectedToken.balance} {selectedToken.symbol}
+                    Balance: {isLoadingBalance ? "..." : `${realBalance} ${selectedToken.symbol}`}
                   </span>
                 </div>
                 <div className="p-4 rounded-xl bg-background border border-border transition-colors focus-within:border-primary/50">
@@ -314,7 +322,7 @@ export function SendPage() {
                     )}
                     <button
                       disabled={isBroadcasting}
-                      onClick={() => setAmount(selectedToken.balance.replace(/,/g, ""))}
+                      onClick={() => setAmount(balanceData ? formatEther(balanceData.value) : "0")}
                       className="text-sm font-semibold text-primary hover:underline underline-offset-4 cursor-pointer disabled:opacity-50"
                     >
                       Use Maximum
@@ -472,7 +480,7 @@ export function SendPage() {
             <div className="flex items-start gap-2 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
               <AlertCircle className="w-4 h-4 text-yellow-500 mt-0.5 shrink-0" />
               <p className="text-sm text-yellow-200">
-                This transaction cannot be reversed. Please verify all details.
+                This action cannot be undone. Please verify all details.
               </p>
             </div>
 

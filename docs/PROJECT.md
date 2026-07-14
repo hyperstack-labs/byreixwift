@@ -1,55 +1,36 @@
-# Byreixwift
+# Project Scope
 
-## What Is This
+Byreixwift is a fixed-fee escrow application built on Sidrachain.
 
-A clean, escrow-first web app for fixed-fee transactions on Sidrachain. The current product direction is a modern JS/TS stack with Next.js on the frontend, a Node/NestJS API, and a Solidity escrow contract.
+## Implemented Features
 
-## Target Users
+- Landing page containing a project overview.
+- Wallet connection interface supporting Sidrachain-compatible wallets (wagmi + MetaMask).
+- Escrow creation interface tracking transaction amounts, fixed fees, and buyer/seller metadata.
+- Escrow status tracker supporting the following states: `pending`, `locked`, `released`, and `refunded`.
+- REST API for escrow CRUD (NestJS + PostgreSQL + Drizzle ORM).
+- Authentication via Sign-In with Ethereum (SIWE) + JWT.
+- Solidity smart contract implementing deposit, lock, release, and refund operations (deployed & tested).
+- Deploy scripts for local Hardhat network and Sidrachain mainnet.
+- Real SDA balance display via Sidrachain RPC.
+- Real SDA transfer via wagmi `useSendTransaction`.
+- Simulation toggle for escrow (mock mode via REST API vs live mode via smart contract).
+- Data provider abstraction pattern (mock providers for dev, Sidra providers for production).
+- CMS admin panel (announcements CRUD, banner ad management).
+- Token price trend charts (mock data, ready for Sidra API).
+- Token swap interface (UI shell — Sidrachain has no DEX yet).
+- CI/CD pipelines (GitHub Actions: lint + build on PR, deploy client & server to Vercel).
+- Docker setup (client, server, PostgreSQL via docker-compose).
+- Tests: 4 contract tests (Hardhat), 12 server tests (Jest), 5 client tests (Vitest).
 
-- Buyers and sellers who need a simple escrow flow for Sidrachain transactions
-- Web3 users who want clear transaction states without extra platform complexity
-- Future HyperStack ecosystem users who need a safer payment and release flow
+## Out of Scope (Future Releases)
 
-## Design Direction
-
-- Dark theme with green accent
-- Clean and clutter-free
-- Professional look
-- Mobile-friendly
-
----
-
-## MVP (Minimum Viable Product)
-
-### Included
-
-- [ ] Landing page with project overview
-- [ ] Wallet connection flow for Sidrachain-compatible wallets
-- [ ] Escrow creation flow with amount, fee, buyer, and seller metadata
-- [ ] Escrow lifecycle states: pending, locked, released, refunded
-- [ ] Mock API flow that mirrors the contract lifecycle for frontend testing
-- [ ] Smart escrow contract v0 with deposit, lock, release, and refund
-- [ ] Responsive design (works on mobile)
-
-### Not Included (for later)
-
-- Dispute resolution and arbitration
-- Multi-party or milestone escrow
-- Multi-chain support (ETH, Solana, zkSync - planned but not MVP)
-- Account verification / KYC flow
-- Notifications
-- Full database-backed production ledger and admin tooling
-
----
-
-## Tech Stack
-
-- **Frontend**: Next.js, TypeScript
-- **Styling**: Tailwind CSS (dark green theme)
-- **Backend**: Node.js, NestJS
-- **Database**: PostgreSQL (planned for production persistence)
-- **Contracts**: Solidity, Hardhat
-
-## Reference
-
-UI inspiration based on provided mockups - dark mode, green accents, wallet dashboard style.
+- Dispute resolution and transaction arbitration.
+- Multi-party and milestone-based escrows.
+- Multi-chain support (e.g., Ethereum, Solana, zkSync).
+- KYC and identity verification flows.
+- Notification dispatching services.
+- Proof of Personhood / sybil resistance (pending Sidrachain release).
+- ERC-4337 smart account wallet (pending Sidrachain release).
+- L3 RWA tokenization (pending Sidrachain release).
+- KYCPort integration (pending Sidrachain release).

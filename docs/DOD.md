@@ -1,29 +1,27 @@
-# Definition of Done (DoD)
+# Definition of Done
 
-An issue is considered **done** when all of the following are checked:
+A task is complete only when all the following conditions are met:
 
-## Code
-- [ ] Code is written and works as expected
-- [ ] No console errors or warnings
-- [ ] Code follows the project style (consistent naming, formatting)
+## 1. Code Quality
 
-## Review
-- [ ] Code has been reviewed by at least one teammate
-- [ ] Reviewer approved the pull request
+- Write code that satisfies the feature requirements.
+- Ensure the changes generate no console warnings or errors.
+- Follow code style policies, including naming conventions and explicit typing.
 
-## Testing
-- [ ] Feature was tested locally
-- [ ] No broken functionality in other parts of the app
+## 2. Verification and Testing
 
-## Documentation
-- [ ] README or relevant docs updated (if needed)
-- [ ] Comments added for complex logic
+- Perform manual verification of the updated feature.
+- Run all existing tests (`pnpm test` in client, server, and contracts) — zero failures required.
+- Add new tests for any new functionality where applicable.
+- Ensure the changes cause no regressions in existing codebase functionalities.
 
-## Git
-- [ ] Commit messages are clear and descriptive
-- [ ] Branch is merged to `main`
-- [ ] Issue is closed on GitHub
+## 3. Code Review
 
----
+- Obtain at least one peer approval on the Pull Request.
 
-If all boxes are checked, the issue is **done**.
+## 4. Documentation and Version Control
+
+- Add comments explaining any complex or non-obvious code paths.
+- Update relevant Markdown documentation and README files if needed.
+- Write clear and descriptive commit messages following project standards.
+- Merge the branch into target integration paths and close the respective issue.

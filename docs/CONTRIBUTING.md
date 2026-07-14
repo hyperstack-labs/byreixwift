@@ -1,35 +1,34 @@
 # Contribution Guidelines
 
-We welcome contributions to ByReiXwift as we build a cleaner escrow-first product. All contributors must follow these standards.
+Follow these guidelines to develop, test, and submit updates.
 
-## Branch Strategy
+## Branching Model
 
-We use a structured branching model to maintain project stability.
+Name and manage branches according to the following conventions:
 
-| Branch | Purpose |
-|--------|---------|
-| `main` | Production-ready code. Always stable. |
-| `dev` | Integration branch for all features. |
-| `feature/*` | Development of new features. |
-| `fix/*` | Maintenance and bug fixes. |
-| `hotfix/*` | Critical production resolutions. |
+- `main`: Stores stable release code. Do not commit or push directly to this branch.
+- `dev`: Serves as the integration branch for all new changes.
+- `feature/*`: Use for developing new features.
+- `fix/*`: Use for fixing bugs and regressions.
+- `hotfix/*`: Use for applying critical patches to production.
 
-## Workflow
+## Development Workflow
 
-1. **Initialization**: Create a feature branch from latest `dev`.
-2. **Implementation**: Commit changes with clear, descriptive messages.
-3. **Verification**: Submit a Pull Request to `dev`.
-4. **Integration**: Merge only after peer review and manual validation.
+Follow this procedure for submitting updates:
 
-## Naming Conventions
+1. Create a feature branch originating from the latest commit on `dev`.
+2. Commit changes with clear, descriptive commit messages.
+3. Open a Pull Request targeting the `dev` branch.
+4. Merge changes only after receiving peer approvals and passing manual verification.
 
-- Features: `feature/short-description`
-- Bug fixes: `fix/short-description`
-- Documentation: `docs/short-description`
+## Branch and Commit Conventions
+
+- **Branch format**: `<type>/<short-description>` (e.g., `feature/wallet-connection`).
+- **Commit message format**: `<type>: <short description>` (e.g., `fix: resolve status bar alignment`).
 
 ## Quality Standards
 
-- **Stability**: Never push directly to `main`.
-- **Review**: Every commit must undergo a Pull Request review.
-- **Cleanliness**: Delete local and remote branches immediately after successful merging.
-- **Definition of Done**: Adhere to all criteria in the project's [Definition of Done](./DOD.md).
+- **Review Policy**: Ensure all commits pass Pull Request review before merging.
+- **Branch Cleanup**: Delete local and remote branches immediately after a successful merge.
+- **Testing**: Run all tests before opening a PR — `pnpm test` in `client/`, `server/`, and `contracts/`. Ensure zero failures.
+- **Definition of Done**: Verify that all deliverables satisfy the criteria defined in the [Definition of Done](./DOD.md).

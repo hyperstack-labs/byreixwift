@@ -1,9 +1,9 @@
-# Byreixwift
+# Team Members
 
-## Team Members
+The following team members manage and contribute to ByReiXwift:
 
-| Name | Role | GitHub |
-|------|------|--------|
+| Name | Role | GitHub Profile |
+| :--- | :--- | :--- |
 | Byron Masser | Product Owner | [@ByronMasser](https://github.com/ByronMasser) |
 | John Raiven Olazo | Lead Developer / Scrum Master | [@johnraivenolazo](https://github.com/johnraivenolazo) |
 | Joey Aibert Collado | Developer | [@JoeyCollado](https://github.com/JoeyCollado) |

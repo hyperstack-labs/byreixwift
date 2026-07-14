@@ -4,7 +4,6 @@ import { useState, ChangeEvent } from "react";
 import { Card, Button, Input, Label } from "@/components/ui";
 import {
   ArrowDownUp,
-  Settings,
   ChevronDown,
   Info,
   Loader2,
@@ -89,31 +88,23 @@ export function SwapPage() {
     toast.info("Swap initiated! Transaction pending...");
 
     try {
-      // Simulate real network performance that can realistically trigger a catch block
-      await new Promise((resolve, reject) => {
-        setTimeout(() => {
-          if (Math.random() < 0.1) {
-            reject(new Error("Slippage limits exceeded due to sudden block congestion."));
-          } else {
-            resolve(true);
-          }
-        }, 2500);
-      });
+      // Simulate a 2.5s network delay for preview purposes
+      await new Promise((resolve) => setTimeout(resolve, 2500));
 
       const newReceipt = {
         fromAmount,
         fromSymbol: fromToken.symbol,
         toAmount,
         toSymbol: toToken.symbol,
-        txHash: "0x7e4a...8f9c",
+        txHash: "0x0000...0000",
         timestamp: new Date().toLocaleTimeString(),
       };
 
       setReceipt(newReceipt);
       setTxStatus("success");
-      toast.success(`Successfully swapped ${fromAmount} ${fromToken.symbol} to ${toToken.symbol}!`);
+      toast.success(`Simulation: Swapped ${fromAmount} ${fromToken.symbol} to ${toToken.symbol}.`);
     } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : "Network routing timed out.";
+      const errorMsg = error instanceof Error ? error.message : "Transaction timed out.";
 
       // Store and attach the simulated or real error message context to the receipt fallback view
       setErrorMessage(errorMsg);
@@ -161,8 +152,8 @@ export function SwapPage() {
               </h2>
               <p className="text-muted-foreground text-sm">
                 {txStatus === "success"
-                  ? "Your assets have been successfully routed."
-                  : errorMessage || "The transaction could not be completed."}
+                  ? "Swap completed successfully."
+                  : errorMessage || "Transaction failed."}
               </p>
             </div>
             <div className="w-full rounded-xl bg-background border border-border p-4 mt-4 text-left space-y-3">
@@ -195,25 +186,14 @@ export function SwapPage() {
         <Card className="border-border bg-card p-5 md:p-6 shadow-sm">
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-xl md:text-2xl font-semibold">Swap Tokens</h2>
-            <Button
-              variant="ghost"
-              size="sm"
-              aria-label="Swap settings"
-              disabled={isSwapping}
-              className="h-9 w-9 p-0 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
-            >
-              <Settings className="h-5 w-5" />
-            </Button>
           </div>
 
           {tokenError && (
             <div className="mb-4 flex items-start gap-3 rounded-xl border border-red-500/20 bg-red-500/5 p-4 text-red-500 animate-in fade-in duration-200">
               <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
               <div className="text-xs">
-                <p className="font-bold">Market Price Link Offline</p>
-                <p className="text-muted-foreground mt-0.5">
-                  Could not fetch baseline conversion rates. Displaying cached valuations.
-                </p>
+                <p className="font-bold">Price feed unavailable</p>
+                <p className="text-muted-foreground mt-0.5">Using cached conversion rates.</p>
               </div>
             </div>
           )}

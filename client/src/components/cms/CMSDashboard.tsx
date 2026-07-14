@@ -22,7 +22,7 @@ export const CMSDashboard = () => {
       {/* Overview component container */}
       <div>
         <h1 className="text-2xl font-bold flex items-center gap-3 text-white">System Overview</h1>
-        <p className="text-white/40 text-sm mt-1">Content and Advertisement Management.</p>
+        <p className="text-white/40 text-sm mt-1">Manage ads and announcements.</p>
       </div>
       {/* Render overview component*/}
       <CMSOverview isLoading={isLoading} />

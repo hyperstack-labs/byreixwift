@@ -79,19 +79,8 @@ export function Footer({ onSectionNavigate }: FooterProps) {
           <div className="max-w-md sm:col-span-2 xl:col-span-1">
             <ByreixLogo />
             <p className="mt-5 text-sm leading-relaxed text-muted-foreground">
-              Online payments for users and merchants, built around transparent fees, transfers,
-              escrow-backed protection, and a product direction shaped by Shariah principles.
+              Online payments, transfers, and escrow on Sidrachain.
             </p>
-            <div className="mt-6 flex flex-wrap gap-2">
-              {["Transparent fees", "Ethical commerce", "Escrow-backed protection"].map((item) => (
-                <span
-                  key={item}
-                  className="rounded-full border border-border bg-card/55 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground"
-                >
-                  {item}
-                </span>
-              ))}
-            </div>
           </div>
 
           {footerSections.map((section) => (
@@ -138,10 +127,9 @@ export function Footer({ onSectionNavigate }: FooterProps) {
         </div>
 
         <div className="mt-10 flex flex-col gap-4 border-t border-border pt-7 text-sm text-muted-foreground sm:mt-12 sm:flex-row sm:items-center sm:justify-between sm:pt-8">
-          <p>Copyright 2026 ByReiXwift. Clear payments. Stronger trust.</p>
+          <p>Copyright 2026 ByReiXwift.</p>
           <p className="max-w-xl text-sm leading-relaxed sm:text-right">
-            Built for users and merchants who need online payments, transfers, and escrow-backed
-            protection with clearer terms from the start.
+            Payments, transfers, and escrow on Sidrachain.
           </p>
         </div>
       </div>

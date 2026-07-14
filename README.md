@@ -1,125 +1,135 @@
 # ByReiXwift
 
-ByReiXwift is an escrow-first Sidrachain product focused on fixed-fee transactions, simple lifecycle states, and a cleaner path toward compliant payment flows.
+ByReiXwift is a decentralized escrow service built on Sidrachain.
+The application implements a fixed-fee billing mechanism and a deterministic escrow state machine.
 
-## Key Principles
+## Architecture and Technical Stack
 
-The product direction is centered on predictable execution and transparent transaction rules.
+The system consists of three main modules:
 
-- **Fixed Fees**: No hidden charges and no percentage-based surprises.
-- **Clear States**: Every escrow should move through simple, auditable lifecycle steps.
-- **Progressive Delivery**: We keep the MVP intentionally small before adding broader payment features.
+- **Frontend Client (`/client`)**: A web application built with Next.js and TypeScript.
+- **Backend Service (`/server`)**: A REST API built with NestJS, PostgreSQL, and Drizzle ORM.
+- **Smart Contracts (`/contracts`)**: Solidity contracts developed using Hardhat.
 
-## Documentation and Resources
+For detailed specifications, read the [Technical Stack](./docs/TECH_STACK.md) and [Backend Architecture](./docs/BACKEND_ARCHITECTURE.md).
 
-For detailed information on project operations and technical specifications, refer to the following resources:
-
-- [Technical Stack](./docs/TECH_STACK.md) - Detailed architecture and infrastructure.
-- [Contribution Guidelines](./docs/CONTRIBUTING.md) - How to develop and submit changes.
-- [Project Scope](./docs/PROJECT.md) - Current product scope and MVP direction.
-- [Team Members](./docs/MEMBERS.md) - Project ownership and lead developers.
-- [Definition of Done](./docs/DOD.md) - Quality standards for task completion.
-
-## Development Setup
+## Set Up the Development Environment
 
 ### Prerequisites
-- Node.js (Latest LTS)
+
+- Node.js 22.x
 - pnpm
+- PostgreSQL (for the backend service)
 
+### Install Dependencies
 
-### Quick Start
+Each workspace has its own `package.json`. Install dependencies for each:
+
 ```bash
-git clone <repository-url>
-cd byreixwift
-cd server && pnpm install
+cd contracts && pnpm install
+cd ../server && pnpm install
 cd ../client && pnpm install
-cd ../contracts && pnpm install
 ```
 
-### Environment Variables
-Each Workspace has its own .env.example file 
-/server/.env.example
-/contracts/.env.example
+### Configure Environment Variables
 
+Copy `.env.example` to `.env` in each workspace:
 
+```bash
+cp server/.env.example server/.env
+cp client/.env.example client/.env.local
+cp contracts/.env.example contracts/.env
+```
 
-## Node.js & Hardhat Setup
+**Server (`server/.env`):**
 
-### Supported Versions
+| Key | Required | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `DATABASE_URL` | Yes | — | PostgreSQL connection string |
+| `JWT_SECRET` | Yes | — | Secret for signing JWT access tokens |
+| `PORT` | No | `3001` | HTTP listen port |
+| `RPC_URL` | Only for on-chain | — | Sidrachain JSON-RPC endpoint |
+| `CONTRACT_ADDRESS` | Only for on-chain | — | Deployed `ByReiXwiftEscrow` contract address |
 
-- **Node.js**: LTS version (recommended)
-- **Hardhat**: Latest version defined in `package.json`
-- **Package Manager**: pnpm
+**Client (`client/.env.local`):**
 
-## Smart Contract Setup
+| Key | Required | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `NEXT_PUBLIC_CONTRACT_ADDRESS` | Yes | — | Escrow contract address (exposed to browser) |
+| `NEXT_PUBLIC_SIDRA_API_URL` | No | `http://localhost:3001/api` | Backend API URL for token/trend data |
+
+**Contracts (`contracts/.env`):**
+
+| Key | Required | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `PRIVATE_KEY` | For deployment | — | Deployer wallet private key |
+| `CONTRACT_ADDRESS` | After deploy | — | Deployed contract address |
+| `RPC_URL` | No | `http://127.0.0.1:8545` | Hardhat node or Sidrachain RPC |
+
+### Compile and Test Smart Contracts
+
 ```bash
 cd contracts
-pnpm install
-pnpm hardhat compile
-pnpm hardhat test
+pnpm compile
+pnpm test
 ```
 
-## Test Consistency
+### Deploy Smart Contracts
 
-Contract tests are expected to:
-
-- Run successfully after installation
-- Pass consistently across different machines
-- Not depend on local machine configuration
-
-If tests fail, ensure:
-```bash
-pnpm install
-pnpm hardhat clean
-pnpm hardhat compile
-pnpm hardhat test
-```
-
-### Deploy to SidraChain Network
-
-**Details**
-Ensure that the following environment variables are inside the .env.example of both /server and /contracts
-
-| KEY | VALUE | 
-| -------- | -------- |
-| CHAIN | SIDRA |
-| CHAIN_ID | 97453 |
-| NETWORK_ID | 97453 |
-| SIDRACHAIN_RPC_URL | https://node.sidrachain.com |
-| INFO_URL | https://www.sidrachain.com |
-| EXPLORER_NAME | Sidra Chain Explorer |
-| EXPLORER_URL | https://ledger.sidrachain.com |
-| EXPLORER_STANDARD | EIP3091 |
-| DEPLOYER_WALLET_PRIVATE_KEY | private key of the wallet to be used for deploying | 
-
-Deploy Commands
 ```bash
 cd contracts
-# For deploying locally 
+
+# Deploy to a local Hardhat node (requires `npx hardhat node` running)
 pnpm deploy:local
 
-# For deploying to SidraChain mainnet
+# Deploy to the SidraChain mainnet (requires funded PRIVATE_KEY in .env)
 pnpm deploy:sidrachain
 ```
-**Key note** 
 
-Make sure that the DEPLOYER_WALLET_PRIVATE_KEY is set on the environment variables and has enough SDA for the gas fees
+### Run the Applications
 
-### Run The App
+Start PostgreSQL, then:
 
 ```bash
 cd server
 pnpm dev
 ```
+The API service runs at `http://localhost:3001/api`.
 
 ```bash
 cd client
 pnpm dev
 ```
+The client application runs at `http://localhost:3000`.
 
-The client runs at `http://localhost:3000` and the API runs at `http://localhost:3001/api`.
+### Run Tests
 
+```bash
+# Contracts (Hardhat)
+cd contracts && pnpm test
 
+# Server (Jest)
+cd server && pnpm test
 
+# Client (Vitest)
+cd client && pnpm test
+```
 
+### Docker (Optional)
 
+```bash
+docker compose up
+```
+
+Starts PostgreSQL, the NestJS server, and the Next.js client.
+
+---
+
+## Technical Specifications and Guidelines
+
+- [Project Scope](./docs/PROJECT.md)
+- [Contribution Guidelines](./docs/CONTRIBUTING.md)
+- [Definition of Done](./docs/DOD.md)
+- [Team Members](./docs/MEMBERS.md)
+- [SidraChain Integration](./docs/SIDRA_INTEGRATION.md)
+- [Backend Architecture](./docs/BACKEND_ARCHITECTURE.md)

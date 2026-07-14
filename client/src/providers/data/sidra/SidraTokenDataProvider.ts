@@ -1,7 +1,7 @@
 import { ITokenDataProvider } from "../ITokenDataProvider";
 import { SidraTokenMetric } from "@/types/sidra";
 
-const BASE_URL = process.env.NEXT_PUBLIC_SIDRA_API_URL ?? "https://localhost:3001/api";
+const BASE_URL = process.env.NEXT_PUBLIC_SIDRA_API_URL ?? "http://localhost:3001/api";
 
 async function sidraFetch<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, {

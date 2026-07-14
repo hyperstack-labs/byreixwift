@@ -1,0 +1,23 @@
+{
+  "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+  "chainId": 31337,
+  "network": "localhost",
+  "deployer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+  "deployedAt": "2026-07-14T00:00:00.000Z",
+  "transactionHash": "",
+  "abi": [
+    {"type":"constructor","inputs":[{"name":"_feeCollector","type":"address","internalType":"address payable"},{"name":"_fixedFee","type":"uint256","internalType":"uint256"}],"stateMutability":"nonpayable"},
+    {"type":"function","name":"deposit","inputs":[{"name":"_seller","type":"address","internalType":"address"},{"name":"_agreementHash","type":"bytes32","internalType":"bytes32"}],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"payable"},
+    {"type":"function","name":"lock","inputs":[{"name":"_txId","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"},
+    {"type":"function","name":"release","inputs":[{"name":"_txId","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"},
+    {"type":"function","name":"refund","inputs":[{"name":"_txId","type":"uint256","internalType":"uint256"}],"outputs":[],"stateMutability":"nonpayable"},
+    {"type":"function","name":"nextTransactionId","inputs":[],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},
+    {"type":"function","name":"transactions","inputs":[{"name":"","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"buyer","type":"address","internalType":"address payable"},{"name":"seller","type":"address","internalType":"address payable"},{"name":"grossAmount","type":"uint256","internalType":"uint256"},{"name":"netAmount","type":"uint256","internalType":"uint256"},{"name":"agreementHash","type":"bytes32","internalType":"bytes32"},{"name":"state","type":"uint8","internalType":"uint8"},{"name":"createdAt","type":"uint64","internalType":"uint64"},{"name":"lockedAt","type":"uint64","internalType":"uint64"},{"name":"resolvedAt","type":"uint64","internalType":"uint64"},{"name":"isInitialized","type":"bool","internalType":"bool"}],"stateMutability":"view"},
+    {"type":"function","name":"fixedFee","inputs":[],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},
+    {"type":"function","name":"feeCollector","inputs":[],"outputs":[{"name":"","type":"address","internalType":"address payable"}],"stateMutability":"view"},
+    {"type":"event","name":"EscrowCreated","inputs":[{"name":"txId","type":"uint256","indexed":true,"internalType":"uint256"},{"name":"buyer","type":"address","indexed":true,"internalType":"address payable"},{"name":"seller","type":"address","indexed":true,"internalType":"address payable"},{"name":"grossAmount","type":"uint256","indexed":false},{"name":"fixedFee","type":"uint256","indexed":false,"internalType":"uint256"},{"name":"agreementHash","type":"bytes32","indexed":false,"internalType":"bytes32"}],"anonymous":false},
+    {"type":"event","name":"EscrowLocked","inputs":[{"name":"txId","type":"uint256","indexed":true,"internalType":"uint256"},{"name":"actor","type":"address","indexed":true,"internalType":"address"}],"anonymous":false},
+    {"type":"event","name":"EscrowReleased","inputs":[{"name":"txId","type":"uint256","indexed":true,"internalType":"uint256"},{"name":"actor","type":"address","indexed":true,"internalType":"address"},{"name":"sellerAmount","type":"uint256","indexed":false},{"name":"feeAmount","type":"uint256","indexed":false,"internalType":"uint256"}],"anonymous":false},
+    {"type":"event","name":"EscrowRefunded","inputs":[{"name":"txId","type":"uint256","indexed":true,"internalType":"uint256"},{"name":"actor","type":"address","indexed":true,"internalType":"address"},{"name":"refundedAmount","type":"uint256","indexed":false}],"anonymous":false}
+  ]
+}

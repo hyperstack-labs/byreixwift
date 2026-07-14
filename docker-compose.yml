@@ -1,0 +1,48 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: byreixwift
+      POSTGRES_PASSWORD: byreixwift
+      POSTGRES_DB: byreixwift
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U byreixwift"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      DATABASE_URL: postgresql://byreixwift:byreixwift@postgres:5432/byreixwift
+      RPC_URL: ${RPC_URL:-https://node.sidrachain.com}
+      CONTRACT_ADDRESS: ${CONTRACT_ADDRESS:-0x5FbDB2315678afecb367f032d93F642f64180aa3}
+      JWT_SECRET: ${JWT_SECRET:-dev-jwt-secret}
+      PORT: "3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_USE_MOCK: "false"
+      NEXT_PUBLIC_CONTRACT_ADDRESS: ${CONTRACT_ADDRESS:-0x5FbDB2315678afecb367f032d93F642f64180aa3}
+      NEXT_PUBLIC_SIDRA_API_URL: http://server:3001/api
+    depends_on:
+      - server
+
+volumes:
+  pgdata:
