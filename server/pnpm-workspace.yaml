@@ -3,5 +3,5 @@ packages:
 allowBuilds:
   "@nestjs/core": true
   esbuild: true
-  unrs-resolver: set this to true or false
+  unrs-resolver: false
 onlyBuiltDependencies: '["@nestjs/core","esbuild","unrs-resolver"]'

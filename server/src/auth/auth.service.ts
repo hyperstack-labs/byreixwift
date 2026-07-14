@@ -59,6 +59,7 @@ export class AuthService {
         user: { id: user.id, address: user.address },
       };
     } catch (e) {
+      console.error("SIWE verify failed:", (e as Error).message, (e as Error).stack);
       throw new UnauthorizedException("Invalid signature");
     }
   }

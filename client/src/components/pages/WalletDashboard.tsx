@@ -32,7 +32,7 @@ interface EscrowRecord {
   createdAt?: string;
 }
 
-/** Placeholder SDA/USD rate, relpace with a live price feed when available */
+/** Placeholder SDA/USD rate, replace with a live price feed when available */
 const SDA_USD_PRICE = 2.0;
 
 /** Placeholder 24h change, replace with a live price feed when available */
@@ -135,18 +135,14 @@ export function WalletDashboard() {
       navigator.clipboard
         .writeText(identity)
         .then(() => {
-          toast.success("Address copied securely to clipboard", {
-            description: "Ready to use for verifiable transaction executions.",
-          });
+          toast.success("Address copied");
         })
         .catch(() => {
-          toast.error("Failed to copy address", {
-            description: "System clipboard permissions may be restricted.",
-          });
+          toast.error("Failed to copy address");
         });
     } else {
-      toast.error("Transaction Error: Connection Missing", {
-        description: "Please connect an active Web3 identification provider wallet to continue.",
+      toast.error("Wallet not connected", {
+        description: "Connect your wallet to copy your address.",
       });
     }
   };
@@ -212,14 +208,19 @@ export function WalletDashboard() {
               >
                 <Copy className="h-4 w-4" />
               </Button>
-              <Button
-                aria-label="View on block explorer"
-                variant="outline"
-                size="icon"
-                className="h-10 w-10 rounded-xl border-border bg-background hover:text-primary transition-all cursor-pointer"
-              >
-                <ExternalLink className="h-4 w-4" />
-              </Button>
+              {identity && identity !== "0x0000...0000" && (
+                <Button
+                  aria-label="View on block explorer"
+                  variant="outline"
+                  size="icon"
+                  onClick={() =>
+                    window.open(`https://ledger.sidrachain.com/address/${identity}`, "_blank")
+                  }
+                  className="h-10 w-10 rounded-xl border-border bg-background hover:text-primary transition-all cursor-pointer"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                </Button>
+              )}
             </div>
           </div>
         </Card>
@@ -273,11 +274,13 @@ export function WalletDashboard() {
                   SDA
                 </span>
               </div>
-              <div className="flex items-center gap-2 text-sm font-medium text-primary mt-3">
-                <TrendingUp className="h-4 w-4" />
-                <span>+$2,345.50 (5.5%)</span>
-                <span className="text-muted-foreground font-normal">last 24h</span>
-              </div>
+              {SDA_CHANGE && (
+                <div className="flex items-center gap-2 text-sm font-medium text-primary mt-3">
+                  <TrendingUp className="h-4 w-4" />
+                  <span>{SDA_CHANGE}</span>
+                  <span className="text-muted-foreground font-normal">last 24h</span>
+                </div>
+              )}
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4 relative z-10">
@@ -313,6 +316,7 @@ export function WalletDashboard() {
               <Button
                 variant="link"
                 size="sm"
+                onClick={() => router.push("/app/trends")}
                 className="font-semibold text-primary cursor-pointer p-0 h-auto hover:no-underline"
               >
                 View All
@@ -326,7 +330,7 @@ export function WalletDashboard() {
                     <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-border bg-background shadow-xs">
                       <Image
                         src="/token_sdr.png"
-                        alt="Sidra identity matrix graphical icon"
+                        alt="SDA token icon"
                         fill
                         sizes="48px"
                         className="object-cover"
@@ -404,7 +408,7 @@ export function WalletDashboard() {
                   </p>
                 </div>
               )}
-              {/* Dynamic Ingested Active Escrows Render Target Loop */}
+              {/* Escrow list */}
               {!isLoadingEscrows &&
                 !escrowsError &&
                 escrows.slice(0, 5).map((escrow) => {

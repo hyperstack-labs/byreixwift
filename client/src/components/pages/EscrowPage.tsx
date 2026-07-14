@@ -376,7 +376,7 @@ export function EscrowPage() {
                   onClick={() => setMode("simulation")}
                   className={`px-3 py-1.5 rounded-lg border transition-all duration-200 cursor-pointer ${
                     mode === "simulation"
-                      ? "bg-neutral-800 text-white-400 border-neutral-700/50 shadow-md font-bold"
+                      ? "bg-neutral-800 text-gray-400 border-neutral-700/50 shadow-md font-bold"
                       : "bg-transparent text-neutral-500 border-transparent hover:text-neutral-300 font-bold"
                   }`}
                 >

@@ -164,10 +164,10 @@ export function TrendViewPage() {
             <div className="absolute inset-0 flex flex-col items-center justify-center rounded-xl bg-background/50 border border-red-500/20 p-6 text-center">
               <AlertCircle className="w-10 h-10 text-red-500 mb-3" />
               <h4 className="text-base font-bold tracking-tight text-foreground">
-                Failed to Sync Market Metrics
+                Failed to load data
               </h4>
               <p className="text-xs text-muted-foreground max-w-xs mt-1">
-                A connection issue occurred while fetching trend data.
+                Could not fetch trend data.
               </p>
               <Button
                 variant="outline"
@@ -205,9 +205,9 @@ export function TrendViewPage() {
               <div className="w-12 h-12 rounded-full bg-muted/40 flex items-center justify-center mb-3">
                 <span className="text-sm font-black text-muted-foreground">?</span>
               </div>
-              <h4 className="text-sm font-bold tracking-tight">No Historical Index Found</h4>
+              <h4 className="text-sm font-bold tracking-tight">No data available</h4>
               <p className="text-xs text-muted-foreground mt-0.5">
-                There is currently no trend metadata parsed within this specific timeframe.
+                No data available for the selected timeframe.
               </p>
             </div>
           ) : (
@@ -289,7 +289,7 @@ export function TrendViewPage() {
         {tokenError ? (
           <div className="flex flex-col items-center justify-center p-8 rounded-xl border border-red-500/20 bg-red-500/5 text-red-500 text-center">
             <AlertCircle className="w-8 h-8 mb-3" />
-            <p className="text-sm font-medium">Could not retrieve watchlists.</p>
+            <p className="text-sm font-medium">Could not load tokens.</p>
             <Button
               variant="outline"
               size="sm"

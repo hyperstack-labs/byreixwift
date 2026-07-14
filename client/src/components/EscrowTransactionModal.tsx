@@ -1,6 +1,6 @@
 "use client";
 
-import { type ElementType } from "react";
+import { type ElementType, useState } from "react";
 import { Button } from "@/components/ui";
 import {
   Loader2,
@@ -203,6 +203,33 @@ export function EscrowTransactionModal({
 }: TransactionModalProps) {
   const cfg = STATE_CONFIG[escrow.state];
   const canAct = escrow.state === "pending" || escrow.state === "locked";
+  const [confirmAction, setConfirmAction] = useState<string | null>(null);
+
+  const handleAction = (action: string) => {
+    setConfirmAction(null);
+    if (action === "lock") onLock();
+    if (action === "release") onRelease();
+    if (action === "refund") onRefund();
+  };
+
+  const confirmLabels: Record<string, { title: string; description: string; button: string }> = {
+    lock: {
+      title: "Lock funds",
+      description:
+        "This will lock the escrow funds in the smart contract. This action cannot be undone.",
+      button: "Confirm Lock",
+    },
+    release: {
+      title: "Release funds",
+      description: "This will release the funds to the seller. This action cannot be undone.",
+      button: "Confirm Release",
+    },
+    refund: {
+      title: "Refund escrow",
+      description: "This will return the funds to the buyer. This action cannot be undone.",
+      button: "Confirm Refund",
+    },
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -230,7 +257,7 @@ export function EscrowTransactionModal({
 
               {/* Dynamic state environment mode indicators */}
               {mode === "simulation" ? (
-                <span className="text-[10px] px-2 py-0.5 uppercase tracking-wider font-bold rounded-full bg-violet-500/10 text-white-400 border border-gray-500/20">
+                <span className="text-[10px] px-2 py-0.5 uppercase tracking-wider font-bold rounded-full bg-violet-500/10 text-gray-400 border border-gray-500/20">
                   Simulation
                 </span>
               ) : (
@@ -380,14 +407,50 @@ export function EscrowTransactionModal({
           </div>
         </div>
 
+        {/* Confirmation overlay */}
+        {confirmAction && (
+          <div className="border-t border-border p-5 flex flex-col gap-3 shrink-0 bg-card animate-in fade-in slide-in-from-bottom-2 duration-200">
+            <div className="flex items-start gap-2 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+              <AlertCircle className="w-4 h-4 text-yellow-500 mt-0.5 shrink-0" />
+              <div className="text-sm">
+                <p className="font-medium text-yellow-200">{confirmLabels[confirmAction].title}</p>
+                <p className="text-muted-foreground mt-1 text-xs">
+                  {confirmLabels[confirmAction].description}
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setConfirmAction(null)}
+                className="flex-1 border-border h-11 cursor-pointer"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => handleAction(confirmAction)}
+                className={`flex-1 h-11 cursor-pointer ${
+                  confirmAction === "release"
+                    ? "bg-primary hover:bg-primary/90 text-primary-foreground"
+                    : confirmAction === "lock"
+                      ? "bg-amber-600 hover:bg-amber-700 text-white"
+                      : "bg-blue-600 hover:bg-blue-700 text-white"
+                }`}
+              >
+                {confirmLabels[confirmAction].button}
+              </Button>
+            </div>
+          </div>
+        )}
+
         {/* Footer actions */}
-        {canAct && (
+        {canAct && !confirmAction && (
           <div className="border-t border-border p-5 flex flex-col sm:flex-row gap-3 shrink-0 bg-card">
             {escrow.state === "pending" && (
               <Button
                 size="lg"
                 disabled={isMutating}
-                onClick={onLock}
+                onClick={() => setConfirmAction("lock")}
                 className="bg-amber-600 hover:bg-amber-700 text-white flex-1 transition-all cursor-pointer"
               >
                 {isMutating ? (
@@ -402,7 +465,7 @@ export function EscrowTransactionModal({
               <Button
                 size="lg"
                 disabled={isMutating}
-                onClick={onRelease}
+                onClick={() => setConfirmAction("release")}
                 className="bg-primary hover:bg-primary/90 text-primary-foreground flex-1 transition-all cursor-pointer"
               >
                 {isMutating ? (
@@ -417,7 +480,7 @@ export function EscrowTransactionModal({
               size="lg"
               variant="outline"
               disabled={isMutating}
-              onClick={onRefund}
+              onClick={() => setConfirmAction("refund")}
               className="border-border hover:bg-secondary flex-1 transition-all cursor-pointer"
             >
               {isMutating ? (

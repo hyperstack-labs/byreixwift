@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ArrowUpRight, Github, MessageSquareText, ShieldCheck } from "lucide-react";
+import { ArrowUpRight, Github, Mail, MessageSquareText, ShieldCheck } from "lucide-react";
 import { PublicSiteShell } from "@/components/public/PublicSiteShell";
 import {
   PublicGlassPanel,
@@ -10,6 +10,13 @@ import {
 } from "@/components/public/PublicPagePrimitives";
 
 const contactRoutes = [
+  {
+    title: "Email the team",
+    description:
+      "Send a direct message to the product team for partnership, compliance, or implementation questions.",
+    href: "mailto:contact@byreixwift.com",
+    icon: Mail,
+  },
   {
     title: "SidraStart project page",
     description:

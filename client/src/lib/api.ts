@@ -21,7 +21,12 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    const authRoutes = ["/auth/verify", "/auth/nonce", "/auth/refresh"];
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !authRoutes.some((route) => originalRequest.url?.includes(route))
+    ) {
       originalRequest._retry = true;
       try {
         const { data } = await axios.post<{ accessToken: string }>(
