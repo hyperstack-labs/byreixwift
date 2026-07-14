@@ -676,7 +676,7 @@ export function LandingPage({ onConnect }: LandingPageProps) {
 
             <p className="mt-4.5 max-w-xl text-[0.98rem] leading-[1.72] text-muted-foreground sm:mt-5.5 sm:text-[1.03rem] lg:text-[1.08rem]">
               Preview every transaction, verify merchant identities, and reveal hidden fees before
-              you sign. Deploy escrow on-demand to protect your high-value peer-to-peer deals.
+              you sign.                 Know what you're signing before you sign it.
             </p>
 
             <div className="mt-6 flex w-full max-w-lg flex-col gap-3 sm:mt-7 sm:w-auto sm:max-w-none sm:flex-row sm:justify-center">
@@ -711,8 +711,7 @@ export function LandingPage({ onConnect }: LandingPageProps) {
                 Digital payments are easy to start and hard to verify.
               </h2>
               <p className="mt-4 max-w-[34rem] text-[0.98rem] leading-[1.68] text-muted-foreground sm:mt-6 sm:text-lg">
-                Fees, settlement terms, and trust gaps still show up too late. ByReiXwift is being
-                built so you can review the deal before money moves.
+                Fees and terms show up after you sign. ByReiXwift flips that: review before you pay.
               </p>
             </div>
 
@@ -860,9 +859,10 @@ export function LandingPage({ onConnect }: LandingPageProps) {
                 <motion.article
                   key={pillar.title}
                   {...sectionReveal(reducedMotion, 0.04 * index)}
-                  className={`${contentCardClass} p-4.5 transition-[transform,border-color,background-color,box-shadow] duration-300 hover:-translate-y-1 hover:border-[rgba(223,194,141,0.2)] hover:shadow-[0_18px_42px_rgba(0,0,0,0.18)] sm:p-6`}
+                  className={`${contentCardClass} relative p-4.5 pt-0 transition-[transform,border-color,background-color,box-shadow] duration-300 hover:-translate-y-1 hover:border-[rgba(223,194,141,0.2)] hover:shadow-[0_18px_42px_rgba(0,0,0,0.18)] sm:p-6 sm:pt-0`}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="h-1.5 w-full rounded-t-[1.7rem] bg-linear-to-r from-primary/40 to-[--byreix-gold-soft]/40 sm:rounded-t-[2rem]" />
+                  <div className="mt-4 flex items-center gap-3 sm:mt-5">
                     <Icon className="h-[1.05rem] w-[1.05rem] shrink-0 text-primary/88" />
                     <h3 className="text-[1.35rem] font-semibold text-foreground sm:text-2xl">
                       {pillar.title}
@@ -884,9 +884,7 @@ export function LandingPage({ onConnect }: LandingPageProps) {
             className="mt-6 border-t border-white/8 pt-5 sm:px-1"
           >
             <p className="text-sm leading-relaxed text-muted-foreground">
-              <span className="font-semibold text-foreground">Supporting capability:</span> swap
-              support can complement a payment flow when conversion matters, but it stays secondary
-              to the review experience.
+              Swap conversion is available when you need it.
             </p>
           </motion.div>
         </div>
@@ -971,8 +969,7 @@ export function LandingPage({ onConnect }: LandingPageProps) {
               Use escrow when trust needs structure.
             </h2>
             <p className="mt-4 max-w-[34rem] text-[0.98rem] leading-[1.68] text-muted-foreground sm:mt-6 sm:text-lg">
-              When a payment needs more structure, lock it first and release or refund with a clear
-              state.
+              Lock funds, release on completion, or refund if terms aren't met. State is always visible.
             </p>
             <div className={`mt-7 ${contentCardClass} p-4.5 sm:mt-8 sm:p-6`}>
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary/85">
@@ -1002,9 +999,10 @@ export function LandingPage({ onConnect }: LandingPageProps) {
               return (
                 <article
                   key={state.title}
-                  className={`${contentCardClass} self-start p-3.5 transition-[transform,border-color,background-color,box-shadow] duration-300 hover:-translate-y-1 hover:border-primary/18 hover:shadow-[0_18px_40px_rgba(0,0,0,0.16)] sm:p-4.5`}
+                  className={`${contentCardClass} self-start p-3.5 pt-0 transition-[transform,border-color,background-color,box-shadow] duration-300 hover:-translate-y-1 hover:border-primary/18 hover:shadow-[0_18px_40px_rgba(0,0,0,0.16)] sm:p-4.5 sm:pt-0`}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="h-1 w-full rounded-t-[1.7rem] bg-primary/30 sm:rounded-t-[2rem]" />
+                  <div className="mt-3.5 flex items-center gap-3 sm:mt-4">
                     <Icon className="h-[1.05rem] w-[1.05rem] shrink-0 text-primary/88" />
                     <h3 className="text-[1.4rem] font-semibold tracking-tight text-foreground sm:text-[1.55rem]">
                       {state.title}
@@ -1024,36 +1022,69 @@ export function LandingPage({ onConnect }: LandingPageProps) {
         className="px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20"
       >
         <div
-          className={`mx-auto grid max-w-6xl gap-7 ${sectionWrapClass} px-4.5 py-7 sm:gap-10 sm:px-8 sm:py-10 lg:grid-cols-[0.88fr_1.12fr] lg:gap-14 lg:px-10`}
+          className={`mx-auto max-w-6xl ${sectionWrapClass} px-4.5 py-7 sm:px-8 sm:py-10 lg:px-10`}
         >
-          <motion.div {...sectionReveal(reducedMotion)} className="max-w-xl">
+          <motion.div
+            {...sectionReveal(reducedMotion)}
+            className="mx-auto flex max-w-2xl flex-col items-center text-center"
+          >
             <SectionLabel>Principles</SectionLabel>
             <h2 className="mt-4 text-[1.82rem] font-bold leading-[1.04] tracking-tight text-foreground sm:mt-6 sm:text-[2.55rem] lg:text-[3.25rem]">
-              The product has to earn its language.
+              Built around clear terms.
             </h2>
-            <p className="mt-4 max-w-[34rem] text-[0.98rem] leading-[1.68] text-muted-foreground sm:mt-6 sm:text-lg">
-              Clear fees, visible approval, understandable states, and honest governance should show
-              up in the product, not just the copy.
+            <p className="mt-4 text-[0.98rem] leading-[1.68] text-muted-foreground sm:mt-6 sm:text-lg">
+              Fees, approval, states, and governance are built into the product, not the marketing.
             </p>
           </motion.div>
 
           <motion.div
             {...sectionReveal(reducedMotion, 0.08)}
-            className={`space-y-3 ${contentCardClass} p-4 sm:p-5`}
+            className="mt-8 grid gap-3 sm:grid-cols-2 sm:grid-rows-2"
           >
-            {principles.map((principle) => (
-              <div
-                key={principle.title}
-                className={`flex flex-col gap-2 ${insetCardClass} px-4 py-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6`}
-              >
-                <div className="sm:max-w-60">
-                  <p className="text-sm font-semibold text-foreground">{principle.title}</p>
-                </div>
-                <p className="text-sm leading-relaxed text-muted-foreground sm:max-w-90 sm:text-right">
-                  {principle.copy}
-                </p>
+            <div
+              className={`${contentCardClass} col-span-2 p-4 sm:col-span-2 sm:p-5`}
+            >
+              <div className="flex items-center gap-2">
+                <div className="h-1 w-6 rounded-full bg-primary" />
+                <p className="text-sm font-semibold text-foreground">{principles[0].title}</p>
               </div>
-            ))}
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                {principles[0].copy}
+              </p>
+            </div>
+            <div
+              className={`${contentCardClass} p-4 sm:p-5`}
+            >
+              <div className="flex items-center gap-2">
+                <div className="h-1 w-6 rounded-full bg-[--byreix-gold-soft]" />
+                <p className="text-sm font-semibold text-foreground">{principles[1].title}</p>
+              </div>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                {principles[1].copy}
+              </p>
+            </div>
+            <div
+              className={`${contentCardClass} p-4 sm:p-5`}
+            >
+              <div className="flex items-center gap-2">
+                <div className="h-1 w-6 rounded-full bg-primary" />
+                <p className="text-sm font-semibold text-foreground">{principles[2].title}</p>
+              </div>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                {principles[2].copy}
+              </p>
+            </div>
+            <div
+              className={`${contentCardClass} col-span-2 p-4 sm:col-span-2 sm:p-5`}
+            >
+              <div className="flex items-center gap-2">
+                <div className="h-1 w-6 rounded-full bg-[--byreix-gold-soft]" />
+                <p className="text-sm font-semibold text-foreground">{principles[3].title}</p>
+              </div>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                {principles[3].copy}
+              </p>
+            </div>
           </motion.div>
         </div>
       </section>
@@ -1063,30 +1094,14 @@ export function LandingPage({ onConnect }: LandingPageProps) {
         className="px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20"
       >
         <div className="mx-auto grid max-w-6xl items-start gap-7 sm:gap-10 lg:grid-cols-[0.92fr_1.08fr] lg:gap-14">
-          <motion.div {...sectionReveal(reducedMotion)}>
+            <motion.div {...sectionReveal(reducedMotion)}>
             <SectionLabel>How It Works</SectionLabel>
             <h2 className="mt-4 text-[1.82rem] font-bold leading-[1.04] tracking-tight text-foreground sm:mt-6 sm:text-[2.55rem] lg:text-[3.25rem]">
-              A payment flow that stays readable.
+              Connect. Review. Approve.
             </h2>
             <p className="mt-4 max-w-[34rem] text-[0.98rem] leading-[1.68] text-muted-foreground sm:mt-6 sm:text-lg">
-              Connect when ready, review the details, then approve with context.
+              No blind signing. See the full details before any transaction goes through.
             </p>
-
-            <div className="mt-7 space-y-6 sm:mt-10 sm:space-y-8">
-              {workflowSteps.map((item) => (
-                <div key={item.step} className="flex gap-4 sm:gap-6">
-                  <div className="text-2xl font-black tracking-tight text-primary/30 sm:text-3xl">
-                    {item.step}
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-semibold text-foreground">{item.title}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                      {item.copy}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
           </motion.div>
 
           <div>
