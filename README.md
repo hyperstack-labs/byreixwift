@@ -1,5 +1,3 @@
-# ByReiXwift
-
 <p align="center">
   <img src="client/public/logo_transparent.png" alt="ByReiXwift Logo" width="250" />
 </p>
