@@ -2,7 +2,7 @@ import axios from "axios";
 import { useAuthStore } from "@/store";
 
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api",
+  baseURL: process.env.NEXT_PUBLIC_SIDRA_API_URL || "http://localhost:3001/api",
   withCredentials: true,
 });
 
@@ -30,7 +30,7 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       try {
         const { data } = await axios.post<{ accessToken: string }>(
-          `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api"}/auth/refresh`,
+          `${process.env.NEXT_PUBLIC_SIDRA_API_URL || "http://localhost:3001/api"}/auth/refresh`,
           {},
           { withCredentials: true }
         );
